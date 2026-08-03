@@ -1,21 +1,21 @@
-# Fairwave SIM profile — production.
+# Fairwave SIM profile - production.
 #
 # !!! MUST NOT RUN WITHOUT HSM/SECURE IMPORT !!!
 #
 # A prod profile assumes real, operator-assigned IMSI ranges and real Ki/OPc
 # material. The provisioner and control plane therefore REQUIRE, before any
 # prod issuance or activation:
-#   1. hsm_import  — Ki/OPc created inside an HSM-backed vault (or imported
+#   1. hsm_import  - Ki/OPc created inside an HSM-backed vault (or imported
 #                    through a secure key ceremony), never generated on the
 #                    issuing machine's disk.
-#   2. license_ref — a valid spectrum/operator license reference recorded
+#   2. license_ref - a valid spectrum/operator license reference recorded
 #                    with the issuance (audit trail, not a convenience).
 # If either gate is missing the control plane returns an error and refuses
 # to issue. Do not weaken these gates; they are the difference between a
 # community project and a regulatory incident.
 
 name: prod
-description: Operator production SIMs — HSM-gated issuance only.
+description: Operator production SIMs - HSM-gated issuance only.
 class: production
 
 requires:

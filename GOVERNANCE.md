@@ -5,11 +5,11 @@ wider contributor community.
 
 ## Roles
 
-- **Maintainer** — write access, merges PRs, cuts releases. Listed in [.github/CODEOWNERS](.github/CODEOWNERS).
-- **Committer** — can triage issues, review PRs (LGTM counts for small changes).
-- **Council** — makes scope, license, release, and spectrum-policy decisions. Seeks consensus.
-- **Contributor** — you! Open issues, discuss, PRs welcome.
-- **Users** — deployers, operators, and researchers. Your needs drive priority.
+- **Maintainer** - write access, merges PRs, cuts releases. Listed in [.github/CODEOWNERS](.github/CODEOWNERS).
+- **Committer** - can triage issues, review PRs (LGTM counts for small changes).
+- **Council** - makes scope, license, release, and spectrum-policy decisions. Seeks consensus.
+- **Contributor** - you! Open issues, discuss, PRs welcome.
+- **Users** - deployers, operators, and researchers. Your needs drive priority.
 
 ## Decision Making
 

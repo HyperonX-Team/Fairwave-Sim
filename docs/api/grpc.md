@@ -28,7 +28,7 @@ Proto services (names as defined in `api/proto/`):
 
 - Protos are linted and generated with **buf** in CI (`buf lint`, `buf generate`).
 - Generated stubs are committed in `api/gen/` so downstream consumers (agent, CLI, UI) build without buf locally.
-- Breaking proto changes require a new package version (`fairwave.v2`) — same rule as REST.
+- Breaking proto changes require a new package version (`fairwave.v2`) - same rule as REST.
 
 ## Current status and roadmap
 

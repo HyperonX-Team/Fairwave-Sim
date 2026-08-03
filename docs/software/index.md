@@ -17,10 +17,10 @@ Fairwave's software is split into repo paths (one repository, multiple component
 | `portal/` | Captive portal | web | onboarding for Wi-Fi calling / non-cellular devices |
 | `core/` | Open5GS stack | containers | EPC: MME/SGW/PGW/HSS/PCRF |
 | `ran/` | srsRAN stack | containers | eNB (and srsUE for lab) |
-| `compose/` | Docker Compose | — | single-command lab stack, v0.1 default |
+| `compose/` | Docker Compose | - | single-command lab stack, v0.1 default |
 | `docs/` | documentation | markdown | this site |
 | `design/` | design docs | markdown | roadmap, threat model, spectrum matrix |
-| `mkdocs.yml` | site config | — | docs rendering |
+| `mkdocs.yml` | site config | - | docs rendering |
 
 ## Control Plane Dependencies
 

@@ -8,10 +8,10 @@ This tutorial covers the operator-facing knobs: PLMN, TAC, APNs, bands, and cust
 
 > Fairwave defaults to lab/no-RF mode. Transmitting on cellular bands without proper authorization is illegal in most jurisdictions. You are solely responsible for licenses, SAS grants, indoor restrictions, and type approval. HyperonX and contributors provide software as-is for lawful private networks, research, and shared-spectrum regimes only.
 
-All configuration lives in YAML validated by JSON Schema — see [ADR-0012](../adr/0012-config-format.md). Two places matter:
+All configuration lives in YAML validated by JSON Schema - see [ADR-0012](../adr/0012-config-format.md). Two places matter:
 
-- `deployments/lab/config.yaml` — node/EPC configuration used in lab mode.
-- `deployments/prod/config.yaml` (template) — the same schema, meant for real deployments.
+- `deployments/lab/config.yaml` - node/EPC configuration used in lab mode.
+- `deployments/prod/config.yaml` (template) - the same schema, meant for real deployments.
 
 Environment variables override any key (prefix `FW_`, nested keys separated by `_`), so containers can be parameterized without editing files.
 
@@ -82,7 +82,7 @@ radio:
     - earfcn: 3450          # another carrier, same band or not
 ```
 
-> Adding an EARFCN only configures the stack; it does **not** authorize transmission. Real RF additionally requires the frequency to be inside the armed allow-list — see [spectrum gate ADR](../adr/0008-spectrum-gate.md) and the [spectrum matrix](/design/spectrum-matrix.md).
+> Adding an EARFCN only configures the stack; it does **not** authorize transmission. Real RF additionally requires the frequency to be inside the armed allow-list - see [spectrum gate ADR](../adr/0008-spectrum-gate.md) and the [spectrum matrix](/design/spectrum-matrix.md).
 
 ## Custom spectrum profile YAML
 

@@ -24,12 +24,12 @@ flowchart LR
 
 | Gate | Where | Fails closed? |
 |---|---|---|
-| Country code | `policy` record | yes — unset = no TX |
-| License acknowledgment | `policy` record | yes — recorded operator statement |
-| Band allow-list | `policy` | yes — EARFCN outside list refused |
-| EIRP cap | `policy` per band profile | yes — no cap, no arm |
-| `tx/arm` | `POST /v1/tx/arm` | yes — per-boot, re-required |
-| Agent `safe_tx` | agent asserts gate + rfkill state | yes — eNB process gated |
+| Country code | `policy` record | yes - unset = no TX |
+| License acknowledgment | `policy` record | yes - recorded operator statement |
+| Band allow-list | `policy` | yes - EARFCN outside list refused |
+| EIRP cap | `policy` per band profile | yes - no cap, no arm |
+| `tx/arm` | `POST /v1/tx/arm` | yes - per-boot, re-required |
+| Agent `safe_tx` | agent asserts gate + rfkill state | yes - eNB process gated |
 
 Lab mode (`zmq`, no RF) needs none of this; the gate only matters when a real SDR is configured.
 
@@ -37,7 +37,7 @@ Lab mode (`zmq`, no RF) needs none of this; the gate only matters when a real SD
 
 | Regime | Basis | Fairwave profile |
 |---|---|---|
-| US CBRS (3.5 GHz) | FCC Part 96, SAS | `cbrs` — certified path required |
+| US CBRS (3.5 GHz) | FCC Part 96, SAS | `cbrs` - certified path required |
 | UK Ofcom SAL (shared access) | individual/light-licensed | `community` with local check |
 | EU local licenses | national regimes (e.g. DE, FR, NL local/private licenses) | `community` |
 | Experimental / campus | research & experimentation licenses | `experimental` |
@@ -49,7 +49,7 @@ Details per region: `docs/spectrum-and-law/regional.md`.
 
 ## The `experimental` Profile
 
-The `experimental`/campus profile is a **reduced-power, confined-site, logged** profile: hard EIRP ceiling, indoor-only flag, site/registration field, mandatory audit logging. It exists so researchers can run lawful experiments without pretending to be a carrier. It does not create authority to transmit — it only encodes whatever authorization the operator already holds.
+The `experimental`/campus profile is a **reduced-power, confined-site, logged** profile: hard EIRP ceiling, indoor-only flag, site/registration field, mandatory audit logging. It exists so researchers can run lawful experiments without pretending to be a carrier. It does not create authority to transmit - it only encodes whatever authorization the operator already holds.
 
 ## Bottom Line
 

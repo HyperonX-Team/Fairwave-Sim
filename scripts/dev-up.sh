@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# dev-up.sh — bring up the full dev lab in one command.
+# dev-up.sh - bring up the full dev lab in one command.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 

@@ -13,7 +13,7 @@ title: Lab Attach Deep Dive
 > Linux it passes reliably; under Docker Desktop (Windows/macOS, WSL2) the
 > UE PHY can lose subframe sync (SYNC TRACK ret=-1) and the Attach Accept
 > delivery over the radio link fails even though the EPC side completes.
-> That is a host environment limitation, not a config bug — the exact same
+> That is a host environment limitation, not a config bug - the exact same
 > config is the reference topology used by the s5uishida Open5GS EPC +
 > srsRAN_4G sample configs on Linux hosts. Run the lab on native Linux for
 > the full data path.
@@ -87,7 +87,7 @@ Traffic exits via the PGW's NAT into your host network (local breakout), so exte
 | Control plane `state: degraded` | A container restarted | `docker compose ps`; check `fairwave doctor` output |
 | No logs from `ue` | Container exited (bad config) | `docker compose logs ue --tail 50`; look for config parse errors |
 
-When in doubt, run `fairwave doctor` — it checks containers, ports, ZMQ sockets, control-plane connectivity, and prints a pass/fail table.
+When in doubt, run `fairwave doctor` - it checks containers, ports, ZMQ sockets, control-plane connectivity, and prints a pass/fail table.
 
 ## Teardown hygiene
 
@@ -95,6 +95,6 @@ When in doubt, run `fairwave doctor` — it checks containers, ports, ZMQ socket
 make lab-down
 ```
 
-Removes containers and the compose network. The `sims/` output directory and Mongo data volume are intentionally **kept** — delete them explicitly when you are done with a campaign, and never commit their contents.
+Removes containers and the compose network. The `sims/` output directory and Mongo data volume are intentionally **kept** - delete them explicitly when you are done with a campaign, and never commit their contents.
 
 See also: [SIM issuance](../tutorials/sim-issue-first.md), [troubleshooting reference](../reference/troubleshooting.md).

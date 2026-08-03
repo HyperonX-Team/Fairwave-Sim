@@ -20,7 +20,7 @@ Fairwave targets lawful private networks, research, education, and shared-spectr
 
 ## Project facts
 
-- **Release:** v0.1.0 (lab) — no-RF virtual radio only.
+- **Release:** v0.1.0 (lab) - no-RF virtual radio only.
 - **Defaults:** PLMN `999-99`, TAC `7`, APNs `internet` and `ims`.
 - **Lab mode:** srsRAN eNB and srsUE over ZMQ virtual radio inside Docker; no SDR touched.
 - **TX gate:** real RF requires the `tx_arm` gate: country code + license acknowledgment + frequency allow-list, all three set.
@@ -39,7 +39,7 @@ Fairwave targets lawful private networks, research, education, and shared-spectr
 | Operator security | [Security overview](security/index.md) · [Operator auth](security/operator-auth.md) · [Privacy](security/privacy.md) · [Release signing](security/release-signing.md) |
 | APIs | [API overview](api/index.md) · [REST reference](api/rest.md) · [gRPC note](api/grpc.md) · `api/openapi.yaml` |
 | Reference | [Glossary](reference/glossary.md) · [Troubleshooting](reference/troubleshooting.md) · [Regulator FAQ](reference/faq-regulators.md) · [Carrier FAQ](reference/faq-carriers.md) · [What Fairwave is NOT](reference/not-fairwave.md) |
-| Decisions | [ADR index](adr/0002-4g-first.md) and siblings — ADR-0001, 0003–0012 |
+| Decisions | [ADR index](adr/0002-4g-first.md) and siblings - ADR-0001, 0003–0012 |
 | Design documents | `/design/threat-model.md`, `/design/spectrum-matrix.md`, `/design/roadmap.md` (mirrored in nav) |
 
 ```mermaid
@@ -59,4 +59,4 @@ flowchart LR
 
 Follow the [30-minute no-RF quickstart](tutorials/quickstart-no-rf.md). It boots a complete EPC with a virtual eNB and UE on your laptop and ends with a live attach and a clean teardown.
 
-If you plan to touch anything that could emit RF, read the [spectrum gate ADR](adr/0008-spectrum-gate.md), the [spectrum matrix](/design/spectrum-matrix.md), and the regulatory FAQ first — and remember the banner at the top of this page.
+If you plan to touch anything that could emit RF, read the [spectrum gate ADR](adr/0008-spectrum-gate.md), the [spectrum matrix](/design/spectrum-matrix.md), and the regulatory FAQ first - and remember the banner at the top of this page.

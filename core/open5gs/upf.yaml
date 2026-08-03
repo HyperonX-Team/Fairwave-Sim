@@ -1,5 +1,5 @@
-# Fairwave Open5GS v2.7.x — UPF (lab, ZMQ virtual). Loopback 127.0.0.7.
-# dev: ogstun — the tun interface carrying UE data; created by the
+# Fairwave Open5GS v2.7.x - UPF (lab, ZMQ virtual). Loopback 127.0.0.7.
+# dev: ogstun - the tun interface carrying UE data; created by the
 # entrypoint. The lab never transmits on RF.
 logger:
   file:

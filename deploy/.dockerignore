@@ -2,7 +2,7 @@
 #
 # Applies to builds whose context is deploy/ (open5gs + srsran images,
 # see docker-compose.yml). The control-plane image builds from the repo root
-# (context: ..) — consider adding a matching root-level .dockerignore so the
+# (context: ..) - consider adding a matching root-level .dockerignore so the
 # whole repo is not shipped as build context.
 
 .git
@@ -16,7 +16,7 @@ hw/
 sim/
 core/
 
-# Other deployment trees — not needed by the lab images
+# Other deployment trees - not needed by the lab images
 helm/
 ansible/
 terraform/

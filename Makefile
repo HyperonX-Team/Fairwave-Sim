@@ -1,4 +1,4 @@
-# Fairwave — community carrier in a pizza box
+# Fairwave - community carrier in a pizza box
 # Targets: bootstrap, check, lab-up/down, docs, release.
 
 SHELL := /bin/bash

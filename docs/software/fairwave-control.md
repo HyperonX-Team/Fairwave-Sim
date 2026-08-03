@@ -85,7 +85,7 @@ Either way the API is the same: `GET /v1/healthz` proves liveness, `GET /v1/stat
 
 1. `fairwave node init` (CLI) → identity + mesh CA generated.
 2. `fairwave node register` → enrollment, lifecycle → `register`.
-3. Set policy (`fairwave policy set`) — APNs, band allow-list.
+3. Set policy (`fairwave policy set`) - APNs, band allow-list.
 4. Arm TX only when a real legal basis exists (`POST /v1/tx/arm`); for lab, leave it off.
 
 ## Related

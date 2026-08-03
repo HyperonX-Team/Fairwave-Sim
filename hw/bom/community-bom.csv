@@ -1,4 +1,4 @@
-# Fairwave community-build BOM — cost-optimized tier, one unit, USD, Q3-2026.
+# Fairwave community-build BOM - cost-optimized tier, one unit, USD, Q3-2026.
 # Community tier targets ~$600 total. Budget SDRs below are for lab/community
 # trials only: transmit eligibility still requires the full RF gate.
 part,qty,unit_usd,vendor_hint,notes

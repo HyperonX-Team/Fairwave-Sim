@@ -27,7 +27,7 @@ Full IMSI in logs was a risk; hashing with a full SHA-256 was a usability risk (
 
 Positive:
 
-- An exposed log set does not enumerate subscribers; correlation to a real person requires knowledge of the IMSI (and building a local mapping — which is the operator's lawful metadata, not the project's).
+- An exposed log set does not enumerate subscribers; correlation to a real person requires knowledge of the IMSI (and building a local mapping - which is the operator's lawful metadata, not the project's).
 - 12-hex truncation is short enough to paste/eyeball and long enough to make casual brute-forcing over the full IMSI space expensive-ish, while *documented* as not a security boundary for a determined adversary.
 - Regulators and carriers get a concrete, auditable claim: "no cleartext IMSI in observability."
 
@@ -39,10 +39,10 @@ Negative:
 
 ## Alternatives Considered
 
-- **Full SHA-256 of IMSI:** rejected — no operational difference for legitimate correlation, and implies stronger identity guarantees than it delivers.
-- **Random per-SIM opaque IDs:** rejected — breaks cross-record correlation that operators need (same SIM across sessions).
-- **Plaintext IMSI in internal-only logs:** rejected — logs leak through copy/paste and support requests; the rule must be structural, not "internal only".
-- **No identifiers at all:** rejected — operations (revocation, troubleshooting) become impossible.
+- **Full SHA-256 of IMSI:** rejected - no operational difference for legitimate correlation, and implies stronger identity guarantees than it delivers.
+- **Random per-SIM opaque IDs:** rejected - breaks cross-record correlation that operators need (same SIM across sessions).
+- **Plaintext IMSI in internal-only logs:** rejected - logs leak through copy/paste and support requests; the rule must be structural, not "internal only".
+- **No identifiers at all:** rejected - operations (revocation, troubleshooting) become impossible.
 
 ## Related
 

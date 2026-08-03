@@ -4,7 +4,7 @@ title: eSIM and LPA
 
 # eSIM and LPA: What Fairwave Supports, Honestly
 
-This page is deliberately honest about eSIM. The GSMA ecosystem around eSIM — the LPA (Local Profile Assistant), the SM-DP+ servers that generate profiles, and the RSP (Remote SIM Provisioning) protocol — is largely proprietary and licensing-bound. Fairwave does not pretend otherwise.
+This page is deliberately honest about eSIM. The GSMA ecosystem around eSIM - the LPA (Local Profile Assistant), the SM-DP+ servers that generate profiles, and the RSP (Remote SIM Provisioning) protocol - is largely proprietary and licensing-bound. Fairwave does not pretend otherwise.
 
 ## What the GSMA ecosystem is
 
@@ -19,7 +19,7 @@ This page is deliberately honest about eSIM. The GSMA ecosystem around eSIM — 
 
 ## What Fairwave does support
 
-1. **Activation/QR code generation.** For provisioning workflows, the operator UI and `fairwave sim issue` can emit an activation code in the `LPA:1$smdp://...$...` shape, plus a QR rendering, for *handset-side capture*. The code references a profile that still has to be made available through a real SM-DP+ — Fairwave generates the paperwork, not the backend.
+1. **Activation/QR code generation.** For provisioning workflows, the operator UI and `fairwave sim issue` can emit an activation code in the `LPA:1$smdp://...$...` shape, plus a QR rendering, for *handset-side capture*. The code references a profile that still has to be made available through a real SM-DP+ - Fairwave generates the paperwork, not the backend.
 2. **Lab profile note.** In lab mode, the LPA/QR is purely cosmetic scaffolding: the virtual UE uses HSS credentials directly, never eUICC download. Treat QR output as a format demo until a real SM-DP+ backend exists.
 3. **Pre-provisioned eUICC with physical profile injection (future).** Some eUICC vendors support injecting a profile at the factory alongside physical personalization. The bureau workflow (see [bureau runbook](bureau-runbook.md)) can carry an "eUICC lot" variant of the bundle; this is the most realistic eSIM path for community networks today.
 
@@ -27,7 +27,7 @@ This page is deliberately honest about eSIM. The GSMA ecosystem around eSIM — 
 
 - No production RSP server (no SM-DP+ implementation, no GSMA certification).
 - No claim of interoperability with operator eSIM catalogs.
-- No LPA implementation — that runs on the handset, out of our control.
+- No LPA implementation - that runs on the handset, out of our control.
 - No bypassing of device/OS eSIM approval flows.
 
 ## Alternatives to a full SM-DP+
@@ -35,9 +35,9 @@ This page is deliberately honest about eSIM. The GSMA ecosystem around eSIM — 
 If you need eSIM in production, options, in rough order of practicality:
 
 1. **Factory-injected eUICC profiles** via your card bureau (works today, matches the bundle flow).
-2. **A commercial SM-DP+ service** — your IMSI ranges and profiles are hosted by a certified provider; Fairwave's provisioner output is the source data you upload to them (CSV/JSON interchange).
-3. **A community "virtual operator" arrangement** — a licensed MVNO/MVNE partner hosts profiles; you keep the network, they keep RSP compliance.
-4. **Plain physical SIMs** — the honest default for community networks; see the bureau runbook.
+2. **A commercial SM-DP+ service** - your IMSI ranges and profiles are hosted by a certified provider; Fairwave's provisioner output is the source data you upload to them (CSV/JSON interchange).
+3. **A community "virtual operator" arrangement** - a licensed MVNO/MVNE partner hosts profiles; you keep the network, they keep RSP compliance.
+4. **Plain physical SIMs** - the honest default for community networks; see the bureau runbook.
 
 ## Timeline
 

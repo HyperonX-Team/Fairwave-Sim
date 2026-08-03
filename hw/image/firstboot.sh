@@ -33,7 +33,7 @@ if [[ ! -f /etc/ssh/ssh_host_ed25519_key ]]; then
 fi
 
 # 3. Control-plane config seed (identity arrives from the bundle; keys and
-#    secrets live in /etc/fairwave/env — mode 0600).
+#    secrets live in /etc/fairwave/env - mode 0600).
 mkdir -p /etc/fairwave /var/lib/fairwave /var/lib/fairwave-agent
 cat > /etc/fairwave/fairwave-control.yaml <<EOF
 version: 1
@@ -69,4 +69,4 @@ systemctl enable fairwave-control.service fairwave-agent.service
 # 7. Consume the bundle, disable this script.
 rm -f "${ENV_FILE}"
 systemctl disable fairwave-firstboot.service 2>/dev/null || true
-echo "[firstboot] provisioning complete — TX remains OFF until the RF gate is passed."
+echo "[firstboot] provisioning complete - TX remains OFF until the RF gate is passed."

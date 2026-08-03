@@ -171,7 +171,7 @@ func WriteJSON(path string, subs []Subscriber) error {
 //
 // IMPORTANT: these exact (Ki, OPc) pairs are duplicated in
 // sim/test-vectors/lab-vectors.yaml, core/open5gs/hss-init.sh and
-// deploy/docker/srs-entry.sh. They are static public dummy values — the
+// deploy/docker/srs-entry.sh. They are static public dummy values - the
 // OPc entries are deliberately NOT derived via DeriveOPc so that the
 // vector file is self-contained and auditable.
 func LabTestVectors() []Subscriber {
@@ -182,7 +182,7 @@ func LabTestVectors() []Subscriber {
 	}
 }
 
-// LoadTestVector returns a lab vector as stored (OPc kept verbatim — see
+// LoadTestVector returns a lab vector as stored (OPc kept verbatim - see
 // the comment on LabTestVectors).
 func LoadTestVector(imsi string) (Subscriber, error) {
 	for _, s := range LabTestVectors() {

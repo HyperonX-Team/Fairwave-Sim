@@ -14,7 +14,7 @@ The provisioner (part of `fairwave-cli sim issue`) generates subscriber credenti
 | `--profile` | `lab` or `prod` | Profile bundle (APNs, lifetimes, IMSI prefix) |
 | `--prefix` | `9999912` | IMSI prefix (must be ≤ 15 digits total) |
 | `--label` | `floor3-lot1` | Operator metadata, never sent to the EPC |
-| (implicit) | — | Cluster KEK (env `FW_SIM_KEK` or HSM path) |
+| (implicit) | - | Cluster KEK (env `FW_SIM_KEK` or HSM path) |
 
 IMSI construction: `prefix + serial` padded to exactly 15 digits. The provisioner refuses a prefix that would overflow 15 digits and refuses to mix prefixes within one run.
 
@@ -82,7 +82,7 @@ The provisioner is fully offline-capable: no API calls, no telemetry, no DNS. Ne
 - Full Ki/OPc exist only in the encrypted vault and briefly in process memory during minting/loading.
 - Never committed: the provisioner refuses to run if the output directory is inside a git working tree without `--force-offline` and a warning.
 - KEK handling: `FW_SIM_KEK` env or HSM slot; KEK never written to any file by the provisioner.
-- Audit: every issue/load records principal, count, prefix, profile, artifact hashes — no credential material.
+- Audit: every issue/load records principal, count, prefix, profile, artifact hashes - no credential material.
 
 ## Related
 

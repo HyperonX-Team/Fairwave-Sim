@@ -1,7 +1,7 @@
 # Fairwave Roadmap
 
 > [!IMPORTANT]
-> **Legal banner** — Fairwave defaults to lab/no-RF mode. Roadmap numbers are aspirational;
+> **Legal banner** - Fairwave defaults to lab/no-RF mode. Roadmap numbers are aspirational;
 > nothing is permitted to bypass spectrum gates.
 
 ## Milestone Overview
@@ -18,41 +18,41 @@
 
 ## Detailed gates
 
-### M0 — v0.1.0 (lab)
+### M0 - v0.1.0 (lab)
 - Open5GS + srsRAN in zmq mode attach on CI
 - `fairwave node init`/`status`/`sim issue --lab`
 - Operator UI skeleton + captive portal
 - Threat model + ADRs + spectrum matrix draft
 - Pre-commit / CI / SBOM / cosign-signed containers
 
-### M1 — v0.2.0 (SIM ops)
+### M1 - v0.2.0 (SIM ops)
 - Offline-first provisioner batch CSV/JSON for card bureaus
 - QR/activation-code generator (lab-only profiles only)
 - HSS/UDM write-back via REST hook (no private Ki/OPc → web processes)
 - CLI: `fairwave sim revoke`, `fairwave sim list`
 
-### M2 — v0.3.0 (peering)
+### M2 - v0.3.0 (peering)
 - mDNS rendezvous, optional static peer seeds
 - mTLS certificate issuance per node via control-plane CA
 - WireGuard full-mesh at up to 5 nodes; beyond 5, hub-and-spoke guide
 - Route exchange: UE pools advertised via labels (BGP-lite)
 
-### M3 — v0.4.0 (hardware)
+### M3 - v0.4.0 (hardware)
 - BOM tiers: Dev (mini-PC+SDR), Community (NUC/CM4+HAT), CBRS (with certified radio)
 - Golden image scripts: Debian Bookworm, locked kernel, isolcpus, hugepages, rfkill off
 - Enclosure docs + thermals + GPSDO outline
 
-### M4 — v0.5.0 (CBRS/SAS)
+### M4 - v0.5.0 (CBRS/SAS)
 - Region flags: `--region=US-CBRS`
 - SAS client interface + mock implementation
 - Docs: how to contract with a certified SAS provider; build-time go tag `-tags cbrs`
 
-### M5 — v0.6.0 (ePDG)
-- Open ePDG integration (strongSwan ePDG profile) — lab mode + operator-authored config
+### M5 - v0.6.0 (ePDG)
+- Open ePDG integration (strongSwan ePDG profile) - lab mode + operator-authored config
 - Docs: lawful-intercept caveats, emergency-call routing
 - Real-world pilot: **`lab-pilot` profile only**
 
-### M6 — v0.7.0 (neutral host)
+### M6 - v0.7.0 (neutral host)
 - Multi-PLMN broadcasting in lab
 - Roaming SEPP/IPX stubs (docs-only; never shipped)
 - Compliance guidance docs

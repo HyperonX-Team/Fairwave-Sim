@@ -22,14 +22,14 @@ LMS7002M channels and sample rates.
   master clock selection). Probe: `SoapySDRUtil --probe="driver=lime"` shows
   supported rates.
 - Gain settings are per-channel (`tx_gain` in srsENB `[rf]` maps to the
-  Lime TX gain in dB). Start 60 dB RX-ish, 50 dB TX in RF tier — and again:
+  Lime TX gain in dB). Start 60 dB RX-ish, 50 dB TX in RF tier - and again:
   **no TX before the RF gate.**
 
 ## Synchronization / multi-unit
 
 - LimeSDR-mini has no onboard GPSDO or external 10 MHz input. For anything
   synchronized (SFN alignment between cells, phase-coherent MIMO), you need
-  an external 10 MHz+PPS into the board — which the mini does not expose.
+  an external 10 MHz+PPS into the board - which the mini does not expose.
   This is why the CBRS tier uses the B210 + GPSDO instead.
 - Two LimeSDRs on one host share USB; check `SoapySDRUtil --find` lists both
   and pass `soapy="driver=lime,serial=<serial>"` to disambiguate.

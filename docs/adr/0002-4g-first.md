@@ -11,7 +11,7 @@ title: ADR-0002: 4G First, 5G Gated
 
 ## Context
 
-Fairwave's target users — community networks, labs, private small cells — overwhelmingly operate (or can lawfully operate) 4G LTE spectrum today: CBRS GAA in the US, ISM-adjacent and licensed-private LTE bands elsewhere. 5G SA/NSA brings higher complexity (NR NRU/FR2 configs, SBA core, new gNB stacks) and no widening of lawful-spectrum access for these users. The team's core competency and the Open5GS/srsRAN ecosystem (ADR-0001, ADR-0009) are LTE-mature and NR-immature.
+Fairwave's target users - community networks, labs, private small cells - overwhelmingly operate (or can lawfully operate) 4G LTE spectrum today: CBRS GAA in the US, ISM-adjacent and licensed-private LTE bands elsewhere. 5G SA/NSA brings higher complexity (NR NRU/FR2 configs, SBA core, new gNB stacks) and no widening of lawful-spectrum access for these users. The team's core competency and the Open5GS/srsRAN ecosystem (ADR-0001, ADR-0009) are LTE-mature and NR-immature.
 
 ## Decision
 
@@ -37,9 +37,9 @@ Negative:
 
 ## Alternatives Considered
 
-- **5G-first (NR SA):** rejected — no lawful-spectrum case for target users, ecosystem immature, scope blowup before v0.1.
-- **Dual-stack from day one:** rejected — doubles test matrix and integration cost for zero v0.1 user value; flags allow later without re-architecture.
-- **NSA-only (LTE anchor + NR data):** deferred — requires 5G core elements (AMF/UDM paths) that milestone M0–M6 does not schedule; revisit only with a licensed partner.
+- **5G-first (NR SA):** rejected - no lawful-spectrum case for target users, ecosystem immature, scope blowup before v0.1.
+- **Dual-stack from day one:** rejected - doubles test matrix and integration cost for zero v0.1 user value; flags allow later without re-architecture.
+- **NSA-only (LTE anchor + NR data):** deferred - requires 5G core elements (AMF/UDM paths) that milestone M0–M6 does not schedule; revisit only with a licensed partner.
 
 ## Related
 

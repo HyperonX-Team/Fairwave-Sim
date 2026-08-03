@@ -1,7 +1,7 @@
 # Fairwave hardware BOM tiers
 
 Three build tiers; all prices are Q3-2026 street estimates in USD, qty-1,
-before shipping/tax. `vendor_hint` is a hint, not an endorsement — a BOM is
+before shipping/tax. `vendor_hint` is a hint, not an endorsement - a BOM is
 never a purchase order. **All tiers are receive-capable in lab mode; transmit
 requires the full RF gate (country + license acknowledgment + band
 allow-list) regardless of what hardware is installed.**

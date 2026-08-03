@@ -37,7 +37,7 @@ Telemetry in Fairwave is local-first and privacy-aware: no IMSI, no subscriber c
 ## Tracing (Stub)
 
 - OpenTelemetry is stubbed in v0.1: `FAIRWAVE_OTEL_ENDPOINT` is read, spans are sketched for the reconcile loop and API calls, but no exporter is wired. The endpoint config exists to keep the tracing contract stable across releases (see `design/roadmap.md`).
-- Do not deploy OTLP collectors expecting working traces in v0.1 — it is not implemented yet.
+- Do not deploy OTLP collectors expecting working traces in v0.1 - it is not implemented yet.
 
 ## Dashboards
 

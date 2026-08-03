@@ -3,15 +3,15 @@
 The provisioner lives inside `fairwave-cli sim issue` and `sim revoke`. It
 is fully offline-first: it mints Ki/OPc, encrypts them under a cluster KEK
 (env `FW_SIM_KEK` or HSM path), and emits artifacts that contain hashes and
-encrypted bundles — never plaintext keys.
+encrypted bundles - never plaintext keys.
 
 ## Usage
 
 ```console
-# Lab SIMs (test range — the only issuance the lab allows)
+# Lab SIMs (test range - the only issuance the lab allows)
 fairwave-cli sim issue --profile lab --prefix 9999912 --count 2 --label floor3-lot1
 
-# Production SIMs — rejected unless HSM + license gates are satisfied
+# Production SIMs - rejected unless HSM + license gates are satisfied
 fairwave-cli sim issue --profile prod --prefix 310150 --count 100 --label site-a-2026q3
 ```
 
@@ -47,7 +47,7 @@ For SIMs handed to a bureau for personalization, use
    working tree without `--force-offline` plus a warning.
 2. Never commit `sims/`, vault material, KEKs, or plaintext CSV exports.
 3. Audit every issue/load: principal, count, prefix, profile, artifact
-   hashes — never credential material.
+   hashes - never credential material.
 4. Lab vectors (sim/test-vectors/lab-vectors.yaml) are the ONLY material the
    lab stack accepts; the control plane rejects anything else in lab mode.
 5. Revocation: `fairwave-cli sim revoke --imsi ...` or

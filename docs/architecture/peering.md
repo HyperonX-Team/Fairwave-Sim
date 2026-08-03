@@ -43,7 +43,7 @@ flowchart LR
 
 One box may act as hub: it holds the uplink (and possibly a certified small-cell path) and terminates other boxes' WireGuard tunnels. Hub selection is operator-chosen, not auto-elected, in v0.1.
 
-## Roaming (Future — Honest Scope)
+## Roaming (Future - Honest Scope)
 
 True roaming across operators (SEPP, IPX, GPRS Tunneling via inter-PLMN) is **not implemented**. M-series items only (`design/roadmap.md`). What exists today: hand-rolled inter-box mobility for the same neighborhood over the mesh. Documenting "roaming" beyond that would be inaccurate.
 

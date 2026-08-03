@@ -37,7 +37,7 @@ flowchart LR
     CP --> Audit[(audit log)]
 ```
 
-Revocation is write-ahead: the HSS subscriber record is marked blocked, the vault flags the credential `revoked`, then (optionally) live bearers are torn down. If the node dies mid-operation, the HSS mark survives — re-running the CLI command is idempotent.
+Revocation is write-ahead: the HSS subscriber record is marked blocked, the vault flags the credential `revoked`, then (optionally) live bearers are torn down. If the node dies mid-operation, the HSS mark survives - re-running the CLI command is idempotent.
 
 ## Blocking lists
 
@@ -89,9 +89,9 @@ Every revocation writes to the audit log:
 
 ## What revocation cannot do
 
-- It cannot un-attach a handset that never returns to the network — the bearer teardown handles connected devices, and the block list handles the rest.
+- It cannot un-attach a handset that never returns to the network - the bearer teardown handles connected devices, and the block list handles the rest.
 - It cannot revoke a card already personalized by a bureau if the bundle leaked *before* revocation; that is why transport security and range hygiene matter (see [bureau runbook](bureau-runbook.md)).
-- It cannot recover a wiped vault — see [wipe] flows in the [lifecycle](index.md).
+- It cannot recover a wiped vault - see [wipe] flows in the [lifecycle](index.md).
 
 ## Related
 

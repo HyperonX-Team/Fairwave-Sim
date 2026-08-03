@@ -1,7 +1,7 @@
 # Contributing to Fairwave
 
 > [!IMPORTANT]
-> **Legal banner** — Fairwave defaults to lab/no-RF mode. Transmitting on cellular bands
+> **Legal banner** - Fairwave defaults to lab/no-RF mode. Transmitting on cellular bands
 > without authorization is illegal in most jurisdictions. Contributions that bypass
 > authorization gates will not be merged.
 
@@ -10,11 +10,11 @@ CI in under an hour.
 
 ## Ways to contribute
 
-- **Report bugs** — open an issue, pick a template
-- **Fix docs** — factual corrections, typos, better tutorials all welcome
-- **Write ADRs** — contributing an Architecture Decision Record helps us preserve knowledge
-- **Code** — see below
-- **Test on hardware** — SDR + pilot notes under [hw/](hw/) are highly valued
+- **Report bugs** - open an issue, pick a template
+- **Fix docs** - factual corrections, typos, better tutorials all welcome
+- **Write ADRs** - contributing an Architecture Decision Record helps us preserve knowledge
+- **Code** - see below
+- **Test on hardware** - SDR + pilot notes under [hw/](hw/) are highly valued
 
 ## Development setup
 

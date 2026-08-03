@@ -1,4 +1,4 @@
-# Fairwave Open5GS v2.7.x — NRF (lab). Needed because v2.7 SMF/UPF register
+# Fairwave Open5GS v2.7.x - NRF (lab). Needed because v2.7 SMF/UPF register
 # with the NRF via SBI even in 4G mode. Loopback 127.0.0.10.
 logger:
   file:

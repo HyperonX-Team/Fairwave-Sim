@@ -21,13 +21,13 @@ Fairwave's privacy stance: **identify the minimum data the network needs, keep o
 
 ### The hash scheme
 
-- `hash(imsi) = first 12 hex chars of SHA-256(imsi)` — lowercase, e.g. `9f2c41b07d3a`.
-- Deliberately truncated: 48 bits of entropy is enough to correlate an operator's own records and *deliberately not* enough to brute-force full IMSI space comfortably at scale, while keeping logs usable. Do not compute it on your own IMSI lists and publish the mapping — that defeats the purpose.
+- `hash(imsi) = first 12 hex chars of SHA-256(imsi)` - lowercase, e.g. `9f2c41b07d3a`.
+- Deliberately truncated: 48 bits of entropy is enough to correlate an operator's own records and *deliberately not* enough to brute-force full IMSI space comfortably at scale, while keeping logs usable. Do not compute it on your own IMSI lists and publish the mapping - that defeats the purpose.
 - Applies to session records, dashboards, audit log, metrics labels.
 
 ## Dashboards
 
-- Session pages show: hash, APN, IP, timestamps, state — no IMSI, no ICCID.
+- Session pages show: hash, APN, IP, timestamps, state - no IMSI, no ICCID.
 - The SIM inventory page shows hashes + operator `label` metadata, not credentials.
 - Default UI hides revoke reasons after 30 days (retention, below).
 - `/metrics` exposes counts by state/APN/PLMN only; no per-subscriber identifiers (see [REST reference](../api/rest.md#metrics)).
@@ -58,7 +58,7 @@ These are notes, not legal advice; a real data-processing agreement (DPA) needs 
 ## Deliberate limits
 
 - Fairwave cannot prevent you from *adding* IMSI logging in your own forks; we document the default and provide lint (`fairwave doctor --privacy`) that flags cleartext IMSI patterns in config/log sinks.
-- Payload inspection is out of scope: the EPC routes, it does not decrypt or DPI. If a deployment needs DPI, that is a deliberate, documented extension — not a hidden feature.
+- Payload inspection is out of scope: the EPC routes, it does not decrypt or DPI. If a deployment needs DPI, that is a deliberate, documented extension - not a hidden feature.
 
 ## Related
 

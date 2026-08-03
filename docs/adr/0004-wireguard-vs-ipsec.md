@@ -1,4 +1,4 @@
-# ADR 0004: Peering data plane — WireGuard (not IPsec or GTP-over-IPsec)
+# ADR 0004: Peering data plane - WireGuard (not IPsec or GTP-over-IPsec)
 
 - Status: Accepted
 - Date: 2026-08-02
@@ -32,6 +32,6 @@ with TCP fallback (via `wstunnel` or user-supplied SSH) handled by `fairwave-age
 
 ## Alternatives considered
 
-- **IPsec/IKEv2** — heavier, but more enterprise-friendly; leave as future but not default.
-- **OpenVPN** — TCP fallback is nice, but userspace does not scale to multiple boxes.
-- **GTP-based mesh** — tempting for UE handover, but operations visibility and NAT complications are too high in v0.1.
+- **IPsec/IKEv2** - heavier, but more enterprise-friendly; leave as future but not default.
+- **OpenVPN** - TCP fallback is nice, but userspace does not scale to multiple boxes.
+- **GTP-based mesh** - tempting for UE handover, but operations visibility and NAT complications are too high in v0.1.

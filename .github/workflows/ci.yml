@@ -50,7 +50,7 @@ jobs:
           set -e
           # Without FAIRWAVE_RF_MODE the RF stack must REFUSE (gate test)
           if [ "$rc" -eq 0 ]; then
-            echo "RF compose unexpectedly validated without the TX gate env — gate broken"
+            echo "RF compose unexpectedly validated without the TX gate env - gate broken"
             exit 1
           fi
           echo "RF gate correctly refuses without FAIRWAVE_RF_MODE=hardware"

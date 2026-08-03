@@ -72,13 +72,13 @@ The Ki/OPc of a SIM are the credentials that authenticate a subscriber to your n
 - Never commit `sims/` output or bundles to git.
 - Rotate cluster KEKs on personnel change.
 - Document who may access the vault; the audit log is your record.
-- If you lose the KEK, the vault is unrecoverable — that is by design.
+- If you lose the KEK, the vault is unrecoverable - that is by design.
 
 If you operate in a jurisdiction with SIM registration or law-enforcement access rules, ensure issuance, retention, and disclosure practices comply with local law before minting real (prod) SIMs.
 
 ## Pages in this section
 
-- [Provisioner architecture](provisioner.md) — offline-first minting, crypto, outputs.
-- [Card bureau runbook](bureau-runbook.md) — turning output into physical cards.
-- [Revocation](revocation.md) — killing credentials, swap controls, audit.
-- [eSIM](esim.md) — what we support today and what we deliberately do not.
+- [Provisioner architecture](provisioner.md) - offline-first minting, crypto, outputs.
+- [Card bureau runbook](bureau-runbook.md) - turning output into physical cards.
+- [Revocation](revocation.md) - killing credentials, swap controls, audit.
+- [eSIM](esim.md) - what we support today and what we deliberately do not.

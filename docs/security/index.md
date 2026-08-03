@@ -40,7 +40,7 @@ The authoritative document is `/design/threat-model.md`. In short:
 
 ## Responsible disclosure
 
-- Security issues: see `SECURITY.md` at the repo root — report via email (security@fairwave.example.org, PGP-published), do not open public issues for vulnerabilities. SLO: acknowledgment within 72 h, coordinated disclosure after 90 days or per reporter preference.
+- Security issues: see `SECURITY.md` at the repo root - report via email (security@fairwave.example.org, PGP-published), do not open public issues for vulnerabilities. SLO: acknowledgment within 72 h, coordinated disclosure after 90 days or per reporter preference.
 - We publish fixes in the next release and backport to the latest minor on request.
 
 ## Architecture at a glance
@@ -57,7 +57,7 @@ flowchart TB
 
 ## Pages in this section
 
-- [Operator auth](operator-auth.md) — tokens, passkeys, TOTP, RBAC, sessions, audit.
-- [Privacy](privacy.md) — what we log (and what we refuse to).
-- [Release signing](release-signing.md) — cosign, SBOM, verification.
+- [Operator auth](operator-auth.md) - tokens, passkeys, TOTP, RBAC, sessions, audit.
+- [Privacy](privacy.md) - what we log (and what we refuse to).
+- [Release signing](release-signing.md) - cosign, SBOM, verification.
 - Related: [SIM lifecycle](../sim-lifecycle/index.md), [peering](../peering/index.md), ADR-0006/0007/0010.

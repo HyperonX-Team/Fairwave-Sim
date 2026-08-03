@@ -11,10 +11,10 @@ A Fairwave box is a state machine: identity, SIMs, policy, peers. Backups protec
 | Path | Contents | Sensitive |
 |---|---|---|
 | `/var/lib/fairwave/store/` | nodes, sims, peers, policy, lifecycle JSON | partial (hashes) |
-| `/var/lib/fairwave/keys/` | node key, mesh CA material | **yes — private keys** |
-| `/var/lib/fairwave/vault/` | Ki/OPc, SIM credential records | **yes — highest sensitivity** |
+| `/var/lib/fairwave/keys/` | node key, mesh CA material | **yes - private keys** |
+| `/var/lib/fairwave/vault/` | Ki/OPc, SIM credential records | **yes - highest sensitivity** |
 | `/var/lib/fairwave/open5gs/` + `srsran/` | rendered configs | medium (EIRP, bands, creds in HSS refs) |
-| HSS subscriber records | Open5GS HSS database export | yes — SIM material |
+| HSS subscriber records | Open5GS HSS database export | yes - SIM material |
 
 Not backed up: container images (re-pulled), OS (re-imaged), caches.
 
@@ -30,7 +30,7 @@ tar -czf fairwave-backup-$(date +%F).tar.gz \
 docker compose exec hss open5gs-dbctl export > hss-export.json
 ```
 
-- Store the archive **off-box** (USB drive, or your own server over the mesh — never plaintext on the open Internet).
+- Store the archive **off-box** (USB drive, or your own server over the mesh - never plaintext on the open Internet).
 - Encrypt at rest: `age`/`gpg` with a key kept separately from the box. The vault is already encrypted with the boot secret; the archive adds a second layer for transport.
 - **Frequency:** before any upgrade, after enrollment/peer changes, after SIM issue/revoke batches, before teardown of a pilot (`docs/ops/cafe-pilot.md`).
 
@@ -40,7 +40,7 @@ docker compose exec hss open5gs-dbctl export > hss-export.json
 2. Install `fairwave-control`, agent, compose stack.
 3. Stop services; extract the archive to `/var/lib/fairwave/` (preserve 0600/0700 modes).
 4. Re-enter the vault boot secret.
-5. `fairwave node status` → control plane reconciles; verify peers re-establish mTLS (mesh CA intact) — if the archive is from a *different* CA generation, peers must be re-enrolled, not restored.
+5. `fairwave node status` → control plane reconciles; verify peers re-establish mTLS (mesh CA intact) - if the archive is from a *different* CA generation, peers must be re-enrolled, not restored.
 6. Import HSS export; `fairwave doctor` full pass.
 7. Re-arm TX only after the checklist (`docs/spectrum-and-law/compliance-checklist.md`).
 

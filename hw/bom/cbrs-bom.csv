@@ -1,4 +1,4 @@
-# Fairwave CBRS (band 48 / 3550-3700 MHz) BOM — production-grade tier, USD, Q3-2026.
+# Fairwave CBRS (band 48 / 3550-3700 MHz) BOM - production-grade tier, USD, Q3-2026.
 # CBRS GAA requires: certified CBSD, SAS registration per site, FCC part 96.
 # These line items are the radio-chain delta on top of the dev kit.
 part,qty,unit_usd,vendor_hint,notes
@@ -11,5 +11,5 @@ PoE+ injector (802.3at),1,35.00,TP-Link / Ubiquiti,outdoor power path
 N-type surge protector,1,30.00,PolyPhaser/Amfenol,lightning/ESD at antenna feed
 Outdoor-rated enclosure 300 mm,1,120.00,Hammond / custom,IP54 min; see hw/enclosure notes
 Heatsink + thermal kit (SDR),1,25.00,generic,CBRS outdoor ambient derating
-SAS service fee (annual, est),1,300.00,Arena (SAS provider),per-CBSD registration; recurring cost — not hardware
+SAS service fee (annual, est),1,300.00,Arena (SAS provider),per-CBSD registration; recurring cost - not hardware
 N-to-SMA jumper,2,15.00,generic,filter-to-SDR and antenna feed

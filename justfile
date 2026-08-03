@@ -1,4 +1,4 @@
-# justfile — faster alternative to make (just install once)
+# justfile - faster alternative to make (just install once)
 set shell := ["bash", "-uc"]
 
 version := "0.1.0"

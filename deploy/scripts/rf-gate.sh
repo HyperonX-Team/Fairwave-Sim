@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Fairwave RF gate — the final safety check before any hardware radio may run.
+# Fairwave RF gate - the final safety check before any hardware radio may run.
 # Refuses (exit 1) unless ALL of the following hold:
 #   1. FAIRWAVE_RF_MODE == "hardware"      (explicit operator intent)
 #   2. FAIRWAVE_TX_ACK_FILE set + existing + non-empty, and containing the

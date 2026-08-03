@@ -27,7 +27,7 @@ TXT record fields:
 | `sig` | Signature over the other TXT values, node key (ed25519) |
 | `ctrlport` | Control plane port (default 8080) |
 
-**Signed announces:** every TXT record carries `sig`, an ed25519 signature over `nodeid|mesh|ver|ctrlport` with the node's discovery key. Peers cache the discovery key at join; announces that fail verification are dropped and counted. mDNS alone gives no NAT traversal — it proves reachability on the same L2 segment.
+**Signed announces:** every TXT record carries `sig`, an ed25519 signature over `nodeid|mesh|ver|ctrlport` with the node's discovery key. Peers cache the discovery key at join; announces that fail verification are dropped and counted. mDNS alone gives no NAT traversal - it proves reachability on the same L2 segment.
 
 ## Rendezvous server
 
@@ -64,14 +64,14 @@ Rules:
 - Announcements expire after 90 s; nodes must re-announce (heartbeat 30 s).
 - Signed announces only; unsigned entries are rejected.
 - `lookup` returns only verified, unexpired entries, rate-limited per IP.
-- `punch` returns both peers' `seen_endpoint` views so each can send WireGuard handshakes to the other's mapped address. The server never relays data-plane traffic (except optional control-plane relay under explicit policy — see below).
+- `punch` returns both peers' `seen_endpoint` views so each can send WireGuard handshakes to the other's mapped address. The server never relays data-plane traffic (except optional control-plane relay under explicit policy - see below).
 
 ## Security
 
-- **Identity:** verification keys are distributed at join (mesh CA) — the rendezvous is a directory, not a trust anchor.
+- **Identity:** verification keys are distributed at join (mesh CA) - the rendezvous is a directory, not a trust anchor.
 - **Replay:** announces carry a 60 s timestamp window; duplicates with older timestamps are dropped.
 - **DoS:** per-IP announce rate limit (10/min); lookups 60/min.
-- **Transparency:** announce history is logged (nodeid, mesh, endpoint hashes) — no subscriber data ever.
+- **Transparency:** announce history is logged (nodeid, mesh, endpoint hashes) - no subscriber data ever.
 - **TLS:** mandatory; the rendezvous operator should pin certs in client config.
 
 ## Deployment
@@ -92,7 +92,7 @@ Operations:
 
 ## When to skip it
 
-If all nodes share a LAN, mDNS suffices. If remote peering is needed but no trusted operator wants to run a rendezvous, use direct `--rendezvous` IP configuration at join time instead of a public service — or do not peer (see [when NOT to peer](index.md#when-not-to-peer)).
+If all nodes share a LAN, mDNS suffices. If remote peering is needed but no trusted operator wants to run a rendezvous, use direct `--rendezvous` IP configuration at join time instead of a public service - or do not peer (see [when NOT to peer](index.md#when-not-to-peer)).
 
 ## Related
 

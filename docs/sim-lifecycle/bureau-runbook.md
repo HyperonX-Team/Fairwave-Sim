@@ -13,7 +13,7 @@ The bureau needs (IMSI, ICCID, Ki, OPc) to personalize cards. Fairwave's rule: *
 - Send: `sims-bundle.enc` (AES-256-GCM) + `manifest.txt` + an envelope key delivered over a separate channel (e.g. PGP or an out-of-band key ceremony).
 - Keep home: the vault, the cluster KEK, `hss-hook.sh`, and any JSON containing hashes (the bureau does not need hashes).
 
-If your bureau requires CSV, generate `bureau-ready.csv` with the manifest's decryption helper — Ki/OPc are decrypted only inside the transport you and the bureau agreed on (encrypted SFTP / PGP-encrypted file). Never email raw CSV with Ki.
+If your bureau requires CSV, generate `bureau-ready.csv` with the manifest's decryption helper - Ki/OPc are decrypted only inside the transport you and the bureau agreed on (encrypted SFTP / PGP-encrypted file). Never email raw CSV with Ki.
 
 ```
 home                            bureau
@@ -25,7 +25,7 @@ vault (KEK) --decrypt--> bundle.enc --PGP/SSH--> personalization CSV -> cards
 | Stays home | Reason |
 | --- | --- |
 | Cluster KEK | Decrypts everything |
-| `sims.json`/`sims.csv` | Hashes and metadata only — policy, not secrecy |
+| `sims.json`/`sims.csv` | Hashes and metadata only - policy, not secrecy |
 | `hss-hook.sh` | Loads into *your* HSS/UDM |
 | Audit log | Your compliance record |
 
@@ -54,14 +54,14 @@ transport: encrypted-sftp
 1. Generate: `fairwave sim issue --profile prod --count 1000 --prefix 9999912`.
 2. Review: `manifest.txt`, spot-check hashes against `sims.csv`.
 3. Package: `bundle.enc` + manifest; encrypt envelope key separately.
-4. Ship: encrypted SFTP or GPG-encrypted attachment — both sides sign manifests.
+4. Ship: encrypted SFTP or GPG-encrypted attachment - both sides sign manifests.
 5. Acknowledge: bureau returns a signed manifest of received files.
 
 Timeline guidance: personalization lead time is bureau-dependent (days to weeks); the provisioner's expiry clock starts at issuance, so order with expiry ≥ personalization + logistics + 30 days buffer.
 
 ## Secure transport rules
 
-- No plaintext Ki in email, chat, or ticket systems — ever.
+- No plaintext Ki in email, chat, or ticket systems - ever.
 - Two-channel rule: file on channel A, envelope key on channel B.
 - Digital signatures on manifests both directions; reconcile hashes.
 - If a transport was exposed (breach, wrong recipient), revoke the affected IMSI range *before* cards leave the bureau: `fairwave sim revoke --prefix 9999912 --reason transport-exposure` (see [revocation](revocation.md)).

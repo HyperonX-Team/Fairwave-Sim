@@ -1,4 +1,4 @@
-# Fairwave Helm values — lab defaults. No secrets here; tokens come from a
+# Fairwave Helm values - lab defaults. No secrets here; tokens come from a
 # Secret referenced by control.tokenSecretName.
 
 # ---------------------------------------------------------------------------
@@ -56,7 +56,7 @@ open5gs:
 
 # ---------------------------------------------------------------------------
 # Radio (srsRAN). mode: zmq = virtual radio, no antenna, lab only.
-# mode: rf requires the RF gate (FAIRWAVE_RF_MODE=hardware + ack file) —
+# mode: rf requires the RF gate (FAIRWAVE_RF_MODE=hardware + ack file) -
 # configure via extra env, never via these defaults.
 # ---------------------------------------------------------------------------
 enb:

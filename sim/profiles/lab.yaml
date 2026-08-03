@@ -1,4 +1,4 @@
-# Fairwave SIM profile — lab.
+# Fairwave SIM profile - lab.
 #
 # LAB-ONLY. IMSIs under the 999 test range are non-routable; nothing here
 # may ever be used outside a lab/campus testbed. The control plane refuses

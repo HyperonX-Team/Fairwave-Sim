@@ -1,11 +1,11 @@
 # =============================================================================
-# LAB-ONLY DUMMY TEST VECTORS — NOT REAL CREDENTIALS.
+# LAB-ONLY DUMMY TEST VECTORS - NOT REAL CREDENTIALS.
 #
 # These Ki/OPc pairs are static, published, public dummy values for the
 # Fairwave lab only (ZMQ virtual radio, no RF). They are:
 #   - deliberately weak and known (never derive security assumptions from them)
 #   - issued under IMSI range 999991234567001..003, the 999 test range
-#     (non-routable — no carrier network will ever accept them)
+#     (non-routable - no carrier network will ever accept them)
 #   - THE ONLY SIM material allowed in the compose lab stack
 #
 # NEVER:

@@ -8,7 +8,7 @@ title: fairwave-agent
 
 ## Duties
 
-1. **Heartbeat** — periodic signed heartbeat to `fairwave-control` (default 10 s). The control plane tracks `fairwave_agent_heartbeat_age_seconds`; a stale heartbeat flips `/v1/status` to degraded and trips alert rules.
+1. **Heartbeat** - periodic signed heartbeat to `fairwave-control` (default 10 s). The control plane tracks `fairwave_agent_heartbeat_age_seconds`; a stale heartbeat flips `/v1/status` to degraded and trips alert rules.
 2. **Health probes**:
 
 | Probe | Source | Metric |
@@ -19,21 +19,21 @@ title: fairwave-agent
 | SDR temperature | `uhd_usrp_get_...` / LimeSuite temp | `fairwave_agent_sdr_temp_celsius` |
 | Disk/IO | `/proc` + sysfs | `fairwave_agent_disk_bytes`, `fairwave_agent_io_busy_ratio` |
 
-3. **Watchdog** — periodic re-check (timer unit `fairwave-watchdog.timer`):
+3. **Watchdog** - periodic re-check (timer unit `fairwave-watchdog.timer`):
 
 - control-plane endpoint reachable?
 - core/RAN containers healthy (via docker healthchecks)?
 - SDR still probing?
 - on failure: collect evidence (journal slice), restart service or notify; never silently ignore.
 
-4. **Safe-TX flag** — the agent holds the *hardware* side of the TX gate: `safe_tx` is only true when the control plane's gate is armed AND the armed band matches the eNB config AND rfkill is in the expected state. The eNB process itself is only allowed to start when the agent asserts `safe_tx`.
+4. **Safe-TX flag** - the agent holds the *hardware* side of the TX gate: `safe_tx` is only true when the control plane's gate is armed AND the armed band matches the eNB config AND rfkill is in the expected state. The eNB process itself is only allowed to start when the agent asserts `safe_tx`.
 
 ## Behavior Rules
 
 - Agent never writes core/RAN config; it only reports and supervises.
 - Agent restarts with the box; it does not resolve config drift itself.
 - Logs are JSON lines (zerolog), `component=agent`; no subscriber material ever (`docs/architecture/telemetry.md`).
-- Probe failures are reported, not "fixed" by the agent — remediation is operator-driven.
+- Probe failures are reported, not "fixed" by the agent - remediation is operator-driven.
 
 ## Example Log Line
 

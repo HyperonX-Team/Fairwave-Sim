@@ -1,4 +1,4 @@
-# Fairwave srsRAN image — srsENB / srsEPC / srsUE (one build, three binaries).
+# Fairwave srsRAN image - srsENB / srsEPC / srsUE (one build, three binaries).
 # Branch pinned: srsRAN_4G release_23_10, Debian 12 base.
 #
 # PROFILE is a runtime env var consumed by docker/srs-entry.sh:
@@ -13,7 +13,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libfftw3-dev libmbedtls-dev libboost-program-options-dev libboost-system-dev \
         libconfig++-dev libsctp-dev libpcsclite-dev \
         libzmq3-dev \
-        # SDR backends — all optional at link time, all installed here so a
+        # SDR backends - all optional at link time, all installed here so a
         # single image supports UHD (USRP), SoapySDR and BladeRF radios.
         libuhd-dev libsoapysdr-dev libbladerf-dev \
     && rm -rf /var/lib/apt/lists/*
@@ -36,7 +36,7 @@ RUN mkdir build \
 
 # ---------------------------------------------------------------------------
 # Runtime: Debian 12 slim. procps provides pgrep (used by healthchecks).
-# Version-matched runtime libs — run `apt-cache policy <lib>` if the base
+# Version-matched runtime libs - run `apt-cache policy <lib>` if the base
 # drifts and adjust.
 # ---------------------------------------------------------------------------
 FROM debian:12-slim AS runtime

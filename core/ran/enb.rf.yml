@@ -1,4 +1,4 @@
-# Fairwave srsENB config — HARDWARE RF TEMPLATE (USRP).
+# Fairwave srsENB config - HARDWARE RF TEMPLATE (USRP).
 #
 # WARNING: transmitting on licensed spectrum without authorization is
 # unlawful. This template must NOT be used unless:
@@ -17,7 +17,7 @@ cell_id = 0x01
 tac = 7
 mcc = 999
 mnc = 99
-# S1-MME: see enb.zmq.yml — same note; replace with the EPC IP/hostname.
+# S1-MME: see enb.zmq.yml - same note; replace with the EPC IP/hostname.
 mme_addr = 10.10.0.2
 gtp_bind_addr = 127.0.0.1
 s1c_bind_addr = 0.0.0.0
@@ -29,12 +29,12 @@ max_users = 32
 
 [rf]
 device_name = uhd
-# USRP device args — adjust per unit: type=b200 (B200mini), serial=..., or
+# USRP device args - adjust per unit: type=b200 (B200mini), serial=..., or
 # master_clock_rate=23.04e6 for LTE. Multiple args are comma-separated.
 device_args = type=b200,master_clock_rate=23.04e6
 tx_gain = 60
 rx_gain = 50
-# EARFCNs MUST come from the operator's license — set per licensed band,
+# EARFCNs MUST come from the operator's license - set per licensed band,
 # e.g. band 3 downlink/upstream pair, NOT the lab defaults.
 # Example (band 3):  dl_earfcn = 1530   ul_earfcn = 19800
 dl_earfcn = 3350

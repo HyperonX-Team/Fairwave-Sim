@@ -16,7 +16,7 @@ One or two sentences. What did you expect, what happened instead?
 - Component: [fairwave-control | agent | CLI | open5gs | srsRAN | UI | website | deploy]
 - Version / commit: (`GET /v1/version` output or git rev)
 - OS / kernel: 
-- RF mode: [lab / zmq | hardware] — **never include license references or
+- RF mode: [lab / zmq | hardware] - **never include license references or
   ack material in public reports**
 
 ## Reproduce

@@ -10,12 +10,12 @@ It is a Go service (`docs/adr/0003-control-plane-language.md`) with a file-backe
 
 ## Responsibilities
 
-1. **Identity and keys** — node identity generation, mesh root CA issuance (mTLS), key separation from SIM credentials.
-2. **Enrollment** — bootstrap-token-based onboarding of new boxes into a neighborhood.
-3. **Reconcile loop** — desired state → concrete config for Open5GS (templating) and srsRAN (supervision), continuously.
-4. **Northbound REST** — JSON API v1 for CLI, UI, and the agent.
-5. **Southbound drivers** — Open5GS config templating + reload, srsRAN process supervision, agent health intake.
-6. **Policy enforcement** — band allow-list, TX arm gate, APN policy.
+1. **Identity and keys** - node identity generation, mesh root CA issuance (mTLS), key separation from SIM credentials.
+2. **Enrollment** - bootstrap-token-based onboarding of new boxes into a neighborhood.
+3. **Reconcile loop** - desired state → concrete config for Open5GS (templating) and srsRAN (supervision), continuously.
+4. **Northbound REST** - JSON API v1 for CLI, UI, and the agent.
+5. **Southbound drivers** - Open5GS config templating + reload, srsRAN process supervision, agent health intake.
+6. **Policy enforcement** - band allow-list, TX arm gate, APN policy.
 
 ## Reconcile Loop
 

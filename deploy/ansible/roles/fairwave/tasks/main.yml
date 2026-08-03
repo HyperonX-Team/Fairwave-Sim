@@ -115,7 +115,7 @@
       WantedBy=multi-user.target
   notify: Restart fairwave-agent
 
-- name: Create secrets env file (0600 — never render secrets via templates)
+- name: Create secrets env file (0600 - never render secrets via templates)
   ansible.builtin.copy:
     dest: "{{ fairwave_dir }}/env"
     owner: "{{ fairwave_user }}"
@@ -126,14 +126,14 @@
       {% endfor %}# Populate via ansible-vault, never via git.
   when: fairwave_env | length > 0
 
-- name: UFW — allow SSH
+- name: UFW - allow SSH
   ansible.builtin.ufw:
     rule: allow
     port: "22"
     proto: tcp
     from_ip: "{{ fairwave_ufw_ssh_from | default('0.0.0.0/0') }}"
 
-- name: UFW — allow service ports (internal only unless overridden)
+- name: UFW - allow service ports (internal only unless overridden)
   ansible.builtin.ufw:
     rule: "{{ item.rule }}"
     port: "{{ item.port }}"
@@ -141,7 +141,7 @@
     from_ip: "{{ item.from_ip }}"
   loop: "{{ fairwave_ufw_rules }}"
 
-- name: UFW — enable
+- name: UFW - enable
   ansible.builtin.ufw:
     state: enabled
     policy: deny

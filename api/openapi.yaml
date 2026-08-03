@@ -5,7 +5,7 @@ info:
     Northbound API for the Fairwave community carrier. All endpoints are
     JSON; auth is `Authorization: Bearer <token>` unless loopback-lab mode.
     Errors use the envelope `{"error":{"code":"...","message":"..."}}`.
-    TX endpoints refuse by default — see spectrum gate docs.
+    TX endpoints refuse by default - see spectrum gate docs.
   version: 0.1.0
   license:
     name: Apache-2.0

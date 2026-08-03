@@ -11,7 +11,7 @@ title: ADR-0012: Configuration Format
 
 ## Context
 
-Fairwave configuration spans node identity, EPC (PLMN, TAC, APNs), radio (bands, EARFCNs), spectrum profiles, policy, and peering. Early prototypes used a mix of JSON, YAML, env vars, and a custom config loader — typos produced runtime failures and spectrum profiles could not be validated before arming TX (ADR-0008 depends on validated profiles). Secrets were occasionally present in configs (violating ADR-0006 and the "no secrets committed" rule).
+Fairwave configuration spans node identity, EPC (PLMN, TAC, APNs), radio (bands, EARFCNs), spectrum profiles, policy, and peering. Early prototypes used a mix of JSON, YAML, env vars, and a custom config loader - typos produced runtime failures and spectrum profiles could not be validated before arming TX (ADR-0008 depends on validated profiles). Secrets were occasionally present in configs (violating ADR-0006 and the "no secrets committed" rule).
 
 ## Decision
 
@@ -26,7 +26,7 @@ Fairwave configuration spans node identity, EPC (PLMN, TAC, APNs), radio (bands,
 Positive:
 
 - Typos and type errors surface at load and in CI, not in production.
-- Spectrum profiles are machine-checkable before TX arming — ADR-0008's allow-list relies on this.
+- Spectrum profiles are machine-checkable before TX arming - ADR-0008's allow-list relies on this.
 - `FW_*` overrides make containers parameterizable without config mounts (compose-friendly, matches [customization](../tutorials/customization.md)).
 - The no-secrets rule is enforced by lint, not convention.
 
@@ -39,9 +39,9 @@ Negative:
 ## Alternatives Considered
 
 - **TOML:** rejected for consistency; ecosystem convention wins.
-- **Raw env-only configuration:** rejected — unreadable at scale, unvalidatable, and hostile to spectrum-profile review.
-- **Config-as-code (Go structs + tags):** rejected — schema-lintable YAML keeps non-developers (community ops) able to review diffs.
-- **Multiple accepted formats:** rejected — single format keeps validation and docs single-sourced.
+- **Raw env-only configuration:** rejected - unreadable at scale, unvalidatable, and hostile to spectrum-profile review.
+- **Config-as-code (Go structs + tags):** rejected - schema-lintable YAML keeps non-developers (community ops) able to review diffs.
+- **Multiple accepted formats:** rejected - single format keeps validation and docs single-sourced.
 
 ## Related
 

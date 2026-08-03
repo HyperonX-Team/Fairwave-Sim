@@ -22,7 +22,7 @@ The reference enclosure is a **260 mm pizza-box** case: a shallow, wide chassis 
 
 - Design target: < 35 °C intake, ≤ 25 °C ΔT over ambient at 25 W sustained.
 - Vented top/bottom with chimney effect; SDR over its own vent path (SDRs dissipate RF PA heat).
-- **No fan by default.** If the PA or CPU exceeds thermal budget (agent reports `cpu_temp_celsius`), the case gets a low-noise fan kit — this is a documented upgrade, not a v0.1 failure.
+- **No fan by default.** If the PA or CPU exceeds thermal budget (agent reports `cpu_temp_celsius`), the case gets a low-noise fan kit - this is a documented upgrade, not a v0.1 failure.
 
 ```mermaid
 flowchart TB

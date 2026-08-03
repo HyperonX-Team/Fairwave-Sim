@@ -17,7 +17,7 @@ A **cafe pilot** is a two-hour, single-site demonstration: a box, a few SIMs, on
 | Guest Wi-Fi + portal onboarding | Free cellular coverage for strangers |
 | Proof of the operator tooling | A revenue or pilot-toll operation |
 
-Without a license/grant/registration covering the site, **the only lawful pilot is lab mode** — no RF at all.
+Without a license/grant/registration covering the site, **the only lawful pilot is lab mode** - no RF at all.
 
 ## Timeline (2 hours)
 
@@ -32,7 +32,7 @@ Without a license/grant/registration covering the site, **the only lawful pilot 
 | 1:40–1:50 | Teardown | drop sessions, stop stack, gate logs exported |
 | 1:50–2:00 | Post-mortem | notes into `docs/ops/` or issue tracker |
 
-## Preflight Checklist (abridged — full: `docs/spectrum-and-law/compliance-checklist.md`)
+## Preflight Checklist (abridged - full: `docs/spectrum-and-law/compliance-checklist.md`)
 
 - [ ] Authorization status decided: **lab** (default) or **authorized RF** (documented).
 - [ ] RF pilot: country, license ref, band allow-list, EIRP cap set; attenuator in TX path for bench.

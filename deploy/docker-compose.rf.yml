@@ -1,4 +1,4 @@
-# Fairwave RF stack — HARDWARE RADIO TEMPLATE. NOT for casual use.
+# Fairwave RF stack - HARDWARE RADIO TEMPLATE. NOT for casual use.
 #
 # =============================================================================
 # THIS STACK REFUSES TO START UNLESS BOTH ARE TRUE:
@@ -8,7 +8,7 @@
 #      (e.g. SAS-GAA-123) for the band/country in use.
 #
 # A country file (ISO-3166-1 alpha-2, e.g. "US") must also be present at
-# $FAIRWAVE_COUNTRY_FILE (default /etc/fairwave/country — mount it below).
+# $FAIRWAVE_COUNTRY_FILE (default /etc/fairwave/country - mount it below).
 #
 # The `rf-gate` service enforces this before the eNB may start; the eNB
 # depends on it completing successfully. Keep this file as the reference
@@ -48,8 +48,8 @@ services:
     networks: [fwnet]
     entrypoint: ["sh", "/scripts/rf-gate.sh"]
     environment:
-      FAIRWAVE_RF_MODE: ${FAIRWAVE_RF_MODE:?FAIRWAVE_RF_MODE must be set to 'hardware' — this stack refuses to start otherwise}
-      FAIRWAVE_TX_ACK_FILE: ${FAIRWAVE_TX_ACK_FILE:?FAIRWAVE_TX_ACK_FILE must point at the license/acknowledgment file — this stack refuses to start otherwise}
+      FAIRWAVE_RF_MODE: ${FAIRWAVE_RF_MODE:?FAIRWAVE_RF_MODE must be set to 'hardware' - this stack refuses to start otherwise}
+      FAIRWAVE_TX_ACK_FILE: ${FAIRWAVE_TX_ACK_FILE:?FAIRWAVE_TX_ACK_FILE must point at the license/acknowledgment file - this stack refuses to start otherwise}
       FAIRWAVE_COUNTRY_FILE: /etc/fairwave/country
     volumes:
       - ./scripts/rf-gate.sh:/scripts/rf-gate.sh:ro
@@ -93,7 +93,7 @@ services:
   # ---------------------------------------------------------------------------
   # srsENB with a real radio. PROFILE=enb-rf reads core/ran/enb.rf.yml;
   # the USRP device args live there (device_name=uhd, master_clock_rate, ...).
-  # TX is not armed by the container — fairwave-control arms TX only after the
+  # TX is not armed by the container - fairwave-control arms TX only after the
   # spectrum gate + tx/arm acknowledgment (see the REST API).
   # ---------------------------------------------------------------------------
   enb:

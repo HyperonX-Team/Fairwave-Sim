@@ -116,11 +116,11 @@ func (r *Registry) Countries() []string {
 }
 
 // builtinProfiles are curated from public regulatory summaries. They are a
-// starting point, NOT legal advice — operators confirm with their regulator.
+// starting point, NOT legal advice - operators confirm with their regulator.
 func builtinProfiles() map[string]Profile {
 	return map[string]Profile{
 		// LAB: country code "999" is the ITU-allocated test MCC range.
-		// Only zmq/virtual devices may ever use it — no real RF.
+		// Only zmq/virtual devices may ever use it - no real RF.
 		"LAB": {
 			Country: "999",
 			MCC:     "999",

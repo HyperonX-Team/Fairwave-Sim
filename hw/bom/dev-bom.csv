@@ -1,4 +1,4 @@
-# Fairwave dev-kit BOM (lab tier) — one unit, prices USD, Q3-2026 street estimate.
+# Fairwave dev-kit BOM (lab tier) - one unit, prices USD, Q3-2026 street estimate.
 # vendor_hint is a hint, not an endorsement; shop around.
 part,qty,unit_usd,vendor_hint,notes
 USRP B200mini-i SDR,1,1325.00,Ettus/NI (Ettus Research),2x2 MIMO 70 MHz-6 GHz; dev + measurement radio; USB3

@@ -4,7 +4,7 @@ title: Peering Overview
 
 # Peering: Meshing Fairwave Nodes
 
-Peering connects Fairwave nodes into a private mesh so subscriber traffic can cross node boundaries — a UE on node A reaching a service behind node B without going through the public internet. It is optional, opt-in, and off by default.
+Peering connects Fairwave nodes into a private mesh so subscriber traffic can cross node boundaries - a UE on node A reaching a service behind node B without going through the public internet. It is optional, opt-in, and off by default.
 
 > Fairwave defaults to lab/no-RF mode. Transmitting on cellular bands without proper authorization is illegal in most jurisdictions. You are solely responsible for licenses, SAS grants, indoor restrictions, and type approval. HyperonX and contributors provide software as-is for lawful private networks, research, and shared-spectrum regimes only.
 
@@ -13,7 +13,7 @@ Peering connects Fairwave nodes into a private mesh so subscriber traffic can cr
 - **Geographic extension**: one logical private network across buildings or sites.
 - **Resilience**: if a node's uplink dies, traffic can traverse surviving peers (failover; local breakout remains the fallback).
 - **Shared services**: on-prem servers, NAS, monitoring reachable from any node's UEs.
-- **Community pooling**: multiple operators share transport for a common APN set — with explicit policy control.
+- **Community pooling**: multiple operators share transport for a common APN set - with explicit policy control.
 
 Fairwave does **not** mesh for commercial roaming: inter-operator settlement/roaming is explicitly future work (see [roaming-future](roaming-future.md)).
 
@@ -39,7 +39,7 @@ flowchart TB
 ```
 
 - **Control plane**: node-to-node mTLS (mesh CA issued at join), used for peer discovery, route exchange, health, and configuration. This is where `peer list` data comes from.
-- **Data plane**: WireGuard only — UDP, forward secrecy, per-node keypairs, allowed-IP routing.
+- **Data plane**: WireGuard only - UDP, forward secrecy, per-node keypairs, allowed-IP routing.
 - **Discovery**: mDNS (`_fairwave._udp.local`) on a shared LAN; signed announces. Optionally a rendezvous server for NAT'd/remote peers.
 - **Route exchange**: each node advertises its UE pool (e.g. `10.44.0.0/24`) plus optional site subnets; the agent renders allowed IPs from the merged table.
 
@@ -72,8 +72,8 @@ Details in [mesh runbook](mesh-runbook.md) and [rendezvous](rendezvous.md).
 
 ## Related
 
-- [Two-box peering tutorial](../tutorials/two-box-peering.md) — hands-on.
-- [Mesh runbook](mesh-runbook.md) — setup, keys, routes, NAT.
-- [Rendezvous server](rendezvous.md) — spec and deployment.
-- [Roaming future](roaming-future.md) — what peering is not yet.
-- ADR-0004 (WireGuard vs IPsec) — why WireGuard.
+- [Two-box peering tutorial](../tutorials/two-box-peering.md) - hands-on.
+- [Mesh runbook](mesh-runbook.md) - setup, keys, routes, NAT.
+- [Rendezvous server](rendezvous.md) - spec and deployment.
+- [Roaming future](roaming-future.md) - what peering is not yet.
+- ADR-0004 (WireGuard vs IPsec) - why WireGuard.

@@ -1,7 +1,7 @@
-# Fairwave Open5GS v2.7.x configuration — lab profile (NO RF, ZMQ virtual).
+# Fairwave Open5GS v2.7.x configuration - lab profile (NO RF, ZMQ virtual).
 #
 # NOTE ON PLMN: MMC/MNC use the international private network test PLMN
-# 999/99 (non-routable test range) — never transmit with it.
+# 999/99 (non-routable test range) - never transmit with it.
 #
 # Mounted by deploy/docker-compose.yml at /etc/open5gs/open5gs.yaml.
 # MongoDB must be reachable at the hss db uri (lab: the `mongo` service).

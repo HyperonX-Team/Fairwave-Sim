@@ -22,8 +22,8 @@ Fairwave exposes one primary HTTP API (REST, JSON) on the control plane, plus a 
 
 Two supported schemes (see [operator auth](../security/operator-auth.md) for enrollment):
 
-1. **mTLS** — node/CLI certificates signed by the mesh CA. Preferred for CLI and peer traffic.
-2. **Bearer token** — short-lived JWT (15 min) obtained after WebAuthn/TOTP login. Required for operator UI sessions.
+1. **mTLS** - node/CLI certificates signed by the mesh CA. Preferred for CLI and peer traffic.
+2. **Bearer token** - short-lived JWT (15 min) obtained after WebAuthn/TOTP login. Required for operator UI sessions.
 
 Unauthenticated requests return `401` with an `error` body. Roles are enforced per endpoint (RBAC; see [operator auth](../security/operator-auth.md#rbac-roles)).
 

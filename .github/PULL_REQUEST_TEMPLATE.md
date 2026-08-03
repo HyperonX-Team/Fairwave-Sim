@@ -7,7 +7,7 @@
 - [ ] Bug fix
 - [ ] Feature
 - [ ] Deploy/infra asset (compose, helm, ansible, terraform)
-- [ ] Docs (docs/ only — see note below)
+- [ ] Docs (docs/ only - see note below)
 - [ ] Refactor / chore
 
 ## Testing
@@ -24,11 +24,11 @@
 
 - [ ] No secrets committed: no keys, tokens, Ki/OPc, wg private keys, ack
       files, or license references anywhere in the diff (test vectors in
-      `sim/test-vectors/` are the only allowed exception — dummy, lab-only)
+      `sim/test-vectors/` are the only allowed exception - dummy, lab-only)
 - [ ] No new paths allow RF TX without the gate: any change touching
       `core/ran/`, `deploy/docker-compose.rf.yml`, `deploy/scripts/rf-gate.sh`
       or `tx/arm` logic preserves the RF gate (country + license
-      acknowledgment + band allow-list) — proposals that weaken it are
+      acknowledgment + band allow-list) - proposals that weaken it are
       rejected
 - [ ] Docs updated (docs/ + README where behavior changed)
 - [ ] Tests run (unit + the integration smoke described above)

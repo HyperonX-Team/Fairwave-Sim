@@ -1,8 +1,8 @@
 ---
-title: ADR-0009: RF Backend — srsRAN Project
+title: ADR-0009: RF Backend - srsRAN Project
 ---
 
-# ADR-0009: RF Backend — srsRAN Project, 4G-First, ZMQ Lab Default
+# ADR-0009: RF Backend - srsRAN Project, 4G-First, ZMQ Lab Default
 
 - Status: Accepted
 - Date: 2025-12-22
@@ -27,21 +27,21 @@ srsRAN Project: active, permissive (AGPL-3.0), mature LTE eNB/gNB + srsUE, first
 Positive:
 
 - One stack to test end-to-end in CI (ZMQ in Docker makes attach tests hermetic and fast).
-- The lab and prod radio paths share config surface (EARFCNs, bands, TAC) — customization doc stays single-sourced.
+- The lab and prod radio paths share config surface (EARFCNs, bands, TAC) - customization doc stays single-sourced.
 - srsRAN's active community matches Fairwave's maintenance model; bugs surface early.
 - ZMQ lab means the quickstart is genuinely no-RF and runs anywhere with Docker.
 
 Negative:
 
-- AGPL-3.0 of srsRAN requires network-service deployments to share modifications if offered to users — acceptable for an AGPL project itself, but documented for commercial operators.
+- AGPL-3.0 of srsRAN requires network-service deployments to share modifications if offered to users - acceptable for an AGPL project itself, but documented for commercial operators.
 - srsENB/srsUE maturity lags 5G paths (irrelevant while ADR-0002 holds).
 - OAI interop gaps cannot be supported by us; they are the operator's experiment.
 
 ## Alternatives Considered
 
-- **OAI as primary:** rejected for v0.1 — heavier ops surface, weaker out-of-box LTE/EPC fit for our audience; re-evaluate only if a 5G milestone materializes (and see ADR-0002's flag).
-- **Custom minimal virtual radio instead of ZMQ:** rejected — ZMQ is maintained upstream, realistic (real IQ over TCP), and already how srsRAN tests itself.
-- **Third-party bundled binaries (e.g. Amarisoft):** rejected — licensing costs and closed core contradict the open-source project.
+- **OAI as primary:** rejected for v0.1 - heavier ops surface, weaker out-of-box LTE/EPC fit for our audience; re-evaluate only if a 5G milestone materializes (and see ADR-0002's flag).
+- **Custom minimal virtual radio instead of ZMQ:** rejected - ZMQ is maintained upstream, realistic (real IQ over TCP), and already how srsRAN tests itself.
+- **Third-party bundled binaries (e.g. Amarisoft):** rejected - licensing costs and closed core contradict the open-source project.
 
 ## Related
 

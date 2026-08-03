@@ -1,7 +1,7 @@
 # Threat Model
 
 > [!IMPORTANT]
-> **Legal banner** — Fairwave defaults to lab/no-RF mode. Transmitting on
+> **Legal banner** - Fairwave defaults to lab/no-RF mode. Transmitting on
 > cellular bands without proper authorization is illegal in most
 > jurisdictions. This threat model covers lawful private LTE deployments
 > only.

@@ -19,8 +19,8 @@ Runbooks for the four scenarios that actually happen to a small cell. **First ru
 
 ### UEs Can't Attach (S2)
 
-1. `fairwave node status` — phase, core/RAN up?
-2. `fairwave doctor` — store, API, SDR probe, sync.
+1. `fairwave node status` - phase, core/RAN up?
+2. `fairwave doctor` - store, API, SDR probe, sync.
 3. Check agent telemetry: GPSDO lock, NTP offset, SDR temp (`fairwave_agent_*` metrics).
 4. SIMs: `fairwave sim issue` / check profile matches HSS; hashes vs vault.
 5. Restart eNB container; check srsRAN logs for `RRC connection` failures vs NAS rejects.
@@ -41,13 +41,13 @@ Runbooks for the four scenarios that actually happen to a small cell. **First ru
 2. Contain: isolate box from LAN; preserve disk image (see Evidence).
 3. Change local accounts; check WebAuthn + TOTP (`docs/architecture/security.md`).
 4. Review audit log: gate events, enrollment, arm events.
-5. Report per your obligations; `design/threat-model.md` describes what a box attacker can do — assume full access to box-local keys.
+5. Report per your obligations; `design/threat-model.md` describes what a box attacker can do - assume full access to box-local keys.
 
 ### Spectrum Gate Bypass Suspicion (S1)
 
 1. **Stop TX immediately**: `fairwave tx/arm` revoke + agent `safe_tx` assert off; power the SDR if needed.
 2. Preserve evidence: gate log, arm events, eNB config, rfkill state, timestamps.
-3. Do NOT re-arm to "test" — that compounds the exposure.
+3. Do NOT re-arm to "test" - that compounds the exposure.
 4. Analyze: was the allow-list wrong, the gate buggy, or the config hand-edited? Hand-editing core/RAN config bypasses the gate by design of the OS layer; treat as policy breach.
 5. File the compliance checklist state and regulator contact if relevant.
 
@@ -70,4 +70,4 @@ Timestamp everything; preserve original logs read-only (copy, don't edit).
 
 ## Regulator Contact (Lawful Only)
 
-If the incident is a legal exposure: stop TX, preserve evidence, then contact the regulator through the official channel for your region (`docs/spectrum-and-law/regional.md`). Do not contact SAS/regulator from a panic state; the evidence file, not apologies, is what matters. This project does not advise on legal strategy — consult counsel.
+If the incident is a legal exposure: stop TX, preserve evidence, then contact the regulator through the official channel for your region (`docs/spectrum-and-law/regional.md`). Do not contact SAS/regulator from a panic state; the evidence file, not apologies, is what matters. This project does not advise on legal strategy - consult counsel.

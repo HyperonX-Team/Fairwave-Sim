@@ -2,7 +2,7 @@
 title: ADR-0011: Captive Portal Onboarding
 ---
 
-# ADR-0011: Captive Portal Onboarding (Anchor 302, Not ePDG — Yet)
+# ADR-0011: Captive Portal Onboarding (Anchor 302, Not ePDG - Yet)
 
 - Status: Accepted
 - Date: 2026-01-15
@@ -13,8 +13,8 @@ title: ADR-0011: Captive Portal Onboarding
 
 A private network's subscribers need a way to onboard: enroll their device, see a privacy notice, get help, and (in future) authenticate for walled-garden access. Two candidate architectures existed:
 
-1. **ePDG (Evolved Packet Data Gateway)-style onboarding** — a standards-grade path where the UE's data plane is steered into a portal via an Access Point Name. Full ePDG is heavy: additional network functions, certificates, IPSec/IKEv2, and interop quirks with consumer handsets.
-2. **Anchor/302 portal** — the network's DNS/edge redirects unauthenticated subscribers' HTTP(S) requests to a portal served by the node, on the local breakout path (ADR-0005). No new core functions; works with any handset that opens a browser.
+1. **ePDG (Evolved Packet Data Gateway)-style onboarding** - a standards-grade path where the UE's data plane is steered into a portal via an Access Point Name. Full ePDG is heavy: additional network functions, certificates, IPSec/IKEv2, and interop quirks with consumer handsets.
+2. **Anchor/302 portal** - the network's DNS/edge redirects unauthenticated subscribers' HTTP(S) requests to a portal served by the node, on the local breakout path (ADR-0005). No new core functions; works with any handset that opens a browser.
 
 ## Decision
 
@@ -34,14 +34,14 @@ Positive:
 Negative:
 
 - Anchor 302 only catches HTTP/S traffic to reachable hosts; apps that never resolve an internet host won't see the portal (documented limitation).
-- Consumer handsets' captive-portal detection is inconsistent across OEMs — the portal must also work as a plain URL.
+- Consumer handsets' captive-portal detection is inconsistent across OEMs - the portal must also work as a plain URL.
 - ePDG remains unimplemented; claims of "APN-grade onboarding" are M5+ and clearly labeled as such.
 
 ## Alternatives Considered
 
-- **ePDG-first:** rejected — biggest scope item with the least v0.1 user value; interop risk with consumer devices.
-- **SMS/USSD onboarding:** rejected — needs an SMSC and roaming-grade signalling; out of scope for private cells.
-- **No onboarding surface (UI only):** rejected — privacy notice and walled-garden need a subscriber-facing page.
+- **ePDG-first:** rejected - biggest scope item with the least v0.1 user value; interop risk with consumer devices.
+- **SMS/USSD onboarding:** rejected - needs an SMSC and roaming-grade signalling; out of scope for private cells.
+- **No onboarding surface (UI only):** rejected - privacy notice and walled-garden need a subscriber-facing page.
 
 ## Related
 

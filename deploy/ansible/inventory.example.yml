@@ -1,5 +1,5 @@
 ---
-# Example inventory — copy, fill in, NEVER commit with real values.
+# Example inventory - copy, fill in, NEVER commit with real values.
 # Secrets (tokens, wg keys) belong in an ansible-vault file:
 #   ansible-vault create host_vars/cell-01/vault.yml
 #   # fairwave_env: ["FAIRWAVE_AGENT_TOKEN=<token>", "WG_PRIVATE_KEY=<key>"]

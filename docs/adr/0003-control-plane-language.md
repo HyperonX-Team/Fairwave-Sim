@@ -1,4 +1,4 @@
-# ADR 0003: Control plane language — Go (not Rust)
+# ADR 0003: Control plane language - Go (not Rust)
 
 - Status: Accepted
 - Date: 2026-08-02
@@ -9,8 +9,8 @@ The Fairwave control plane (`fairwave-control`, `fairwave-agent`, `fairwave-cli`
 long-running daemon: it holds state, drives process configs, exposes REST+gRPC, and performs
 background reconciliation. Candidate languages:
 
-- **Go** — mature ops ecosystem (Prometheus, gRPC, Cobra, Docker client, Zerolog), fast compile, low barrier to contributor entry.
-- **Rust** — stronger memory safety without a GC; modern async (tokio), but higher learning curve and slower iteration in a community dominated by network-ops contributors.
+- **Go** - mature ops ecosystem (Prometheus, gRPC, Cobra, Docker client, Zerolog), fast compile, low barrier to contributor entry.
+- **Rust** - stronger memory safety without a GC; modern async (tokio), but higher learning curve and slower iteration in a community dominated by network-ops contributors.
 
 ## Decision
 
@@ -28,6 +28,6 @@ on constrained box, parser hardening), migrate that path to a Rust FFI later.
 
 ## Alternatives considered
 
-- **Rust** — excellent safety, but slower onboarding for community contributors and typical
+- **Rust** - excellent safety, but slower onboarding for community contributors and typical
   workloads here are I/O-bound where Go's GC is acceptable. Decision: Go now, Rust later for
   proven hot paths, via explicit hot-path ADR.

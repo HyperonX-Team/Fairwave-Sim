@@ -6,7 +6,7 @@ title: Two-Box Peering
 
 > Fairwave defaults to lab/no-RF mode. Transmitting on cellular bands without proper authorization is illegal in most jurisdictions. You are solely responsible for licenses, SAS grants, indoor restrictions, and type approval. HyperonX and contributors provide software as-is for lawful private networks, research, and shared-spectrum regimes only.
 
-This tutorial joins two Fairwave lab stacks into a peer mesh over WireGuard. Both boxes run the ZMQ virtual radio — no RF — so it is safe to run anywhere. The same steps apply to real nodes once RF is gated on.
+This tutorial joins two Fairwave lab stacks into a peer mesh over WireGuard. Both boxes run the ZMQ virtual radio - no RF - so it is safe to run anywhere. The same steps apply to real nodes once RF is gated on.
 
 ## Prerequisites
 
@@ -81,7 +81,7 @@ The control plane exchanges subnet routes over the mTLS channel; the agent insta
 
 - site-a advertises `10.44.0.0/24` (its UE pool behind PGW).
 - site-b advertises `10.45.0.0/24`.
-- A UE attached at site-a can ping `10.45.0.2` at site-b through the mesh — this is **peered breakout**; without the mesh, traffic breaks out locally at each edge.
+- A UE attached at site-a can ping `10.45.0.2` at site-b through the mesh - this is **peered breakout**; without the mesh, traffic breaks out locally at each edge.
 
 ```bash
 docker compose -f deployments/lab/docker-compose.yml exec ue ping -c 2 10.45.0.2

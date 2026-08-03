@@ -8,7 +8,7 @@ Wants=network-online.target
 Type=simple
 User=fairwave
 Group=fairwave
-# Secrets (tokens, wg keys) come ONLY from this env file — mode 0600,
+# Secrets (tokens, wg keys) come ONLY from this env file - mode 0600,
 # provisioned at first boot; never baked into the image.
 EnvironmentFile=/etc/fairwave/env
 ExecStart=/usr/local/bin/fairwave-control

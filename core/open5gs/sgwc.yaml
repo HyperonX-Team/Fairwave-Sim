@@ -1,4 +1,4 @@
-# Fairwave Open5GS v2.7.x — SGW-C (lab, ZMQ virtual). Loopback 127.0.0.3.
+# Fairwave Open5GS v2.7.x - SGW-C (lab, ZMQ virtual). Loopback 127.0.0.3.
 logger:
   file:
     path: /var/log/open5gs/sgwc.log

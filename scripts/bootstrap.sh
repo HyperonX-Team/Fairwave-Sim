@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# bootstrap.sh — install/verify Fairwave toolchains (idempotent).
+# bootstrap.sh - install/verify Fairwave toolchains (idempotent).
 set -euo pipefail
 
 echo "== Fairwave bootstrap =="

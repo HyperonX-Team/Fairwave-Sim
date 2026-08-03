@@ -1,4 +1,4 @@
-# Fairwave lab stack — NO RF. Radio is ZMQ virtual (srsENB/srsUE talk over
+# Fairwave lab stack - NO RF. Radio is ZMQ virtual (srsENB/srsUE talk over
 # tcp:// on the docker network; nothing touches an antenna).
 #
 # Bring up:    docker compose -f docker-compose.yml up -d --build
@@ -89,7 +89,7 @@ services:
 
   # ---------------------------------------------------------------------------
   # srsENB over ZMQ. One virtual cell; ZMQ TX bind *:2000, RX connect to
-  # 127.0.0.1:2001 (the UE's TX bind) — see deploy/docker/srs-entry.sh.
+  # 127.0.0.1:2001 (the UE's TX bind) - see deploy/docker/srs-entry.sh.
   # The eNB must stay on fwnet (S1-MME to open5gs) and SHARE its namespace
   # with ue1 so the ZMQ radio runs over localhost (no TCP jitter).
   # ---------------------------------------------------------------------------
@@ -117,7 +117,7 @@ services:
       start_period: 30s
 
   # ---------------------------------------------------------------------------
-  # srsUE (ZMQ, single UE — the reference topology). Shares the eNB network
+  # srsUE (ZMQ, single UE - the reference topology). Shares the eNB network
   # namespace so the ZMQ radio runs over localhost (matches the srsRAN docs).
   # ---------------------------------------------------------------------------
   ue1:

@@ -46,7 +46,7 @@ versions follow [SemVer](https://semver.org/spec/v2.0.0.html).
 
 - The final ZMQ data-path hop (UE IP on `tun_srsue`, ping) requires stable
   low-jitter scheduling; verified on native Linux, degraded under Docker
-  Desktop/WSL2 (UE PHY loses subframe sync — see docs/tutorials/lab-attach.md).
+  Desktop/WSL2 (UE PHY loses subframe sync - see docs/tutorials/lab-attach.md).
 - 5G SA/NSA stubs behind flags; no production SIM bureau integration.
 - eSIM/LPA and roaming SEPP/IPX are documented future work.
 

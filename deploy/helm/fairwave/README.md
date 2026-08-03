@@ -2,7 +2,7 @@
 
 Deploys the Fairwave control plane (REST API `:8080`) on Kubernetes. The
 Open5GS EPC and srsRAN radio are containers inside the chart only when
-`open5gs.enabled` / `enb.enabled` are left on — for a hosted core or a
+`open5gs.enabled` / `enb.enabled` are left on - for a hosted core or a
 separately managed RAN, disable them and point the control plane at the
 external services via values.
 
@@ -43,7 +43,7 @@ helm uninstall fairwave --namespace fairwave
 | `open5gs.enabled` | `true` | Deploy Open5GS EPC in-cluster |
 | `open5gs.mongoStorage` | `8Gi` | MongoDB PVC size |
 | `enb.enabled` | `true` | Deploy srsRAN radio |
-| `enb.mode` | `zmq` | `zmq` (lab, virtual RF) or `rf` (hardware — requires the RF gate flow) |
+| `enb.mode` | `zmq` | `zmq` (lab, virtual RF) or `rf` (hardware - requires the RF gate flow) |
 | `networkPolicies.enabled` | `true` | Namespace-scoped network policies |
 | `ingress.enabled` | `false` | Expose the API via Ingress |
 | `ingress.host` | `fairwave.example.com` | Ingress host |

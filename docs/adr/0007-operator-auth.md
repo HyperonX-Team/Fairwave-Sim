@@ -11,7 +11,7 @@ title: ADR-0007: Operator Authentication
 
 ## Context
 
-The control plane can mint SIMs, arm TX, revoke peers, and read sessions — a powerful and sensitive surface. Password-based auth is the wrong default for community-operated nodes: passwords are shared, phishable, and stored badly. We also need a first-enrollment path that does not ship with a default credential, and a fallback for operators whose devices cannot do WebAuthn. See [operator auth](../security/operator-auth.md) for the operational page.
+The control plane can mint SIMs, arm TX, revoke peers, and read sessions - a powerful and sensitive surface. Password-based auth is the wrong default for community-operated nodes: passwords are shared, phishable, and stored badly. We also need a first-enrollment path that does not ship with a default credential, and a fallback for operators whose devices cannot do WebAuthn. See [operator auth](../security/operator-auth.md) for the operational page.
 
 ## Decision
 
@@ -35,14 +35,14 @@ Negative:
 
 - WebAuthn needs a supporting browser/OS; older kiosk setups fall back to TOTP with a worse security story.
 - Lost passkey = admin-mediated re-enrollment (documented procedure).
-- Token TTL friction on slow ops teams (re-invite required) — accepted as a feature.
+- Token TTL friction on slow ops teams (re-invite required) - accepted as a feature.
 
 ## Alternatives Considered
 
-- **Username/password + TOTP:** rejected — password database remains the attack surface and phishing vector.
-- **Client certificates only:** rejected — good for nodes/CLI (mTLS), impractical for human browser sessions.
-- **Magic-link email auth:** rejected — email is out of scope for offline-first nodes and creates dependency on mail infra.
-- **Unlimited-lifetime bootstrap tokens:** rejected — contradicts the threat model (credential-dump scenarios).
+- **Username/password + TOTP:** rejected - password database remains the attack surface and phishing vector.
+- **Client certificates only:** rejected - good for nodes/CLI (mTLS), impractical for human browser sessions.
+- **Magic-link email auth:** rejected - email is out of scope for offline-first nodes and creates dependency on mail infra.
+- **Unlimited-lifetime bootstrap tokens:** rejected - contradicts the threat model (credential-dump scenarios).
 
 ## Related
 

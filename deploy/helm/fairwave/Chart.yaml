@@ -1,6 +1,6 @@
 apiVersion: v2
 name: fairwave
-description: Fairwave community small-cell — Open5GS EPC, srsRAN radio, control plane.
+description: Fairwave community small-cell - Open5GS EPC, srsRAN radio, control plane.
 type: application
 version: 0.1.0
 appVersion: "0.1.0"

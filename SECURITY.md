@@ -1,7 +1,7 @@
 # Security Policy
 
 > [!IMPORTANT]
-> **Legal banner** — Fairwave defaults to lab/no-RF mode. Transmitting on cellular
+> **Legal banner** - Fairwave defaults to lab/no-RF mode. Transmitting on cellular
 > bands without authorization is illegal in most jurisdictions. You are solely responsible
 > for licenses, SAS grants, indoor restrictions, and type approval. HyperonX and
 > contributors provide software as-is for lawful private networks, research, and

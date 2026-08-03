@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Fairwave golden image builder — Debian 12 node OS.
+# Fairwave golden image builder - Debian 12 node OS.
 #
 # Outline: run ONCE per image build on a Debian/Ubuntu host (or in a
 # privileged container). Produces build/rootfs.tar.xz + build/image.img.
@@ -105,5 +105,5 @@ umount_chroot
 tar -C "${OUT}/rootfs" -cf - . | xz -9 > "${OUT}/rootfs.tar.xz"
 
 echo "[golden-image] done. Artifacts in ${OUT}/:"
-echo "  rootfs.tar.xz  — unpack onto the SBC root partition"
+echo "  rootfs.tar.xz  - unpack onto the SBC root partition"
 echo "  (image.img flashable disk image: follow docs/hardware/image.md)"

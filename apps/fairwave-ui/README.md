@@ -1,7 +1,7 @@
 # Fairwave operator UI
 
 Single-file, framework-free dashboard (`index.html`) served statically by
-the control plane — no build step, no node_modules.
+the control plane - no build step, no node_modules.
 
 ## Serving
 
@@ -23,7 +23,7 @@ header through.
 The dashboard reads the bearer token from `localStorage["fairwave_token"]`.
 Use **Set API token** in the toolbar; it prompts once and stores locally.
 Tokens never leave the browser except in the `Authorization` header. Clear it
-with the same button (empty input). Server-side, auth is optional — with
+with the same button (empty input). Server-side, auth is optional - with
 `tokenSecretName`/`FAIRWAVE_TOKEN` unset the API runs unauthenticated
 (lab only).
 
@@ -47,5 +47,5 @@ drop-in once the CSS moves to a small `style.css`.
 
 Open the page, enter a token, verify the six status cards + three tables
 refresh, and that "Transition to on-air" is refused (or succeeds with the
-proper gates) — check the network tab for `{"error":{...}}` bodies, which
+proper gates) - check the network tab for `{"error":{...}}` bodies, which
 the page surfaces in the error banner.

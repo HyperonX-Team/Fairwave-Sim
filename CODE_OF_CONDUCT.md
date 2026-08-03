@@ -1,7 +1,7 @@
 # Contributor Covenant Code of Conduct
 
 > [!IMPORTANT]
-> **Legal banner** — Fairwave defaults to lab/no-RF mode. Transmitting on cellular bands
+> **Legal banner** - Fairwave defaults to lab/no-RF mode. Transmitting on cellular bands
 > without authorization is illegal in most jurisdictions. This Code of Conduct includes
 > requirements for lawful, non-harmful use.
 

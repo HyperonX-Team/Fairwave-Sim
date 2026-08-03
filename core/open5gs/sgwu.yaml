@@ -1,4 +1,4 @@
-# Fairwave Open5GS v2.7.x — SGW-U (lab, ZMQ virtual). Loopback 127.0.0.6.
+# Fairwave Open5GS v2.7.x - SGW-U (lab, ZMQ virtual). Loopback 127.0.0.6.
 logger:
   file:
     path: /var/log/open5gs/sgwu.log

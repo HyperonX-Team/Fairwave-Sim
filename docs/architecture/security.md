@@ -60,7 +60,7 @@ Compromise of the mesh CA does **not** expose SIM credentials, and vice versa. K
 
 ## IMSI Privacy
 
-- IMSIs are stored **at rest as truncated sha256 hashes** (e.g. first 8 bytes hex), not raw — except inside the SIM vault, which needs the raw value to program HSS.
+- IMSIs are stored **at rest as truncated sha256 hashes** (e.g. first 8 bytes hex), not raw - except inside the SIM vault, which needs the raw value to program HSS.
 - Logs, metrics, and the UI show only hashes or derived IDs. Metrics and logs never emit full IMSI.
 - Rationale: a neighborhood box is a low-trust device; raw IMSIs should not be recoverable from a stolen disk, UI screenshot, or log dump.
 

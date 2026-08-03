@@ -98,7 +98,7 @@
     <div class="card" style="padding:0">
       <table aria-label="Enrolled nodes">
         <thead><tr><th>Name</th><th>State</th><th>PLMN</th><th>Last seen</th></tr></thead>
-        <tbody id="nodesBody"><tr><td colspan="4" class="muted">—</td></tr></tbody>
+        <tbody id="nodesBody"><tr><td colspan="4" class="muted">-</td></tr></tbody>
       </table>
     </div>
   </section>
@@ -109,7 +109,7 @@
       <table aria-label="Issued SIMs">
         <thead><tr><th>IMSI (sha256:12)</th><th>Profile</th><th>State</th>
           <th>APNs</th><th>Expires</th></tr></thead>
-        <tbody id="simsBody"><tr><td colspan="5" class="muted">—</td></tr></tbody>
+        <tbody id="simsBody"><tr><td colspan="5" class="muted">-</td></tr></tbody>
       </table>
     </div>
   </section>
@@ -120,7 +120,7 @@
       <table aria-label="WireGuard mesh peers">
         <thead><tr><th>Name</th><th>State</th><th>Endpoint</th>
           <th>Handshake age (s)</th></tr></thead>
-        <tbody id="peersBody"><tr><td colspan="4" class="muted">—</td></tr></tbody>
+        <tbody id="peersBody"><tr><td colspan="4" class="muted">-</td></tr></tbody>
       </table>
     </div>
   </section>
@@ -176,8 +176,8 @@ function fmtUptime(sec) {
 function renderStatus(s) {
   const grid = $("statusGrid");
   const cards = [
-    ["Version", s.version || "—", "mode " + (s.mode || "?")],
-    ["Phase", s.phase || "—", "lifecycle state"],
+    ["Version", s.version || "-", "mode " + (s.mode || "?")],
+    ["Phase", s.phase || "-", "lifecycle state"],
     ["TX armed", s.tx_armed === true ? "YES" : "no", "requires spectrum gate + ack"],
     ["Nodes", String(s.nodes ?? 0), "enrolled"],
     ["UEs", String(s.ues ?? 0), "registered"],
@@ -199,7 +199,7 @@ function escapeHtml(v) {
 
 function rows(data, key, render, emptyCols) {
   const list = (data && data[key]) || [];
-  if (!list.length) return `<tr><td colspan="${emptyCols}" class="muted">—</td></tr>`;
+  if (!list.length) return `<tr><td colspan="${emptyCols}" class="muted">-</td></tr>`;
   return list.map(render).join("");
 }
 
@@ -210,17 +210,17 @@ async function refreshAll() {
     ]);
     renderStatus(status);
     $("nodesBody").innerHTML = rows(nodes, "nodes",
-      (n) => `<tr><td>${escapeHtml(n.name || "—")}</td><td>${escapeHtml(n.state || "—")}</td>
-              <td>${escapeHtml(n.plmn || "—")}</td><td>${escapeHtml(n.last_seen || "—")}</td></tr>`, 4);
+      (n) => `<tr><td>${escapeHtml(n.name || "-")}</td><td>${escapeHtml(n.state || "-")}</td>
+              <td>${escapeHtml(n.plmn || "-")}</td><td>${escapeHtml(n.last_seen || "-")}</td></tr>`, 4);
     $("simsBody").innerHTML = rows(sims, "sims",
-      (s) => `<tr><td><code>${escapeHtml(s.imsi_sha256_12 || "—")}</code></td>
-              <td>${escapeHtml(s.profile || "—")}</td><td>${escapeHtml(s.state || "—")}</td>
-              <td>${escapeHtml((s.apns || []).join(", ") || "—")}</td>
-              <td>${escapeHtml(s.expires_at || "—")}</td></tr>`, 5);
+      (s) => `<tr><td><code>${escapeHtml(s.imsi_sha256_12 || "-")}</code></td>
+              <td>${escapeHtml(s.profile || "-")}</td><td>${escapeHtml(s.state || "-")}</td>
+              <td>${escapeHtml((s.apns || []).join(", ") || "-")}</td>
+              <td>${escapeHtml(s.expires_at || "-")}</td></tr>`, 5);
     $("peersBody").innerHTML = rows(peers, "peers",
-      (p) => `<tr><td>${escapeHtml(p.name || "—")}</td><td>${escapeHtml(p.state || "—")}</td>
-              <td>${escapeHtml(p.endpoint || "—")}</td>
-              <td>${escapeHtml(p.handshake_age_s ?? "—")}</td></tr>`, 4);
+      (p) => `<tr><td>${escapeHtml(p.name || "-")}</td><td>${escapeHtml(p.state || "-")}</td>
+              <td>${escapeHtml(p.endpoint || "-")}</td>
+              <td>${escapeHtml(p.handshake_age_s ?? "-")}</td></tr>`, 4);
     if (policy && policy.local_breakout !== undefined) {
       $("policyHint").textContent = "policy: local_breakout=" + policy.local_breakout +
         (policy.hub_peer ? ", hub=" + policy.hub_peer : "");

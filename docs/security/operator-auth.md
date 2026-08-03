@@ -33,9 +33,9 @@ Rules:
 
 ## WebAuthn passkeys (primary)
 
-- Registration and assertion use WebAuthn/FIDO2; the control plane stores only the public key and credential ID — no secrets at rest.
+- Registration and assertion use WebAuthn/FIDO2; the control plane stores only the public key and credential ID - no secrets at rest.
 - Resident credentials (discoverable) preferred; device-bound passkeys encouraged for `sim:admin`.
-- Fallback if a browser/OS cannot do WebAuthn: TOTP enrollment (below) — never a static password.
+- Fallback if a browser/OS cannot do WebAuthn: TOTP enrollment (below) - never a static password.
 
 ## TOTP (fallback)
 

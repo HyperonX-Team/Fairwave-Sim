@@ -1,4 +1,4 @@
-# ADR 0005: Breakout — Edge NAT local-first, hub optional
+# ADR 0005: Breakout - Edge NAT local-first, hub optional
 
 - Status: Accepted
 - Date: 2026-08-02
@@ -7,9 +7,9 @@
 
 When a UE attaches, Fairwave must decide where its traffic exits. Options:
 
-1. **Hub breakout** — All traffic to a central Fairwave hub (privacy, uniformity)
-2. **Local EPC breakout** — Traffic exits via the box's Ethernet/SNAT (low latency, distributed)
-3. **Hybrid** — peer-selected per UE/APN policy
+1. **Hub breakout** - All traffic to a central Fairwave hub (privacy, uniformity)
+2. **Local EPC breakout** - Traffic exits via the box's Ethernet/SNAT (low latency, distributed)
+3. **Hybrid** - peer-selected per UE/APN policy
 
 ## Decision
 
@@ -28,7 +28,7 @@ Default to **Edge NAT local-first breakout**:
 
 ## Alternatives considered
 
-- **Hub-first** — rejected: centralization is contrary to Fairwave's spirit and introduces a single point of failure.
-- **Full local-only** — rejected: breaks when users want internet and the café's uplink fails.
+- **Hub-first** - rejected: centralization is contrary to Fairwave's spirit and introduces a single point of failure.
+- **Full local-only** - rejected: breaks when users want internet and the café's uplink fails.
 
 The compromise is a box-local NAT that **defaults to WAN egress**, with a WireGuard fallback rule for hub mode.

@@ -11,7 +11,7 @@ Run this checklist **before** any real-RF session and keep the completed copy wi
 ## Operator Side
 
 - [ ] Country code recorded in policy (gate refuses without it).
-- [ ] License reference recorded: licence number, grant ID, or registration — even if "none applies, lab only".
+- [ ] License reference recorded: licence number, grant ID, or registration - even if "none applies, lab only".
 - [ ] Band allow-list populated: only bands you may transmit on; EARFCNs checked against `design/spectrum-matrix.md`.
 - [ ] Indoor/outdoor declared and matches what the authorization allows.
 - [ ] EIRP cap set per band profile and below the authorization's limit.
@@ -20,14 +20,14 @@ Run this checklist **before** any real-RF session and keep the completed copy wi
 
 ## Hardware Side
 
-- [ ] Attenuator (30–40 dB) in the TX path for bench work — mandatory, non-negotiable (`docs/hardware/sdr-notes.md`).
+- [ ] Attenuator (30–40 dB) in the TX path for bench work - mandatory, non-negotiable (`docs/hardware/sdr-notes.md`).
 - [ ] GPS reference locked (real RF deployments; PPS verified) where the regime requires it.
 - [ ] Antenna/feeder known to be band-correct; EIRP math includes cable + antenna gain.
 - [ ] Type approval: radio path certified for the regime (CBRS: Part 96 CBSD; EU: RED conformity where applicable).
 
 ## Software Side
 
-- [ ] `tx/arm` completed with correct country, license ref, band list — or explicitly left unarmed for lab.
+- [ ] `tx/arm` completed with correct country, license ref, band list - or explicitly left unarmed for lab.
 - [ ] Agent `safe_tx` asserted; eNB process only runs when asserted (`docs/software/fairwave-agent.md`).
 - [ ] `rfkill` state matches policy (authorized bands only; not blanket-off).
 - [ ] Logging/audit on: gate decisions, arm events, grant heartbeats, phase transitions are retained.

@@ -79,7 +79,7 @@ Canonical contract: `api/openapi.yaml`. All paths below assume base `http://127.
 }
 ```
 
-### `POST /v1/sims` — issue
+### `POST /v1/sims` - issue
 
 Request:
 
@@ -157,7 +157,7 @@ Response:
 }
 ```
 
-`POST /v1/tx/arm` request: `{"arm": true, "profile_id": "us-gaa-b48"}` — requires all gates green, else `409`:
+`POST /v1/tx/arm` request: `{"arm": true, "profile_id": "us-gaa-b48"}` - requires all gates green, else `409`:
 
 ```json
 {"error": {"code": "tx_gate_blocked", "message": "allow-list missing earfcn 55090"}}

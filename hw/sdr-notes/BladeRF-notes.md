@@ -7,7 +7,7 @@ sudo apt-get install -y bladerf libbladerf-dev bladerf-firmware-fx3
 bladeRF-cli -i
 # In the CLI:  info        → hardware + firmware versions
 #              firmware load /usr/share/Nuand/bladeRF/bladeRF_fw_*.img  (only if needed)
-#              flash load  ...  (only when upgrading the FX3/FPGA — not routine)
+#              flash load  ...  (only when upgrading the FX3/FPGA - not routine)
 ```
 
 srsRAN 4G uses BladeRF via SoapySDR (`device_name=soapy`) with the
@@ -28,16 +28,16 @@ before starting srsENB.
 
 ## libbladeRF
 
-- x40: 40 MS/s, 1×1, 300 MHz–3.8 GHz — enough for band 3/48 RX and low-rate
+- x40: 40 MS/s, 1×1, 300 MHz–3.8 GHz - enough for band 3/48 RX and low-rate
   TX in community trials.
 - x115: 115 MS/s, 1×1, broader frequency range.
-- micro A4: 2×2 MIMO, 61.44 MS/s, 70 MHz–6 GHz — the dev-tier BladeRF.
+- micro A4: 2×2 MIMO, 61.44 MS/s, 70 MHz–6 GHz - the dev-tier BladeRF.
 - All: 12-bit ADCs/DACs, tuneable gain; `set gain 50` etc. Check
   `hw/bom/community-bom.csv` for the x40 line.
 
 ## Gain / sample rate
 
-- `tx_gain` 50–60 dB community tier start (again gated by the RF gate —
+- `tx_gain` 50–60 dB community tier start (again gated by the RF gate -
   never transmit without it).
 - Keep sample rates LTE multiples: 23.04e6 works across srsRAN configs.
 - BladeRF's FX3 USB3 path is sensitive to host scheduling: run srsUE/srsENB
@@ -46,7 +46,7 @@ before starting srsENB.
 ## Synchronization
 
 - No onboard GPSDO on the classic x40; micro A4 has optional external clock
-  input (10 MHz). For CBRS-grade timing use the B210 path — BladeRF is a
+  input (10 MHz). For CBRS-grade timing use the B210 path - BladeRF is a
   lab/community instrument.
 
 ## Troubleshooting

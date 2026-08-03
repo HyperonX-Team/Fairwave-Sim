@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# gen-docs.sh — generate derived docs (API reference) into docs/_gen/.
+# gen-docs.sh - generate derived docs (API reference) into docs/_gen/.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 

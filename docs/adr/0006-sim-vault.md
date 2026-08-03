@@ -11,7 +11,7 @@ title: ADR-0006: SIM Credential Vault
 
 ## Context
 
-Fairwave's provisioner generates Ki/OPc for every SIM. These are the subscriber's network credentials: whoever holds them authenticates as the subscriber. The project rules are absolute — Ki/OPc are never committed, never logged, never sent in plaintext (see [provisioner](../sim-lifecycle/provisioner.md)). But they must be stored at rest long enough to load into HSS/UDM and to re-issue deterministic bundles for bureaus.
+Fairwave's provisioner generates Ki/OPc for every SIM. These are the subscriber's network credentials: whoever holds them authenticates as the subscriber. The project rules are absolute - Ki/OPc are never committed, never logged, never sent in plaintext (see [provisioner](../sim-lifecycle/provisioner.md)). But they must be stored at rest long enough to load into HSS/UDM and to re-issue deterministic bundles for bureaus.
 
 Naive options (plaintext JSON next to the CSV, env-var dump, gitignored-but-readable files) fail the project's own standard. We need real encryption with a key the software cannot invent.
 
@@ -41,10 +41,10 @@ Negative:
 
 ## Alternatives Considered
 
-- **Plaintext files with restrictive permissions:** rejected — violates the no-plaintext-at-rest rule; permissions alone are not crypto.
-- **OS keychain / DPAPI-style keying:** rejected — not portable across the x86/ARM Linux node fleet and Dockerized lab.
-- **Cloud KMS:** rejected — offline-first is a project requirement (provisioner must work air-gapped); KMS is a fallback provider, not the default.
-- **Software-embedded key:** rejected outright — security theater.
+- **Plaintext files with restrictive permissions:** rejected - violates the no-plaintext-at-rest rule; permissions alone are not crypto.
+- **OS keychain / DPAPI-style keying:** rejected - not portable across the x86/ARM Linux node fleet and Dockerized lab.
+- **Cloud KMS:** rejected - offline-first is a project requirement (provisioner must work air-gapped); KMS is a fallback provider, not the default.
+- **Software-embedded key:** rejected outright - security theater.
 
 ## Related
 

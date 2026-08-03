@@ -2,7 +2,7 @@
 title: ADR-0008: TX Spectrum Gate
 ---
 
-# ADR-0008: TX Gating — Three Independent Layers
+# ADR-0008: TX Gating - Three Independent Layers
 
 - Status: Accepted
 - Date: 2025-12-20
@@ -13,7 +13,7 @@ title: ADR-0008: TX Spectrum Gate
 
 Fairwave is an open-source project whose default stance is "transmits nothing." Real deployments are legal only where the operator holds spectrum rights (licensed, SAS-granted GAA/PPA, or lawful experimental regimes). Software cannot grant rights, but it can make accidental or casual transmission hard and make the gate state inspectable. The risk profile: a community member clones the repo, plugs in an SDR, and keys up on a wrong frequency.
 
-A single toggle is insufficient — the failure of one check must not arm TX.
+A single toggle is insufficient - the failure of one check must not arm TX.
 
 ## Decision
 
@@ -31,21 +31,21 @@ Positive:
 
 - Default build is physically incapable of transmitting; the claim is checkable by code inspection.
 - Compromise of one layer (e.g. a forged config) does not arm TX; two layers must fail.
-- Gate state is public and auditable — regulators and MNOs can verify (see [regulator FAQ](../reference/faq-regulators.md)).
+- Gate state is public and auditable - regulators and MNOs can verify (see [regulator FAQ](../reference/faq-regulators.md)).
 - Re-evaluation on reload catches config drift automatically.
 
 Negative:
 
-- Operators must deliberately re-arm after every config change touching radio — friction by design.
-- Compile-time flag complicates "SDR on laptop" experiments slightly (they need a custom build — correct).
-- The gate does not enforce *legal* use — it only forces informed, deliberate actions. Docs must keep saying so.
+- Operators must deliberately re-arm after every config change touching radio - friction by design.
+- Compile-time flag complicates "SDR on laptop" experiments slightly (they need a custom build - correct).
+- The gate does not enforce *legal* use - it only forces informed, deliberate actions. Docs must keep saying so.
 
 ## Alternatives Considered
 
-- **Single runtime flag:** rejected — one bit flipped by a script or misconfig arms TX.
-- **Hardware fuse/dongle:** rejected — non-portable, prevents legitimate research builds.
-- **Cloud authorization service (SAS-style check-in):** rejected — offline-first requirement; SAS compliance itself remains the operator's obligation (CBRS: optional-but-mandatory-by-rules GAA check-in is out of Fairwave's scope).
-- **No gate at all (trust operators):** rejected — conflicts with the project's public-safety stance and regulator questions.
+- **Single runtime flag:** rejected - one bit flipped by a script or misconfig arms TX.
+- **Hardware fuse/dongle:** rejected - non-portable, prevents legitimate research builds.
+- **Cloud authorization service (SAS-style check-in):** rejected - offline-first requirement; SAS compliance itself remains the operator's obligation (CBRS: optional-but-mandatory-by-rules GAA check-in is out of Fairwave's scope).
+- **No gate at all (trust operators):** rejected - conflicts with the project's public-safety stance and regulator questions.
 
 ## Related
 

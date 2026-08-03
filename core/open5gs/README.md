@@ -16,7 +16,7 @@ EPC. It is the single source the compose/helm/ansible stacks mount at
 
 Key lab values:
 
-- PLMN **999-99** (test range, non-routable), TAC **7** — see the MME `gummei`
+- PLMN **999-99** (test range, non-routable), TAC **7** - see the MME `gummei`
   and `tai` sections.
 - S1-MME binds **0.0.0.0** so the srsENB container can reach it; all S11/S5
   traffic stays on 127.0.0.1 inside the EPC container.
@@ -44,7 +44,7 @@ repo as the canonical lab source and let the control plane apply overrides.
 ## Seeding subscribers
 
 ```console
-# mongo container (compose) — see core/open5gs/hss-init.sh
+# mongo container (compose) - see core/open5gs/hss-init.sh
 docker compose -f deploy/docker-compose.yml exec mongo sh /init/hss-init.sh
 ```
 

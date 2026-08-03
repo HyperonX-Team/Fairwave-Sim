@@ -1,5 +1,5 @@
-# Fairwave Open5GS v2.7.x — SMF (lab, ZMQ virtual). Loopback 127.0.0.4.
-# SMF replaced PGW-C in v2.7. IMPORTANT: this is the EPC-only SMF —
+# Fairwave Open5GS v2.7.x - SMF (lab, ZMQ virtual). Loopback 127.0.0.4.
+# SMF replaced PGW-C in v2.7. IMPORTANT: this is the EPC-only SMF -
 # the SBI section is deliberately absent (matches the known-working
 # s5uishida Open5GS EPC + srsRAN_4G ZMQ reference). A configured SBI/NRF
 # client makes the SMF spam HTTP/2 SBI retries and can stall EPC attach.

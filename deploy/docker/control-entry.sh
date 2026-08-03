@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# control-entry.sh — chown the data volume (root) then drop to the
+# control-entry.sh - chown the data volume (root) then drop to the
 # non-root fairwave user. The Go binary is static; sh + coreutils suffice.
 set -e
 

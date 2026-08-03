@@ -1,4 +1,4 @@
-# Fairwave srsENB config — ZMQ VIRTUAL RADIO (lab). No antenna, no RF.
+# Fairwave srsENB config - ZMQ VIRTUAL RADIO (lab). No antenna, no RF.
 #
 # This file is the stock srsRAN_4G release_23_11 enb.conf.example with the
 # lab overrides applied via CLI flags in deploy/docker/srs-entry.sh

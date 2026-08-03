@@ -1,4 +1,4 @@
-# Core runtime state — never committed.
+# Core runtime state - never committed.
 data/
 *.key
 *.pem

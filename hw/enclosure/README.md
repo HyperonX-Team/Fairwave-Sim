@@ -16,7 +16,7 @@ variant for the community tier.
 | Chassis plate thickness | 2 | ±0.2 |
 | Vent area, side panels (total) | 2× 60×40 | slots 3 mm wide |
 | Standoff height (board-to-floor) | 10 | ±0.5 |
-| Weight (empty, aluminum) | ~1.6 kg | — |
+| Weight (empty, aluminum) | ~1.6 kg | - |
 
 ## Panel cutouts
 

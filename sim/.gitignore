@@ -1,4 +1,4 @@
-# SIM material guards — keep credentials and prod material out of git.
+# SIM material guards - keep credentials and prod material out of git.
 # The test vectors are the ONLY exception (explicitly dummy, lab-only).
 
 # Issued output (never committed)
@@ -14,7 +14,7 @@ hss-hook.sh
 **/prod/**
 prod/
 
-# Key material — guard by name everywhere
+# Key material - guard by name everywhere
 ki*
 opc*
 *.ki

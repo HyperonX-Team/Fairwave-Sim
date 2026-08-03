@@ -4,7 +4,7 @@ title: SDR Notes
 
 # SDR Notes
 
-Fairwave supports three SDR families. All are USB 3.0 devices; none are FCC/CE-certified as cellular transmitters by themselves — real RF requires the `tx/arm` gate, a legal basis, and (for CBRS) a certified path (`docs/spectrum-and-law/`).
+Fairwave supports three SDR families. All are USB 3.0 devices; none are FCC/CE-certified as cellular transmitters by themselves - real RF requires the `tx/arm` gate, a legal basis, and (for CBRS) a certified path (`docs/spectrum-and-law/`).
 
 ## Comparison
 
@@ -47,7 +47,7 @@ Fairwave supports three SDR families. All are USB 3.0 devices; none are FCC/CE-c
 
 - **Attenuator requirement:** any TX-capable SDR must have a 30–40 dB attenuator between its SMA and a receiver/antenna. Full LTE TX into an antenna indoors can exceed legal EIRP and will desensitize your own RX.
 - Loopback check: SDR TX → attenuator → SDR RX; verify srsUE attach before going near air.
-- Cable quality matters: > 3 m USB3 runs cause USB errors and `underrun` in the eNB logs — keep SDR adjacent to the box (`docs/hardware/index.md`).
+- Cable quality matters: > 3 m USB3 runs cause USB errors and `underrun` in the eNB logs - keep SDR adjacent to the box (`docs/hardware/index.md`).
 
 ## Related
 

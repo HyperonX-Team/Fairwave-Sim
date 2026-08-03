@@ -1,4 +1,4 @@
-# Fairwave Open5GS image — EPC (mme, sgw, pgw, hss, pcrf) built from source.
+# Fairwave Open5GS image - EPC (mme, sgw, pgw, hss, pcrf) built from source.
 # Version pinned: Open5GS v2.7.2, Debian 12 base.
 #
 # Requires a MongoDB reachable at the hss db uri (lab: mongodb://mongo:27017,
@@ -42,7 +42,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libmicrohttpd12 libcurl3-gnutls libnghttp2-14 \
         libtins-dev libtalloc2 libpcsclite1 libdw1 libidn12 \
     && rm -rf /var/lib/apt/lists/*
-# NOTE: libtins-dev is deliberately used at runtime — its name is ABI-stable
+# NOTE: libtins-dev is deliberately used at runtime - its name is ABI-stable
 # while the plain runtime package (libtinsX) varies with distro versioning.
 # Trim it to the exact package once your base is pinned.
 

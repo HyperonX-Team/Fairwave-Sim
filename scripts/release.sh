@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# release.sh — cut a Fairwave release: tag, changelog, SBOM, sign.
+# release.sh - cut a Fairwave release: tag, changelog, SBOM, sign.
 # Usage: ./scripts/release.sh 0.2.0
 set -euo pipefail
 VERSION="${1:-0.1.0}"

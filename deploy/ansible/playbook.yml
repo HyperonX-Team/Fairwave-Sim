@@ -1,5 +1,5 @@
 ---
-# Fairwave node deployment — Debian 12 host.
+# Fairwave node deployment - Debian 12 host.
 #   ansible-playbook -i inventory.example.yml playbook.yml
 - name: Deploy Fairwave node (control plane + agent, docker, firewall)
   hosts: fairwave

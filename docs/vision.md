@@ -24,7 +24,7 @@ of the modern mobile market create the harm:
    buy the equivalent for cellular without a lawyer and a warehouse.
 
 Every year the gap widens: handsets get better, modems get cheaper, software radios get
-stronger — yet the baseline experience of "no bars" stays exactly where it was in 2009 for
+stronger - yet the baseline experience of "no bars" stays exactly where it was in 2009 for
 hundreds of millions of people.
 
 ## The HyperonX fix
@@ -71,7 +71,7 @@ flowchart LR
 ## Why it threatens incumbents
 
 MNO value concentrates in scarcity: scarce spectrum, scarce towers, scarce SIMs. Fairwave
-makes the *local* copy abundant. It doesn't need to beat the national network everywhere —
+makes the *local* copy abundant. It doesn't need to beat the national network everywhere -
 it only needs to beat it in the café, the co-op, the village. Once offload and roaming
 interfaces normalize, the national SIM becomes the *overlay*, not the *access*. That's an
 existential re-pricing of the least defensible part of the wireless cartel.
@@ -89,7 +89,7 @@ existential re-pricing of the least defensible part of the wireless cartel.
 Fairwave's promise: **if you can run a router, you can run a cell**.
 Its boundary: we ship no code path that hides identifiers from lawful intercept where
 required, jams, spoofs PLMNs, or transmits outside authorized frequencies. Community
-infrastructure deserves the same legitimacy as any carrier — and only gets it by behaving
+infrastructure deserves the same legitimacy as any carrier - and only gets it by behaving
 like one. See the [threat model](design/threat-model.md) and
 [spectrum matrix](design/spectrum-matrix.md).
 

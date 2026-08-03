@@ -1,7 +1,7 @@
 # Fairwave Threat Model
 
 > [!IMPORTANT]
-> **Legal banner** — Fairwave defaults to lab/no-RF mode. Transmitting on cellular bands
+> **Legal banner** - Fairwave defaults to lab/no-RF mode. Transmitting on cellular bands
 > without authorization is illegal in most jurisdictions. This threat model covers lawful
 > private LTE deployments only; it explicitly excludes IMSI-catchers, jamming, or bypass
 > of lawful interception requirements.
@@ -27,11 +27,11 @@
 
 ## 2. Actors
 
-- **External attacker** — without credentials on the public internet / in RF range
-- **Malicious insider** — café/enterprise operator with legitimate UI access but wanting unauthorized spectrum or data access
-- **Supplier / CI threat** — compromised build, poisoned base image, malicious PR
-- **Upstream dependency compromise** — supply-chain attacks against Open5GS/srsRAN images or Go modules
-- **Curious/rogue UE** — SIM trying to authenticate wrongly, botnet scanning PLMN for open attach
+- **External attacker** - without credentials on the public internet / in RF range
+- **Malicious insider** - café/enterprise operator with legitimate UI access but wanting unauthorized spectrum or data access
+- **Supplier / CI threat** - compromised build, poisoned base image, malicious PR
+- **Upstream dependency compromise** - supply-chain attacks against Open5GS/srsRAN images or Go modules
+- **Curious/rogue UE** - SIM trying to authenticate wrongly, botnet scanning PLMN for open attach
 
 ## 3. Trust boundaries
 
@@ -66,9 +66,9 @@
 
 ## 5. Lateral abuse cases explicitly out of scope
 
-- **IMSI catching** — we do not build or support passive interrogation; eNodeB only serves provisioned UEs.
-- **Roaming spoofing** — SEPP/IPX forged for external carriers is out of scope.
-- **Spektrum flooding/jamming** — all TX paths require authorization; jamming signals are not implemented.
+- **IMSI catching** - we do not build or support passive interrogation; eNodeB only serves provisioned UEs.
+- **Roaming spoofing** - SEPP/IPX forged for external carriers is out of scope.
+- **Spektrum flooding/jamming** - all TX paths require authorization; jamming signals are not implemented.
 
 ## 6. Mitigation details
 

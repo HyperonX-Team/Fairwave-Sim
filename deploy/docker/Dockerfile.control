@@ -1,4 +1,4 @@
-# Fairwave control-plane image — fairwave-control (API :8080) + fairwave-cli.
+# Fairwave control-plane image - fairwave-control (API :8080) + fairwave-cli.
 #
 # Build context is the REPO ROOT (compose sets context: ..):
 #   docker build -f deploy/docker/Dockerfile.control -t fairwave/control:0.1.0 .

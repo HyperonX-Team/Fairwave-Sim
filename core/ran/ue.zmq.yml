@@ -1,5 +1,5 @@
-# Fairwave srsUE config — ZMQ VIRTUAL RADIO (lab UE).
-# SIM below is the DUMMY lab test vector — see sim/test-vectors/lab-vectors.yaml.
+# Fairwave srsUE config - ZMQ VIRTUAL RADIO (lab UE).
+# SIM below is the DUMMY lab test vector - see sim/test-vectors/lab-vectors.yaml.
 # NEVER put a real SIM here. CLI overrides in srs-entry.sh win over this file.
 
 [usim]

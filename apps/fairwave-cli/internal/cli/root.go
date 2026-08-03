@@ -19,7 +19,7 @@ const DefaultControlURL = "http://localhost:8080"
 func Root() *cobra.Command {
 	root := &cobra.Command{
 		Use:           "fairwave",
-		Short:         "Fairwave — community carrier in a pizza box",
+		Short:         "Fairwave - community carrier in a pizza box",
 		Long:          "Fairwave CLI: manage nodes, SIMs, peers, spectrum gates, and the local control plane.",
 		SilenceUsage:  true,
 		SilenceErrors: true,

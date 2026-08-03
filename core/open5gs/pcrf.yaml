@@ -1,4 +1,4 @@
-# Fairwave Open5GS v2.7.x — PCRF (lab). Loopback 127.0.0.9 (Gx).
+# Fairwave Open5GS v2.7.x - PCRF (lab). Loopback 127.0.0.9 (Gx).
 # db_uri is REQUIRED: the PCRF only initializes mongoc when it is set
 # (pcrf-init.c: ogs_dbi_init(ogs_app()->db_uri)); without it the Gx CCR
 # handler aborts inside libmongoc on the first policy query.

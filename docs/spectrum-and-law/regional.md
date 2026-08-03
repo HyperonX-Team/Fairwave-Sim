@@ -23,17 +23,17 @@ Region details below are indicative, not legal advice, and change frequently. Ve
 
 ## Notes by Region
 
-**US** — Outside CBRS, most cellular bands are assigned to licensees; a small cell needs a real authorization or an FCC experimental licence. CBRS specifics: `docs/spectrum-and-law/cbrs.md`.
+**US** - Outside CBRS, most cellular bands are assigned to licensees; a small cell needs a real authorization or an FCC experimental licence. CBRS specifics: `docs/spectrum-and-law/cbrs.md`.
 
-**UK** — Ofcom SAL allows low-power individual licensing on certain bands (including parts of 3.8 GHz and others); EIRP and coexistence obligations apply per licence. Indoor/outdoor matters: indoor SAL terms differ.
+**UK** - Ofcom SAL allows low-power individual licensing on certain bands (including parts of 3.8 GHz and others); EIRP and coexistence obligations apply per licence. Indoor/outdoor matters: indoor SAL terms differ.
 
-**EU** — No single "EU licence." Each member state issues local/private 5G/4G licences on distinct bands (e.g. 3.8–4.2 GHz local licences in several states). Type approval and conformity (RED) apply to the radio; your SDR + eNB stack is a transmitter, not a CE-marked terminal in most members' eyes — check.
+**EU** - No single "EU licence." Each member state issues local/private 5G/4G licences on distinct bands (e.g. 3.8–4.2 GHz local licences in several states). Type approval and conformity (RED) apply to the radio; your SDR + eNB stack is a transmitter, not a CE-marked terminal in most members' eyes - check.
 
-**Experimental / campus profiles** — For research: confinement to a defined site, low EIRP, registration with the regulator where required, and logs. Fairwave's `experimental` profile encodes: hard EIRP cap, indoor-only flag, site field, mandatory audit logs. None of these substitute for the licence itself.
+**Experimental / campus profiles** - For research: confinement to a defined site, low EIRP, registration with the regulator where required, and logs. Fairwave's `experimental` profile encodes: hard EIRP cap, indoor-only flag, site field, mandatory audit logs. None of these substitute for the licence itself.
 
-**India** — Captive (campus) networks under telecom licensing rules: registration, no interconnection to the public switched network, no mobility across the campus boundary. Bands and rules are operator-of-record dependent; contact the DoT/telecom service provider channel for current terms.
+**India** - Captive (campus) networks under telecom licensing rules: registration, no interconnection to the public switched network, no mobility across the campus boundary. Bands and rules are operator-of-record dependent; contact the DoT/telecom service provider channel for current terms.
 
-**Australia** — ACMA: class licences cover some low-power uses; higher-power or cellular uses need spectrum licences or an experimental licence. ACMA keeps a spectrum licence register you can check for your site.
+**Australia** - ACMA: class licences cover some low-power uses; higher-power or cellular uses need spectrum licences or an experimental licence. ACMA keeps a spectrum licence register you can check for your site.
 
 ## What the Profile Actually Does
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Fairwave srsRAN entrypoint — dispatches on PROFILE.
+# Fairwave srsRAN entrypoint - dispatches on PROFILE.
 #   PROFILE=enb-zmq | ue-zmq | enb-rf   (required)
 # Configs are read from RAN_CFG_DIR (default /etc/fairwave/ran).
 set -euo pipefail
@@ -9,7 +9,7 @@ RAN_CFG_DIR="${RAN_CFG_DIR:-/etc/fairwave/ran}"
 
 # ZMQ virtual-radio plumbing (lab). The eNB and UEs share one network
 # namespace (network_mode: service:enb in compose), so all ZMQ runs over
-# localhost — the exact topology from the srsRAN 4G ZeroMQ app note.
+# localhost - the exact topology from the srsRAN 4G ZeroMQ app note.
 # TCP transport across Docker bridge networks adds subframe jitter that
 # makes the UE PHY intermittently lose sync (SYNC TRACK ret=-1) and the
 # eNB to abort InitialContextSetup.
@@ -73,7 +73,7 @@ case "$PROFILE" in
         ;;
 
     enb-rf)
-        # Hardware radio — gated upstream (rf-gate service / tx/arm API), but
+        # Hardware radio - gated upstream (rf-gate service / tx/arm API), but
         # defend again here so a misconfigured PROFILE can never TX silently.
         if [[ "${FAIRWAVE_RF_MODE:-}" != "hardware" ]]; then
             echo "REFUSED: PROFILE=enb-rf requires FAIRWAVE_RF_MODE=hardware. RF TX needs a country, a license acknowledgment and the band allow-list (deploy/scripts/rf-gate.sh + POST /v1/tx/arm)." >&2

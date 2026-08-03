@@ -75,7 +75,7 @@ func doctorCmd() *cobra.Command {
 			}
 
 			if fail > 0 {
-				fmt.Printf("\n%d issue(s) found — see docs/ops/troubleshooting.md\n", fail)
+				fmt.Printf("\n%d issue(s) found - see docs/ops/troubleshooting.md\n", fail)
 				return nil
 			}
 			fmt.Println("\nall checks passed")

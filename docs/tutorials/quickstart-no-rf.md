@@ -130,7 +130,7 @@ Expected lines (EPC side completes in all environments):
 ```
 
 > [!NOTE]
-> The final hop — UE IP visible on `tun_srsue` and ping through it — needs
+> The final hop - UE IP visible on `tun_srsue` and ping through it - needs
 > stable ZMQ timing. It passes on native Linux. Under Docker Desktop
 > (Windows/macOS) the UE PHY can lose subframe sync and the attach accept
 > is not delivered over the virtual radio, even though the EPC-side attach

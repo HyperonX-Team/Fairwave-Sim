@@ -12,7 +12,7 @@ Fairwave runs a real, identifiable network (its own PLMN), serves only subscribe
 
 ## Not a free nationwide MNO
 
-Fairwave does not make you a mobile operator, give you spectrum, or interconnect you with anyone. It is a private small-cell toolkit. No SEPP/IPX, no roaming, no settlement — and no road map to change that without a licensed partner ([roaming-future](../peering/roaming-future.md)).
+Fairwave does not make you a mobile operator, give you spectrum, or interconnect you with anyone. It is a private small-cell toolkit. No SEPP/IPX, no roaming, no settlement - and no road map to change that without a licensed partner ([roaming-future](../peering/roaming-future.md)).
 
 ## Not a spectrum free-for-all
 
@@ -36,7 +36,7 @@ Everything is inspectable: code, configs, ADRs, SBOMs, runtime gate state (`/v1/
 
 ## The one-sentence version
 
-> Fairwave is a lawful, private, inspectable small-cell toolkit for people who hold or lawfully access spectrum — not a surveillance device, not an MNO replacement, and not a shortcut past regulation.
+> Fairwave is a lawful, private, inspectable small-cell toolkit for people who hold or lawfully access spectrum - not a surveillance device, not an MNO replacement, and not a shortcut past regulation.
 
 ## Related
 

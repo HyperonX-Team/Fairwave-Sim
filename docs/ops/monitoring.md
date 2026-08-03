@@ -38,7 +38,7 @@ groups:
         expr: fairwave_sessions_active == 0
         for: 24h
         annotations:
-          summary: "no sessions for 24h — investigate or it's expected (lab?)"
+          summary: "no sessions for 24h - investigate or it's expected (lab?)"
 ```
 
 `fairwave_agent_ntp_offset_seconds` > 50 ms for 10 min → alert in RF deployments. `fairwave_agent_sdr_temp_celsius` > 75 → hardware check.
@@ -54,7 +54,7 @@ groups:
 - Grafana is optional and hand-provisioned (no bundled dashboard in v0.1); recommend three panels groups:
   1. **Coverage/sync**: `fairwave_tx_armed`, `fairwave_agent_gpsdo_lock`, NTP offset, eNB process state.
   2. **Backhaul**: uplink rate/latency, agent heartbeats, disk/IO.
-  3. **UE/usage**: `fairwave_sessions_active` (counts only), attach events per hash-bucket — never IMSI.
+  3. **UE/usage**: `fairwave_sessions_active` (counts only), attach events per hash-bucket - never IMSI.
 
 ## Log Retention
 
@@ -63,16 +63,16 @@ groups:
 | journald (agent, control) | system | 14 days default, extend to 90 |
 | component JSON logs | `/var/lib/fairwave/logs/` | 30 days, rotated 10 MB |
 | Prometheus TSDB | docker volume | 15 days, or as disk allows |
-| Gate/arm events | audit log (append-only) | **indefinite** — legal evidence |
+| Gate/arm events | audit log (append-only) | **indefinite** - legal evidence |
 
 Adjust retention to fit the disk; the audit log is exempt from cleanup by policy.
 
 ## Privacy in Monitoring
 
-- **No IMSI in logs, metrics, or dashboards** — enforced at the producer (`docs/architecture/telemetry.md`), not by dashboard config.
+- **No IMSI in logs, metrics, or dashboards** - enforced at the producer (`docs/architecture/telemetry.md`), not by dashboard config.
 - Session metrics are counts; UE identifiers are truncated hashes.
 - Review your alerting receivers: webhook endpoints receive metric labels only, which contain no subscriber data.
-- A stolen box's Prometheus DB reveals topology and counts, not subscribers — that is the point.
+- A stolen box's Prometheus DB reveals topology and counts, not subscribers - that is the point.
 
 ## Related
 

@@ -1,4 +1,4 @@
-# Fairwave Open5GS v2.7.x — HSS (lab). Loopback 127.0.0.8 (S6a).
+# Fairwave Open5GS v2.7.x - HSS (lab). Loopback 127.0.0.8 (S6a).
 # Subscribers are seeded by hss-init.sh into MongoDB (the `mongo` service).
 db_uri: mongodb://mongo:27017/open5gs
 logger:

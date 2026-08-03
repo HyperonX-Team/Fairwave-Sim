@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="dark">
-<title>Fairwave — Welcome</title>
+<title>Fairwave - Welcome</title>
 <style>
   :root { --bg:#0f1420; --panel:#171e2e; --line:#2a3654; --text:#dbe4f5;
     --muted:#8fa0bd; --accent:#4dd0e1; }
@@ -101,7 +101,7 @@ fetch("/v1/status", { headers: { "Accept": "application/json" } })
     dot.classList.toggle("up", up);
     status.textContent = up
       ? "Network is up (phase: " + s.phase + ", " + (s.ues || 0) + " UE(s))."
-      : "Network is being provisioned — check back soon.";
+      : "Network is being provisioned - check back soon.";
   })
   .catch(() => {
     dot.classList.remove("up");

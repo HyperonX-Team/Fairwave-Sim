@@ -1,7 +1,7 @@
 # Spectrum & Regulatory Matrix
 
 > [!IMPORTANT]
-> **Legal banner** — Fairwave defaults to lab/no-RF mode. Transmitting on cellular bands
+> **Legal banner** - Fairwave defaults to lab/no-RF mode. Transmitting on cellular bands
 > without authorization is illegal in most jurisdictions. You are solely responsible for
 > licenses, SAS grants, indoor restrictions, and type approval. HyperonX and contributors
 > provide software as-is for lawful private networks, research, and shared-spectrum regimes only.
@@ -26,7 +26,7 @@ code; the configuration layer will refuse to set ARFCN/band outside the allowed 
 
 Fairwave's software **soft-gates TX** via three independent layers:
 
-### Layer 1 — Compile mode
+### Layer 1 - Compile mode
 
 ```bash
 FAIRWAVE_RF_MODE=none      # default: no RF support compiled in
@@ -34,12 +34,12 @@ FAIRWAVE_RF_MODE=lab-zmq   # virtual zmq only (CI)
 FAIRWAVE_RF_MODE=hardware  # + enable_tx knob needed at runtime
 ```
 
-### Layer 2 — Runtime country gate
+### Layer 2 - Runtime country gate
 
 `country_code` must match a list of MCCs for which Fairwave has curated band plans. Note
 Fairwave does not force every MNC/MCC; those are your responsibility as operator.
 
-### Layer 3 — Frequency allow-list per profile
+### Layer 3 - Frequency allow-list per profile
 
 Each profile in `core/policy` declares:
 - `bands`: allowed LTE band numbers
@@ -59,20 +59,20 @@ generated Open5GS config to disk unless `node.is_lab=true && country_code == XX`
 
 ## Technical summary by country
 
-### USA — CBRS (48/3550–3700)
+### USA - CBRS (48/3550–3700)
 
 - Requires SAS client: proof-of-certified-GAA/PPA.
 - Fairwave stub has SAS **interface** + **mock**, with signed key exchange stub; distribution
   is subject to SAS vendor contract (CommScope, Google, Amdocs, Federated, etc.).
-- Self-hosted open SAS is not permitted—SAS must be certified per FCC Part 96.
+- Self-hosted open SAS is not permitted-SAS must be certified per FCC Part 96.
 
-### UK — Shared Access License (SAL)
+### UK - Shared Access License (SAL)
 
 - Operator completes Ofcom online form; receives a licence with permitted frequency/power.
 - Fairwave gates: `country_code=UK`, profile has `ofcom_licence_ref`, license number stored
   as part of tx-arm signed blob.
 
-### EU — various local / experimental licenses
+### EU - various local / experimental licenses
 
 - Most regimes require bundle with detailed technical annex; Fairwave accepts PDF upload
   as docs-only (not machine-parsed) and requires `licence_annex_version` token to sign.

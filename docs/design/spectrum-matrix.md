@@ -1,7 +1,7 @@
 # Spectrum Matrix
 
 > [!IMPORTANT]
-> **Legal banner** — Fairwave defaults to lab/no-RF mode. Transmitting on
+> **Legal banner** - Fairwave defaults to lab/no-RF mode. Transmitting on
 > cellular bands without proper authorization is illegal in most
 > jurisdictions. You are solely responsible for licenses, SAS grants,
 > indoor restrictions, and type approval. This matrix is a starting point,

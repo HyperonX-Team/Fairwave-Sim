@@ -19,8 +19,8 @@ artifacts affected.
 ## Impact
 
 - Components touched: [control plane | agent | CLI | EPC config | RAN | UI | deploy]
-- RF implications: [none | gated — describe which gate (spectrum/check,
-  tx/arm, band allow-list) applies] — **feature requests involving TX must
+- RF implications: [none | gated - describe which gate (spectrum/check,
+  tx/arm, band allow-list) applies] - **feature requests involving TX must
   respect the RF gate; proposals that bypass it will be rejected.**
 
 ## Alternatives considered

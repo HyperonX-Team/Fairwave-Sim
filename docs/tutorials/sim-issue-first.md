@@ -57,7 +57,7 @@ cat sims/2026-08-02/sims.json
 
 Notes:
 
-- `sims.csv` is the bureau-facing form (no Ki, no OPc — see the [bureau runbook](../sim-lifecycle/bureau-runbook.md)).
+- `sims.csv` is the bureau-facing form (no Ki, no OPc - see the [bureau runbook](../sim-lifecycle/bureau-runbook.md)).
 - `sims.json` is machine-readable for tooling.
 - `hss-hook.sh` is the provisioner hook that loads the Ki/OPc into the Open5GS HSS database locally.
 - Only `*_sha256_12` hashes ever appear in committed or logged output. Full Ki/OPc material lives only in the protected bundle files that never leave the machine by default.
@@ -79,7 +79,7 @@ The hook inserts the Ki/OPc into the HSS database via the Open5GS internal API. 
 
 ## Step 4: Attach a device
 
-### Option A — srsUE (lab, no SIM card needed)
+### Option A - srsUE (lab, no SIM card needed)
 
 The lab UE container reads the minted IMSI from the shared subscriber store:
 
@@ -92,15 +92,15 @@ docker compose -f deployments/lab/docker-compose.yml logs -f ue
 [srsue] PDN connectivity complete. IP: 10.45.0.2
 ```
 
-### Option B — a real handset with a physical SIM card
+### Option B - a real handset with a physical SIM card
 
-This requires a **provisioned SIM card** (a physical card whose Ki/OPc match the HSS record) and a node with RF armed. A physical card is *not* provisioned by `fairwave sim issue` alone — the provisioner output must go to a card bureau that personalizes the card with the same Ki/OPc (see [bureau runbook](../sim-lifecycle/bureau-runbook.md)).
+This requires a **provisioned SIM card** (a physical card whose Ki/OPc match the HSS record) and a node with RF armed. A physical card is *not* provisioned by `fairwave sim issue` alone - the provisioner output must go to a card bureau that personalizes the card with the same Ki/OPc (see [bureau runbook](../sim-lifecycle/bureau-runbook.md)).
 
 Workflow for a real handset:
 
 1. `fairwave sim issue --profile prod` (separate profile from lab; never mix).
 2. Send the encrypted bundle to your card bureau for personalization.
-3. On the node: set country code, acknowledge the license, and arm TX (`fairwave spectrum check`, then `fairwave tx arm` — see [spectrum gate ADR](../adr/0008-spectrum-gate.md)).
+3. On the node: set country code, acknowledge the license, and arm TX (`fairwave spectrum check`, then `fairwave tx arm` - see [spectrum gate ADR](../adr/0008-spectrum-gate.md)).
 4. Insert the card, dial nothing, watch the node UI for the attach: handset shows signal; control plane `/v1/sessions` lists the new session.
 
 Expected control-plane session:
@@ -123,7 +123,7 @@ curl -s http://127.0.0.1:8080/v1/sessions | jq
 }
 ```
 
-Note the session list exposes the IMSI **hash**, never the IMSI itself — see [privacy ADR](../adr/0010-privacy-logging.md).
+Note the session list exposes the IMSI **hash**, never the IMSI itself - see [privacy ADR](../adr/0010-privacy-logging.md).
 
 ## Differences: srsUE vs physical handset
 
@@ -137,7 +137,7 @@ Note the session list exposes the IMSI **hash**, never the IMSI itself — see [
 
 ## Next steps
 
-- [SIM lifecycle overview](../sim-lifecycle/index.md) — the full state machine.
-- [Provisioner architecture](../sim-lifecycle/provisioner.md) — crypto and formats.
-- [Bureau runbook](../sim-lifecycle/bureau-runbook.md) — turning JSON into cards.
-- [Revocation](../sim-lifecycle/revocation.md) — taking a SIM away.
+- [SIM lifecycle overview](../sim-lifecycle/index.md) - the full state machine.
+- [Provisioner architecture](../sim-lifecycle/provisioner.md) - crypto and formats.
+- [Bureau runbook](../sim-lifecycle/bureau-runbook.md) - turning JSON into cards.
+- [Revocation](../sim-lifecycle/revocation.md) - taking a SIM away.

@@ -4,7 +4,7 @@ title: Troubleshooting
 
 # Troubleshooting Reference
 
-Symptom → cause → fix, fastest first. When unsure where you are, run `fairwave doctor` — it checks containers, ports, ZMQ sockets, control-plane connectivity, and config schema, and prints a pass/fail table.
+Symptom → cause → fix, fastest first. When unsure where you are, run `fairwave doctor` - it checks containers, ports, ZMQ sockets, control-plane connectivity, and config schema, and prints a pass/fail table.
 
 | # | Symptom | Likely cause | Fix |
 | --- | --- | --- | --- |
@@ -35,5 +35,5 @@ curl -s http://127.0.0.1:8080/v1/tx/arm
 ## Still stuck?
 
 - Read the deep-dive for the relevant layer: [lab attach](../tutorials/lab-attach.md), [mesh runbook](../peering/mesh-runbook.md), [SIM lifecycle](../sim-lifecycle/index.md).
-- Open an issue with the doctor JSON, logs (hashes fine — no credentials), and what you changed.
+- Open an issue with the doctor JSON, logs (hashes fine - no credentials), and what you changed.
 - Do not post Ki/OPc, IMSIs, or vault material anywhere, including issue trackers (ADR-0010).

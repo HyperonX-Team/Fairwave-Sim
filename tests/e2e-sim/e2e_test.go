@@ -73,7 +73,7 @@ func TestStatusReflectsLab(t *testing.T) {
 		t.Fatalf("decode: %v (%s)", err, body)
 	}
 	if st.Mode != "lab" {
-		t.Fatalf("mode: %q (want lab) — is the control plane running in lab mode?", st.Mode)
+		t.Fatalf("mode: %q (want lab) - is the control plane running in lab mode?", st.Mode)
 	}
 	if st.TxArmed {
 		t.Fatal("TX must never be armed in lab mode")

@@ -1,4 +1,4 @@
-# Fairwave Open5GS v2.7.x — MME (lab, ZMQ virtual).
+# Fairwave Open5GS v2.7.x - MME (lab, ZMQ virtual).
 # Loopback addresses follow the Open5GS quickstart layout: each component
 # gets its own 127.0.0.x so all daemons can coexist in one container.
 # PLMN 999/99 = international private-network test range, non-routable.
