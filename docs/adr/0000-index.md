@@ -21,6 +21,7 @@ An ADR is immutable once accepted; superseding decisions get a new ADR that link
 | [0010](0010-privacy-logging.md) | UE identifier minimization: hash-at-rest, no IMSI in logs | Accepted | 2026-08-02 |
 | [0011](0011-captive-portal.md) | Onboarding: captive portal anchor, not an ePDG | Accepted | 2026-08-02 |
 | [0012](0012-config-format.md) | Config: three-file YAML + env; jsonschema validation | Accepted | 2026-08-02 |
+| [0013](0013-esim.md) | Lab eSIM (SM-DP+) stack: SGP.22-shaped RSP, JSON transport, lab-only | Accepted | 2026-08-04 |
 
 ## Conventions
 

@@ -10,6 +10,14 @@ versions follow [SemVer](https://semver.org/spec/v2.0.0.html).
 
 - Peering mesh data-plane runbook (v0.3 preview)
 - CBRS/SAS client interface stubs (M4 preview)
+- **Lab eSIM (SM-DP+) stack (`core/esim/`):** SGP.22-shaped remote SIM
+  provisioning with P-256 ECDH key agreement, AES-128-CMAC (NIST SP 800-38B
+  KAT-verified), counter-mode KDF, and AES-128-CBC encrypted bound profile
+  packages; ES9+ endpoints (`initiateAuthentication` ... `cancelSession`);
+  software eUICC running the full download loop for CI; QR activation codes
+  (`LPA:1$...`); CLI `fairwave esim issue|serve`; file-backed profile
+  registry (0600). Lab-only: dummy MCC 999 vectors, JSON transport pending
+  GSMA conformance. See docs/adr/0013-esim.md.
 
 ## [0.1.0] - 2026-08-02
 

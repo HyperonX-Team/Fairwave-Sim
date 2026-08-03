@@ -5,6 +5,7 @@ go 1.22
 require (
 	github.com/grandcat/zeroconf v1.0.0
 	github.com/prometheus/client_golang v1.19.1
+	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
 	github.com/spf13/cobra v1.8.1
 	github.com/xeipuuv/gojsonschema v1.2.0
 	gopkg.in/yaml.v3 v3.0.1

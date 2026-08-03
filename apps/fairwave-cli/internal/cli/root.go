@@ -31,6 +31,7 @@ func Root() *cobra.Command {
 	root.AddCommand(
 		nodeCmd(),
 		simCmd(),
+		esimCmd(),
 		peerCmd(),
 		spectrumCmd(),
 		policyCmd(),

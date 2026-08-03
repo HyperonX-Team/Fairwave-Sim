@@ -118,6 +118,7 @@ nav:
       - tutorials/lab-attach.md
       - tutorials/two-box-peering.md
       - tutorials/sim-issue-first.md
+      - tutorials/esim-first.md
       - tutorials/customization.md
   - Reference:
       - reference/glossary.md
