@@ -1,0 +1,17 @@
+# Fairwave Open5GS v2.7.x — SGW-U (lab, ZMQ virtual). Loopback 127.0.0.6.
+logger:
+  file:
+    path: /var/log/open5gs/sgwu.log
+  level: info
+
+global:
+  max:
+    ue: 1024
+
+sgwu:
+  pfcp:
+    server:
+      - address: 127.0.0.6
+  gtpu:
+    server:
+      - address: 127.0.0.6

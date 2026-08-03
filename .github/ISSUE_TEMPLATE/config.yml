@@ -1,0 +1,13 @@
+# Issues must use a template. Blank issues are disabled on purpose:
+# unlabeled issue triage hurts a community project more than it helps.
+blank_issues_enabled: false
+
+# Add contact links once the org/repo locations are finalized (e.g. a
+# security reporting form for SECURITY.md, a discussion forum):
+# contact_links:
+#   - name: Security reports
+#     url: https://github.com/<org>/fairwave/security/advisories/new
+#     about: Report vulnerabilities privately — never in a public issue
+#   - name: Community discussions
+#     url: https://github.com/<org>/fairwave/discussions
+#     about: Questions, show-and-tell, hardware build help

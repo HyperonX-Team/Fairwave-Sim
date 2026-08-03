@@ -1,0 +1,47 @@
+Fairwave — a community carrier in a pizza box
+Copyright 2026 HyperonX and the Fairwave contributors.
+
+This product includes software developed at
+HyperonX (https://github.com/HyperonX-Team).
+
+========================================================================
+Third-party attributions (deployed/integrated components)
+========================================================================
+
+Open5GS (https://github.com/open5gs/open5gs)
+  License: GNU AGPL v3.0 (network use only; unmodified containers)
+  SPDX: AGPL-3.0-only
+  Note:  Fairwave does not modify Open5GS source in the default path. It provides
+         configuration overlays, container recipes, and a control-plane integration.
+         Operators distributing modified Open5GS must comply with AGPL network-use terms.
+
+srsRAN Project (https://github.com/srsran/srsRAN_Project)
+  License: BSD-3-Clause (srsRAN Project) / AGPL-3.0 for srsRAN 4G components
+  SPDX: BSD-3-Clause AND AGPL-3.0-only (component dependent)
+  Note:  Used as-is via official containers/binaries. Fairwave controls it via config
+         and its REST/CLI interfaces; no patches are applied by default.
+
+srsUE / srsRAN 4G UE (https://github.com/srsran/srsRAN_4G)
+  License: AGPL-3.0
+  SPDX: AGPL-3.0-only
+
+WireGuard tools (https://www.wireguard.com)
+  License: GPLv2
+  SPDX: GPL-2.0-only
+
+Ory Hydra (https://github.com/ory/hydra) [OIDC provider used in dev]
+  License: Apache-2.0
+  SPDX: Apache-2.0
+
+The Prometheus Go client, gRPC-Go, Cobra, Zerolog, and other Go libraries:
+  See go.mod / go.sum for exact dependency list and individual licenses (Apache-2.0 / MIT / BSD-3).
+
+========================================================================
+Fairwave-specific legal posture
+========================================================================
+
+Fairwave itself is licensed Apache-2.0. SIM test vectors under sim/test-vectors are
+lab-only dummy data and contain no real network credentials.
+
+Deployers must independently verify they have spectrum authorization for any transmit
+operation. The presence of software support for a band does not imply legal authorization.

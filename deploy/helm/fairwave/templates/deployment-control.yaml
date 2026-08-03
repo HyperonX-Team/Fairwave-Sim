@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "fairwave.fullname" . }}-control
+  labels:
+    {{- include "fairwave.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.control.replicas }}
+  selector:
+    matchLabels:
+      {{- include "fairwave.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: control
+  template:
+    metadata:
+      labels:
+        {{- include "fairwave.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: control
+      {{- if .Values.metrics.enabled }}
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+      {{- end }}
+    spec:
+      serviceAccountName: {{ include "fairwave.fullname" . }}
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+      containers:
+        - name: control
+          image: "{{ .Values.control.image.repository }}:{{ .Values.control.image.tag }}"
+          imagePullPolicy: {{ .Values.control.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          env:
+            - name: FAIRWAVE_CONFIG
+              value: /etc/fairwave/fairwave-control.yaml
+            - name: FAIRWAVE_DATA_DIR
+              value: /var/lib/fairwave
+            {{- if .Values.control.tokenSecretName }}
+            - name: FAIRWAVE_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.control.tokenSecretName }}
+                  key: token
+            {{- end }}
+          livenessProbe:
+            httpGet:
+              path: /v1/healthz
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 15
+          readinessProbe:
+            httpGet:
+              path: /v1/healthz
+              port: http
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          resources:
+            {{- toYaml .Values.control.resources | nindent 12 }}
+          volumeMounts:
+            - name: config
+              mountPath: /etc/fairwave
+              readOnly: true
+            - name: data
+              mountPath: /var/lib/fairwave
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "fairwave.fullname" . }}-control
+        - name: data
+          persistentVolumeClaim:
+            claimName: {{ include "fairwave.fullname" . }}-data

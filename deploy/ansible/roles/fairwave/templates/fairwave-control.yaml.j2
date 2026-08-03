@@ -1,0 +1,29 @@
+# Rendered by ansible from deploy/ansible/roles/fairwave/templates/.
+# No secrets in this file — credentials live in /etc/fairwave/env (0600).
+version: 1
+mode: {{ fairwave_mode | default('lab') }}
+listen_addr: ":8080"
+data_dir: {{ fairwave_data_dir | default('/var/lib/fairwave') }}
+plmn:
+  mcc: {{ fairwave_plmn_mcc | default(999) }}
+  mnc: {{ fairwave_plmn_mnc | default(99) }}
+tac: {{ fairwave_tac | default(7) }}
+apns:
+  - internet
+  - ims
+max_ues: 128
+policy:
+  local_breakout: true
+  hub_peer: ""
+rf:
+  mode: {{ 'hardware' if fairwave_mode | default('lab') == 'rf' else 'lab' }}
+  country_file: /etc/fairwave/country
+  ack_file: /etc/fairwave/tx-ack
+open5gs:
+  mongo_uri: mongodb://mongo:27017
+  config_path: /etc/open5gs/open5gs.yaml
+enb:
+  mode: {{ 'rf' if fairwave_mode | default('lab') == 'rf' else 'zmq' }}
+  config: /etc/fairwave/ran/enb.{{ 'rf' if fairwave_mode | default('lab') == 'rf' else 'zmq' }}.yml
+agent:
+  token_env: FAIRWAVE_AGENT_TOKEN

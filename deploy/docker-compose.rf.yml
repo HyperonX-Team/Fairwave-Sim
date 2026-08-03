@@ -1,0 +1,161 @@
+# Fairwave RF stack — HARDWARE RADIO TEMPLATE. NOT for casual use.
+#
+# =============================================================================
+# THIS STACK REFUSES TO START UNLESS BOTH ARE TRUE:
+#   1. FAIRWAVE_RF_MODE=hardware       (explicit operator intent)
+#   2. FAIRWAVE_TX_ACK_FILE points at a file containing the acknowledgment
+#      text "I hold authorization for this transmission" plus a license ref
+#      (e.g. SAS-GAA-123) for the band/country in use.
+#
+# A country file (ISO-3166-1 alpha-2, e.g. "US") must also be present at
+# $FAIRWAVE_COUNTRY_FILE (default /etc/fairwave/country — mount it below).
+#
+# The `rf-gate` service enforces this before the eNB may start; the eNB
+# depends on it completing successfully. Keep this file as the reference
+# template: copy it to a private, non-committed name before adding any
+# real country/license material.
+# =============================================================================
+#
+# Usage:
+#   FAIRWAVE_RF_MODE=hardware \
+#   FAIRWAVE_TX_ACK_FILE=$PWD/deploy/config/tx-ack \
+#   docker compose -f docker-compose.rf.yml up -d --build
+#
+# Env overrides: FW_OPEN5GS_IMAGE, FW_SRS_IMAGE, FW_CONTROL_IMAGE,
+#               FW_CONTROL_PORT, FW_NET_SUBNET, FW_COUNTRY_FILE.
+
+name: fairwave-rf
+
+networks:
+  fwnet:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: ${FW_NET_SUBNET:-10.10.0.0/24}
+
+volumes:
+  mongo-data:
+  fairwave-data:
+
+services:
+  # ---------------------------------------------------------------------------
+  # RF gate: exits 0 only when hardware mode + acknowledgment + country are in
+  # place. The eNB waits on it, so a denied gate blocks the whole RF stack.
+  # ---------------------------------------------------------------------------
+  rf-gate:
+    image: alpine:3.20
+    restart: "no"
+    networks: [fwnet]
+    entrypoint: ["sh", "/scripts/rf-gate.sh"]
+    environment:
+      FAIRWAVE_RF_MODE: ${FAIRWAVE_RF_MODE:?FAIRWAVE_RF_MODE must be set to 'hardware' — this stack refuses to start otherwise}
+      FAIRWAVE_TX_ACK_FILE: ${FAIRWAVE_TX_ACK_FILE:?FAIRWAVE_TX_ACK_FILE must point at the license/acknowledgment file — this stack refuses to start otherwise}
+      FAIRWAVE_COUNTRY_FILE: /etc/fairwave/country
+    volumes:
+      - ./scripts/rf-gate.sh:/scripts/rf-gate.sh:ro
+      # Mount your country code file (contains "US" / "DE" / ... no newline
+      # requirements, trimmed by the script):
+      # - ./config/country:/etc/fairwave/country:ro
+
+  mongo:
+    image: ${FW_MONGO_IMAGE:-mongo:6.0}
+    restart: unless-stopped
+    networks: [fwnet]
+    volumes:
+      - mongo-data:/data/db
+      - ../core/open5gs:/init:ro
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+
+  open5gs:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.open5gs
+    image: ${FW_OPEN5GS_IMAGE:-open5gs:lab}
+    restart: unless-stopped
+    networks: [fwnet]
+    depends_on:
+      mongo:
+        condition: service_healthy
+    volumes:
+      - ../core/open5gs/open5gs.yaml:/etc/open5gs/open5gs.yaml:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep -x open5gs-mmed >/dev/null && pgrep -x open5gs-hssd >/dev/null && pgrep -x open5gs-pgwd >/dev/null"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  # ---------------------------------------------------------------------------
+  # srsENB with a real radio. PROFILE=enb-rf reads core/ran/enb.rf.yml;
+  # the USRP device args live there (device_name=uhd, master_clock_rate, ...).
+  # TX is not armed by the container — fairwave-control arms TX only after the
+  # spectrum gate + tx/arm acknowledgment (see the REST API).
+  # ---------------------------------------------------------------------------
+  enb:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.srsran
+    image: ${FW_SRS_IMAGE:-fairwave/srsran:lab}
+    restart: unless-stopped
+    networks: [fwnet]
+    privileged: true                      # USB SDR access (USRP/BladeRF/Lime)
+    environment:
+      PROFILE: enb-rf
+      RAN_CFG_DIR: /etc/fairwave/ran
+      FAIRWAVE_RF_MODE: ${FAIRWAVE_RF_MODE}
+    depends_on:
+      open5gs:
+        condition: service_healthy
+      rf-gate:
+        condition: service_completed_successfully
+    volumes:
+      - ../core/ran:/etc/fairwave/ran:ro
+      # Pass the host radio through (adjust the device path for your SDR):
+      # - /dev/bus/usb:/dev/bus/usb:ro
+    devices:
+      - /dev/bus/usb
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep -x srsenb >/dev/null"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  # ---------------------------------------------------------------------------
+  # No srsUE here: the RF stack serves real handsets. For an RF loopback test
+  # with ZMQ UEs, use the lab stack and swap enb PROFILE only.
+  # ---------------------------------------------------------------------------
+
+  control-plane:
+    build:
+      context: ..
+      dockerfile: deploy/docker/Dockerfile.control
+    image: ${FW_CONTROL_IMAGE:-fairwave/control:0.1.0}
+    restart: unless-stopped
+    networks: [fwnet]
+    ports:
+      - "${FW_CONTROL_PORT:-8080}:8080"
+    environment:
+      FAIRWAVE_CONFIG: /etc/fairwave/fairwave-control.yaml
+      FAIRWAVE_DATA_DIR: /var/lib/fairwave
+      FAIRWAVE_RF_MODE: ${FAIRWAVE_RF_MODE}
+      FAIRWAVE_TX_ACK_FILE: ${FAIRWAVE_TX_ACK_FILE}
+      FAIRWAVE_COUNTRY_FILE: /etc/fairwave/country
+    depends_on:
+      open5gs:
+        condition: service_healthy
+      enb:
+        condition: service_healthy
+    volumes:
+      - fairwave-data:/var/lib/fairwave
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:8080/v1/healthz || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 30s

@@ -1,0 +1,45 @@
+# Secrets & credentials — never commit
+*.key
+*.pem
+*.crt
+!test-vectors/*.pem  # lab-only dummy
+.env
+.env.*
+!.env.example
+secrets/
+vault/
+real-kis.txt
+
+# SIM real material guard (lab vectors allowed under sim/test-vectors only)
+sim/profiles/*-prod.*
+hss-data/
+open5gs-data/
+
+# Build
+bin/
+dist/
+out/
+*.test
+coverage.out
+coverage.xml
+sbom*.spdx.json
+
+# Go
+vendor/
+
+# Node
+node_modules/
+
+# Python
+.venv/
+__pycache__/
+site/
+
+# Docs
+docs/_gen/
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

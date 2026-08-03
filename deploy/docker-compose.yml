@@ -1,0 +1,228 @@
+# Fairwave lab stack — NO RF. Radio is ZMQ virtual (srsENB/srsUE talk over
+# tcp:// on the docker network; nothing touches an antenna).
+#
+# Bring up:    docker compose -f docker-compose.yml up -d --build
+# Teardown:    docker compose -f docker-compose.yml down -v
+#
+# REQUIRED env overrides (all optional, defaults in line):
+#   FW_MONGO_IMAGE     mongo:6.0
+#   FW_OPEN5GS_IMAGE   open5gs:lab
+#   FW_SRS_IMAGE       fairwave/srsran:lab
+#   FW_CONTROL_IMAGE   fairwave/control:0.1.0
+#   FW_CONTROL_PORT    8080
+#   FW_NET_SUBNET      10.10.0.0/24     (open5gs mme lands on .2 by default)
+#   FW_UE1_IMSI        999991234567001  (must be a lab test vector)
+#   FW_UE2_IMSI        999991234567002  (must be a lab test vector)
+#
+# NOTE: control-plane image builds from the repo root (it compiles Go from
+# core/fairwave-control + apps/fairwave-cli). The deploy/.dockerignore in this
+# directory applies only to the open5gs/srsran builds (context: deploy/).
+
+name: fairwave-lab
+
+networks:
+  fwnet:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: ${FW_NET_SUBNET:-10.10.0.0/24}
+
+volumes:
+  mongo-data:
+  fairwave-data:
+
+services:
+  # ---------------------------------------------------------------------------
+  # Subscriber database (Open5GS HSS). No auth inside the lab network.
+  # ---------------------------------------------------------------------------
+  mongo:
+    image: ${FW_MONGO_IMAGE:-mongo:6.0}
+    restart: unless-stopped
+    networks:
+      fwnet:
+        ipv4_address: ${FW_MONGO_IP:-10.10.0.10} # pinned to keep .2 free for the MME
+    volumes:
+      - mongo-data:/data/db
+      - ../core/open5gs:/init:ro            # hss-init.sh + configs for seeding
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+
+  # ---------------------------------------------------------------------------
+  # Open5GS EPC (mme, sgw, pgw, hss, pcrf) built from source v2.7.2.
+  # ---------------------------------------------------------------------------
+  open5gs:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.open5gs
+    image: ${FW_OPEN5GS_IMAGE:-open5gs:lab}
+    restart: unless-stopped
+    networks:
+      fwnet:
+        ipv4_address: ${FW_MME_IP:-10.10.0.2} # pinned: srsENB inet_pton() needs a literal IP
+    devices:
+      - "/dev/net/tun:/dev/net/tun"
+    cap_add:
+      - NET_ADMIN # UPF creates ogstun for UE traffic
+    environment:
+      FW_DEBUG_GDB: ${FW_DEBUG_GDB:-} # e.g. "open5gs-pcrfd" to wrap a daemon in gdb
+    depends_on:
+      mongo:
+        condition: service_healthy
+    volumes:
+      - ../core/open5gs/mme.yaml:/usr/local/etc/open5gs/mme.yaml:ro
+      - ../core/open5gs/sgwc.yaml:/usr/local/etc/open5gs/sgwc.yaml:ro
+      - ../core/open5gs/sgwu.yaml:/usr/local/etc/open5gs/sgwu.yaml:ro
+      - ../core/open5gs/smf.yaml:/usr/local/etc/open5gs/smf.yaml:ro
+      - ../core/open5gs/upf.yaml:/usr/local/etc/open5gs/upf.yaml:ro
+      - ../core/open5gs/hss.yaml:/usr/local/etc/open5gs/hss.yaml:ro
+      - ../core/open5gs/pcrf.yaml:/usr/local/etc/open5gs/pcrf.yaml:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep -x open5gs-mmed >/dev/null && pgrep -x open5gs-hssd >/dev/null && pgrep -x open5gs-upfd >/dev/null"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  # ---------------------------------------------------------------------------
+  # srsENB over ZMQ. One virtual cell; ZMQ TX bind *:2000, RX connect to
+  # 127.0.0.1:2001 (the UE's TX bind) — see deploy/docker/srs-entry.sh.
+  # The eNB must stay on fwnet (S1-MME to open5gs) and SHARE its namespace
+  # with ue1 so the ZMQ radio runs over localhost (no TCP jitter).
+  # ---------------------------------------------------------------------------
+  enb:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.srsran
+    image: ${FW_SRS_IMAGE:-fairwave/srsran:lab}
+    restart: unless-stopped
+    networks: [fwnet]
+    environment:
+      PROFILE: enb-zmq
+      RAN_CFG_DIR: /etc/fairwave/ran
+      FW_ENB_RX_PORTS: ${FW_ENB_RX_PORTS:-tcp://127.0.0.1:2001}
+    depends_on:
+      open5gs:
+        condition: service_healthy
+    volumes:
+      - ../core/ran:/etc/fairwave/ran:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep -x srsenb >/dev/null"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  # ---------------------------------------------------------------------------
+  # srsUE (ZMQ, single UE — the reference topology). Shares the eNB network
+  # namespace so the ZMQ radio runs over localhost (matches the srsRAN docs).
+  # ---------------------------------------------------------------------------
+  ue1:
+    image: ${FW_SRS_IMAGE:-fairwave/srsran:lab}
+    restart: unless-stopped
+    network_mode: "service:enb"
+    environment:
+      PROFILE: ue-zmq
+      RAN_CFG_DIR: /etc/fairwave/ran
+      UE_IMSI: ${FW_UE1_IMSI:-999991234567001}
+    depends_on:
+      enb:
+        condition: service_healthy
+    volumes:
+      - ../core/ran:/etc/fairwave/ran:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep -x srsue >/dev/null"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  # ue2: second lab UE. NOTE: srsENB's ZMQ PULL socket round-robins across
+  # connected UE TX endpoints, so a second UE halves each UE's uplink and
+  # breaks attach reliability. Two-UE labs must use two eNB RX channels
+  # (see docs/architecture/ran.md). Kept here as a template.
+  ue2:
+    image: ${FW_SRS_IMAGE:-fairwave/srsran:lab}
+    restart: unless-stopped
+    profiles: ["multi-ue"]
+    networks: [fwnet]
+    environment:
+      PROFILE: ue-zmq
+      RAN_CFG_DIR: /etc/fairwave/ran
+      UE_IMSI: ${FW_UE2_IMSI:-999991234567002}
+    depends_on:
+      enb:
+        condition: service_healthy
+    volumes:
+      - ../core/ran:/etc/fairwave/ran:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep -x srsue >/dev/null"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  # ---------------------------------------------------------------------------
+  # Fairwave control plane (REST API on :8080). Data persists in the volume;
+  # the config file is mounted read-only from ./config/ (create it from the
+  # ansible template or the helm configmap).
+  # ---------------------------------------------------------------------------
+  control-plane:
+    build:
+      context: ..
+      dockerfile: deploy/docker/Dockerfile.control
+    image: ${FW_CONTROL_IMAGE:-fairwave/control:0.1.0}
+    restart: unless-stopped
+    networks: [fwnet]
+    ports:
+      - "${FW_CONTROL_PORT:-8080}:8080"
+    environment:
+      FAIRWAVE_CONFIG: /etc/fairwave/fairwave-control.yaml
+      FAIRWAVE_SERVER_DATADIR: /var/lib/fairwave
+    depends_on:
+      open5gs:
+        condition: service_healthy
+      enb:
+        condition: service_healthy
+    volumes:
+      - fairwave-data:/var/lib/fairwave
+      - ./config/fairwave-control.yaml:/etc/fairwave/fairwave-control.yaml:ro
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:8080/v1/healthz || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  # ---------------------------------------------------------------------------
+  # Optional metrics. Uncomment after creating deploy/config/prometheus.yml
+  # with a scrape_config targeting control-plane:8080/metrics.
+  # ---------------------------------------------------------------------------
+  # metrics:
+  #   image: prom/prometheus:v2.53.0
+  #   restart: unless-stopped
+  #   networks: [fwnet]
+  #   command: ["--config.file=/etc/prometheus/prometheus.yml", "--storage.tsdb.retention.time=14d"]
+  #   volumes:
+  #     - ./config/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+  #     - prom-data:/prometheus
+  #   ports:
+  #     - "9090:9090"
+  # grafana:
+  #   image: grafana/grafana:11.0.0
+  #   restart: unless-stopped
+  #   networks: [fwnet]
+  #   environment:
+  #     GF_AUTH_ANONYMOUS_ENABLED: "true"
+  #     GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+  #   ports:
+  #     - "3000:3000"
+  #   volumes:
+  #     - grafana-data:/var/lib/grafana
+  #
+  # volumes:
+  #   prom-data:
+  #   grafana-data:

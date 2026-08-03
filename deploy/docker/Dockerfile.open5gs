@@ -1,0 +1,122 @@
+# Fairwave Open5GS image — EPC (mme, sgw, pgw, hss, pcrf) built from source.
+# Version pinned: Open5GS v2.7.2, Debian 12 base.
+#
+# Requires a MongoDB reachable at the hss db uri (lab: mongodb://mongo:27017,
+# see core/open5gs/open5gs.yaml).
+#
+# Build (from deploy/): docker build -f docker/Dockerfile.open5gs -t open5gs:lab .
+
+FROM debian:12 AS build
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        ca-certificates git meson ninja-build build-essential pkg-config \
+        flex bison python3 cmake \
+        libsctp-dev libgnutls28-dev libgcrypt-dev libssl-dev \
+        libmongoc-dev libbson-dev libyaml-dev libmicrohttpd-dev \
+        libcurl4-gnutls-dev libnghttp2-dev libtins-dev libtalloc-dev \
+        libpcsclite-dev libdw-dev libidn2-dev libidn11-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+ARG OPEN5GS_VERSION=v2.7.7
+RUN git clone --depth 1 --branch ${OPEN5GS_VERSION} \
+        https://github.com/open5gs/open5gs.git /src
+
+WORKDIR /src
+# -Wno-error=stringop-overflow: Open5GS v2.7.2 emits a false-positive
+# stringop-overflow with GCC >= 12 in mme-context.c; keep the rest of the
+# warning surface intact.
+RUN meson setup build --prefix=/usr/local -Dbuildtype=release \
+        -Dc_args="-Wno-error=stringop-overflow" \
+    && ninja -C build \
+    && ninja -C build install
+
+# ---------------------------------------------------------------------------
+# Runtime: Debian 12 slim. procps provides pgrep (used by healthchecks).
+# ---------------------------------------------------------------------------
+FROM debian:12-slim AS runtime
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        procps ca-certificates gdb \
+        libsctp1 libgnutls30 libgcrypt20 libssl3 \
+        libmongoc-1.0-0 libbson-1.0-0 libyaml-0-2 \
+        libmicrohttpd12 libcurl3-gnutls libnghttp2-14 \
+        libtins-dev libtalloc2 libpcsclite1 libdw1 libidn12 \
+    && rm -rf /var/lib/apt/lists/*
+# NOTE: libtins-dev is deliberately used at runtime — its name is ABI-stable
+# while the plain runtime package (libtinsX) varies with distro versioning.
+# Trim it to the exact package once your base is pinned.
+
+COPY --from=build /usr/local/bin /usr/local/bin
+COPY --from=build /usr/local/lib /usr/local/lib
+COPY --from=build /usr/local/etc/open5gs /usr/local/etc/open5gs
+COPY --from=build /usr/local/etc/freeDiameter /usr/local/etc/freeDiameter
+RUN ldconfig
+
+# freeDiameter TLS certs (self-signed, lab-grade). Open5GS' meson build
+# generates these only in the distro packages; we create an equivalent
+# local CA + per-component certs so the Diameter paths can start.
+RUN apt-get install -y --no-install-recommends openssl && \
+    mkdir -p /usr/local/etc/open5gs/tls && cd /usr/local/etc/open5gs/tls && \
+    openssl req -x509 -newkey rsa:2048 -nodes -days 3650 \
+        -keyout ca.key -out ca.crt -subj "/CN=Fairwave Lab CA" 2>/dev/null && \
+    for c in mme hss smf pcrf; do \
+        openssl req -newkey rsa:2048 -nodes -subj "/CN=$c.localdomain" \
+            -keyout $c.key -out $c.csr 2>/dev/null && \
+        openssl x509 -req -in $c.csr -CA ca.crt -CAkey ca.key \
+            -CAcreateserial -days 3650 -out $c.crt 2>/dev/null && \
+        rm -f $c.csr; \
+    done && \
+    rm -f ca.srl && apt-get purge -y openssl >/dev/null 2>&1 || true
+
+# Entrypoint: run the EPC daemons together with a respawn loop; forward
+# signals to all. Open5GS v2.7 renamed daemons: SGW -> sgwc+sgwu,
+# PGW -> smf+upf. A crashed daemon is restarted (crash-loops are capped).
+RUN <<'EOF'
+cat > /usr/local/bin/open5gs-entry.sh <<'SH'
+#!/usr/bin/env bash
+set -u
+mkdir -p /var/log/open5gs /var/local/log/open5gs
+# Create the UPF data interface (ogstun) for UE traffic (10.45.0.1/16).
+if command -v ip >/dev/null 2>&1; then
+    ip tuntap add dev ogstun mode tun 2>/dev/null || true
+    ip addr add 10.45.0.1/16 dev ogstun 2>/dev/null || true
+    ip link set ogstun up 2>/dev/null || true
+fi
+DAEMONS=(open5gs-nrfd open5gs-mmed open5gs-sgwcd open5gs-sgwud open5gs-smfd open5gs-upfd open5gs-hssd open5gs-pcrfd)
+declare -A pids
+shutdown() { echo "[open5gs-entry] stopping"; kill "${pids[@]}" 2>/dev/null || true; wait; exit 0; }
+trap shutdown TERM INT
+
+for d in "${DAEMONS[@]}"; do
+    echo "[open5gs-entry] starting $d"
+    if [[ -n "${FW_DEBUG_GDB:-}" && -x /usr/bin/gdb && -n "$(command -v $d)" ]]; then
+        # Debug hook: wrap a daemon in gdb and dump a backtrace on crash.
+        # Enable with: FW_DEBUG_GDB=open5gs-pcrfd (logs to /tmp/gdb-$d.log)
+        if [[ "$d" == "$FW_DEBUG_GDB" ]]; then
+            echo "[open5gs-entry] DEBUG: wrapping $d in gdb (log: /var/log/open5gs/gdb-$d.log)"
+            ( /usr/bin/gdb -batch -ex 'run' -ex 'bt 15' --args "$d" > "/var/log/open5gs/gdb-$d.log" 2>&1 & )
+            pids["$d"]=$!
+            continue
+        fi
+    fi
+    "$d" &
+    pids["$d"]=$!
+done
+
+while true; do
+    for d in "${DAEMONS[@]}"; do
+        if ! kill -0 "${pids[$d]}" 2>/dev/null; then
+            echo "[open5gs-entry] $d exited; restarting"
+            "$d" &
+            pids["$d"]=$!
+        fi
+    done
+    sleep 5
+done
+SH
+chmod +x /usr/local/bin/open5gs-entry.sh
+EOF
+
+EXPOSE 36412/udp 2152/udp 2123/udp 3868/udp
+
+ENTRYPOINT ["/usr/local/bin/open5gs-entry.sh"]

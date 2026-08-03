@@ -1,0 +1,46 @@
+# Fairwave Open5GS v2.7.x — MME (lab, ZMQ virtual).
+# Loopback addresses follow the Open5GS quickstart layout: each component
+# gets its own 127.0.0.x so all daemons can coexist in one container.
+# PLMN 999/99 = international private-network test range, non-routable.
+# The eNB (srsENB) reaches this MME's S1-MME at 10.10.0.2:36412.
+logger:
+  file:
+    path: /var/log/open5gs/mme.log
+  level: debug
+
+global:
+  max:
+    ue: 1024
+
+mme:
+  freeDiameter: /usr/local/etc/freeDiameter/mme.conf
+  s1ap:
+    server:
+      - address: 0.0.0.0
+        port: 36412
+  gtpc:
+    server:
+      - address: 127.0.0.2
+    client:
+      sgwc:
+        - address: 127.0.0.3
+      smf:
+        - address: 127.0.0.4
+  gummei:
+    - plmn_id:
+        mcc: 999
+        mnc: 99
+      mme_gid: 2
+      mme_code: 1
+  tai:
+    - plmn_id:
+        mcc: 999
+        mnc: 99
+      tac: 7
+  security:
+    integrity_order: [EIA2, EIA1, EIA0]
+    ciphering_order: [EEA0, EEA1, EEA2]
+  network_name:
+    full: Fairwave Lab
+    short: FW
+  mme_name: fairwave-mme0

@@ -1,0 +1,37 @@
+# Fairwave Open5GS v2.7.x — SMF (lab, ZMQ virtual). Loopback 127.0.0.4.
+# SMF replaced PGW-C in v2.7. IMPORTANT: this is the EPC-only SMF —
+# the SBI section is deliberately absent (matches the known-working
+# s5uishida Open5GS EPC + srsRAN_4G ZMQ reference). A configured SBI/NRF
+# client makes the SMF spam HTTP/2 SBI retries and can stall EPC attach.
+logger:
+  file:
+    path: /var/log/open5gs/smf.log
+  level: info
+
+global:
+  max:
+    ue: 1024
+
+smf:
+  pfcp:
+    server:
+      - address: 127.0.0.4
+    client:
+      upf:
+        - address: 127.0.0.7
+          dnn: internet
+  gtpc:
+    server:
+      - address: 127.0.0.4
+  gtpu:
+    server:
+      - address: 127.0.0.4
+  session:
+    - subnet: 10.45.0.0/16
+      gateway: 10.45.0.1
+      dnn: internet
+  dns:
+    - 8.8.8.8
+    - 8.8.4.4
+  mtu: 1400
+  freeDiameter: /usr/local/etc/freeDiameter/smf.conf

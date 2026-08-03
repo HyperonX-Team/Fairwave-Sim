@@ -1,0 +1,33 @@
+# SIM material guards — keep credentials and prod material out of git.
+# The test vectors are the ONLY exception (explicitly dummy, lab-only).
+
+# Issued output (never committed)
+sims/
+*.bundle.enc
+sims.csv
+sims.json
+manifest.txt
+hss-hook.sh
+
+# Prod materials in any form, anywhere
+*.prod.*
+**/prod/**
+prod/
+
+# Key material — guard by name everywhere
+ki*
+opc*
+*.ki
+*.opc
+!**/test-vectors/**
+!**/test-vectors/**/*
+
+# KEKs, vaults, bureau exports
+*.kek
+*.vault
+*.enc.csv
+bureau_*.csv
+
+# Local tooling state
+*.log
+.env

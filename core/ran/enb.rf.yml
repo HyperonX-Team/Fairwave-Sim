@@ -1,0 +1,44 @@
+# Fairwave srsENB config — HARDWARE RF TEMPLATE (USRP).
+#
+# WARNING: transmitting on licensed spectrum without authorization is
+# unlawful. This template must NOT be used unless:
+#   - FAIRWAVE_RF_MODE=hardware is set (compose/helm gates)
+#   - FAIRWAVE_TX_ACK_FILE exists with the acknowledgment line
+#     "I hold authorization for this transmission"
+#   - the operator holds a license for the band/country configured below
+#
+# srsRAN_4G (release_23_10) INI format; rendered by fairwave-control to
+# /etc/srsran/enb.conf and consumed by deploy/docker/srs-entry.sh (PROFILE
+# enb-rf, which re-verifies FAIRWAVE_RF_MODE before exec).
+
+[enb]
+enb_id = 0x19B
+cell_id = 0x01
+tac = 7
+mcc = 999
+mnc = 99
+# S1-MME: see enb.zmq.yml — same note; replace with the EPC IP/hostname.
+mme_addr = 10.10.0.2
+gtp_bind_addr = 127.0.0.1
+s1c_bind_addr = 0.0.0.0
+s1u_bind_addr = 0.0.0.0
+n_prb = 50
+
+[rrc]
+max_users = 32
+
+[rf]
+device_name = uhd
+# USRP device args — adjust per unit: type=b200 (B200mini), serial=..., or
+# master_clock_rate=23.04e6 for LTE. Multiple args are comma-separated.
+device_args = type=b200,master_clock_rate=23.04e6
+tx_gain = 60
+rx_gain = 50
+# EARFCNs MUST come from the operator's license — set per licensed band,
+# e.g. band 3 downlink/upstream pair, NOT the lab defaults.
+# Example (band 3):  dl_earfcn = 1530   ul_earfcn = 19800
+dl_earfcn = 3350
+ul_earfcn = 21400
+# FREQUENCY PER LICENSE: fairwave-control substitutes dl/ul earfcn from the
+# approved band allow-list at /v1/spectrum/check time. The values above are
+# placeholders and must never be used for hardware TX without a license.

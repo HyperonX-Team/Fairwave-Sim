@@ -1,0 +1,92 @@
+# Fairwave Open5GS v2.7.x configuration — lab profile (NO RF, ZMQ virtual).
+#
+# NOTE ON PLMN: MMC/MNC use the international private network test PLMN
+# 999/99 (non-routable test range) — never transmit with it.
+#
+# Mounted by deploy/docker-compose.yml at /etc/open5gs/open5gs.yaml.
+# MongoDB must be reachable at the hss db uri (lab: the `mongo` service).
+#
+# Format: Open5GS v2.7 "server:" list syntax (see open5gs.org quickstart).
+# Addresses are container-internal; the eNB (srsENB) reaches the MME S1-MME
+# at 10.10.0.2:36412 on the default fwnet subnet (docker .2 = first service).
+
+logger:
+  file: /var/log/open5gs/open5gs.log
+  level: info
+
+global:
+  max:
+    ue: 1024
+    peer: 128
+
+mme:
+  freeDiameter: /etc/freeDiameter/mme.conf
+  s1ap:
+    server:
+      - address: 0.0.0.0
+        port: 36412
+  gtpc:
+    server:
+      - address: 127.0.0.1
+  gummei:
+    - plmn_id:
+        mcc: 999
+        mnc: 99
+      mme_gid: 2
+      mme_code: 1
+  tai:
+    - plmn_id:
+        mcc: 999
+        mnc: 99
+      tac: 7
+  security:
+    integrity_order: [EIA1, EIA2, EIA0]
+    ciphering_order: [EEA0, EEA1, EEA2]
+  network_name:
+    full: Fairwave Lab
+    short: FW
+
+sgw:
+  gtpc:
+    server:
+      - address: 127.0.0.1
+  gtpu:
+    server:
+      - address: 127.0.0.1
+
+pgw:
+  gtpc:
+    server:
+      - address: 127.0.0.1
+  gtpu:
+    server:
+      - address: 127.0.0.1
+  ue_pool:
+    - 10.45.0.0/16
+  apn:
+    - apn: internet
+      dns:
+        ipv4:
+          - 8.8.8.8
+          - 1.1.1.1
+    - apn: ims
+      dns:
+        ipv4:
+          - 8.8.8.8
+          - 1.1.1.1
+
+hss:
+  db:
+    uri: mongodb://mongo:27017
+    name: open5gs
+
+pcrf:
+  freeDiameter: /etc/freeDiameter/pcrf.conf
+  gtpc:
+    server:
+      - address: 127.0.0.1
+
+parameters:
+  default_dns:
+    - 8.8.8.8
+    - 1.1.1.1

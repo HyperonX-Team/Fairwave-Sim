@@ -1,0 +1,17 @@
+# Linter config for all Fairwave Go code. Keep the bar high but practical.
+run:
+  timeout: 5m
+linters:
+  enable:
+    - errcheck
+    - govet
+    - gofmt
+    - goimports
+    - misspell
+    - revive
+    - staticcheck
+    - unused
+issues:
+  exclude-rules:
+    - path: api/go/gen
+      linters: [revive, misspell] # generated code

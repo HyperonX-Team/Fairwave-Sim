@@ -1,0 +1,26 @@
+# Fairwave pre-commit hooks: keep secrets out, keep code clean.
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-added-large-files
+        args: ["--maxkb=500"]
+      - id: check-yaml
+        files: \.(yaml|yml)$
+        exclude: deploy/helm/.*templates/.*
+      - id: detect-private-key
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.18.4
+    hooks:
+      - id: gitleaks
+  - repo: https://github.com/gofmt/gofmt
+    rev: v0.1.0
+    hooks:
+      - id: go-fmt
+  - repo: https://github.com/golangci/golangci-lint
+    rev: v1.64.8
+    hooks:
+      - id: golangci-lint
+        args: ["run", "--config=.golangci.yml", "./..."]

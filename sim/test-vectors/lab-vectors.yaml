@@ -1,0 +1,45 @@
+# =============================================================================
+# LAB-ONLY DUMMY TEST VECTORS — NOT REAL CREDENTIALS.
+#
+# These Ki/OPc pairs are static, published, public dummy values for the
+# Fairwave lab only (ZMQ virtual radio, no RF). They are:
+#   - deliberately weak and known (never derive security assumptions from them)
+#   - issued under IMSI range 999991234567001..003, the 999 test range
+#     (non-routable — no carrier network will ever accept them)
+#   - THE ONLY SIM material allowed in the compose lab stack
+#
+# NEVER:
+#   - use any of these vectors outside a lab/campus testbed
+#   - copy them into a prod profile, a prod HSS, or a bureau shipment
+#   - reference them from hardware-RF configurations
+# Real credentials are minted offline by the provisioner (sim/provisioner)
+# with HSM-backed storage (sim/profiles/prod.yaml gates).
+# =============================================================================
+
+# The compose stack + core/open5gs/hss-init.sh + core/ran/ue.zmq.yml read
+# these exact values. If you change them, change all three together.
+
+vectors:
+  - imsi: "999991234567001"
+    ki: "465B5CE8B199B49FAA5F0A2EE238A6BC"
+    opc: "4D9B7A2C5E8F1A3B6C0D2E4F7A9B5C1D"
+    note: "test-only, lab UE #1"
+
+  - imsi: "999991234567002"
+    ki: "8A1F3C9D5E7B2A4F6C8D0E1F3A5B7C9D"
+    opc: "2E6B4A7D9F1C3E5B8A0D2F4C6E8B1A3F"
+    note: "test-only, lab UE #2"
+
+  - imsi: "999991234567003"
+    ki: "3C9E5B7A1D8F2C4E6A0B3D5F7C9E1B2A"
+    opc: "7F1D3A5C9B2E4F6A8C0D2E4B6F8A1C3"
+    note: "test-only, spare"
+
+meta:
+  plmn:
+    mcc: 999
+    mnc: 99
+  algorithm: milenage
+  amf: "8000"
+  sqn_start: "0000000000000000"
+  classify: lab_only

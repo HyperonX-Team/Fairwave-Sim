@@ -1,0 +1,32 @@
+---
+# Fairwave node deployment — Debian 12 host.
+#   ansible-playbook -i inventory.example.yml playbook.yml
+- name: Deploy Fairwave node (control plane + agent, docker, firewall)
+  hosts: fairwave
+  become: true
+  vars:
+    fairwave_user: fairwave
+    fairwave_dir: /etc/fairwave
+    fairwave_data_dir: /var/lib/fairwave
+    fairwave_mode: "{{ fairwave_mode | default('lab') }}"
+    fairwave_control_endpoint: "{{ fairwave_control_endpoint | default('http://127.0.0.1:8080') }}"
+    fairwave_env: "{{ fairwave_env | default([]) }}"
+    fairwave_ufw_rules:
+      - rule: allow
+        port: "8080"
+        proto: tcp
+        from_ip: 10.0.0.0/8
+      - rule: allow
+        port: "8080"
+        proto: tcp
+        from_ip: 172.16.0.0/12
+      - rule: allow
+        port: "8080"
+        proto: tcp
+        from_ip: 192.168.0.0/16
+      - rule: allow
+        port: "51820"
+        proto: udp
+        from_ip: 0.0.0.0/0
+  roles:
+    - fairwave

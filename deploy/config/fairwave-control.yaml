@@ -1,0 +1,27 @@
+# Fairwave control-plane lab config (generated; safe defaults).
+server:
+  listen: ":8080"
+  data_dir: /var/lib/fairwave
+  mode: lab
+  country: LAB
+  log_level: info
+  log_format: console
+plmn:
+  mcc: "999"
+  mnc: "99"
+tac: 7
+apns: [internet, ims]
+auth:
+  bootstrap_token_ttl: 5m
+  admin_token_env: FAIRWAVE_ADMIN_TOKEN
+southbound:
+  driver: none
+peering:
+  enabled: true
+  mdns: false
+policy:
+  local_breakout: true
+  max_ues: 128
+  apns: [internet, ims]
+telemetry:
+  metrics: true

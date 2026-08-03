@@ -1,0 +1,15 @@
+# Fairwave dev-kit BOM (lab tier) — one unit, prices USD, Q3-2026 street estimate.
+# vendor_hint is a hint, not an endorsement; shop around.
+part,qty,unit_usd,vendor_hint,notes
+USRP B200mini-i SDR,1,1325.00,Ettus/NI (Ettus Research),2x2 MIMO 70 MHz-6 GHz; dev + measurement radio; USB3
+Mini-ITX arm64 SBC (ODROID-M1 / Rock 5B),1,110.00,Hardkernel / OKDO,4-8 GB RAM; runs control-plane + agent; passive-capable
+32 GB eMMC / SD,1,14.00,SanDisk / Samsung,boots Debian 12 golden image (hw/image)
+48V-to-12V DC-DC converter,1,22.00,Mean Well,on-board power; or 12V PSU 65W
+260 mm pizza-box enclosure,1,45.00,CNC/sheet metal,see hw/enclosure; aluminum for heatsinking
+40 mm PWM fan,2,8.00,Noctua/Arctic,front-to-back airflow; fanless capable in lab
+GPSDO module (optional),1,60.00,Leo Bodnar / u-blox,10 MHz + PPS discipline for RF; lab can skip
+SMA-SMA jumper,4,9.00,generic,panel-to-SDR pigtails
+Dipole antenna 2.4 GHz (lab RX only),1,12.00,generic,never used for TX in lab
+PoE splitter 802.3af,1,25.00,generic,optional power path
+Thermal pad / standoffs kit,1,15.00,generic,0.5 W/mK for SDR-to-case coupling
+USB3 A-B cable 0.5 m,2,8.00,generic,SDR + backup

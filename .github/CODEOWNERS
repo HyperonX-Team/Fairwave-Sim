@@ -1,0 +1,27 @@
+# Core/security-sensitive paths are owned by the Fairwave maintainers.
+# Changes to these files require a maintainer review, no exceptions.
+
+# SIM material (profiles, vectors, provisioner, bureau format)
+/sim/ @HyperonX-Team
+
+# RF and spectrum (RAN configs, RF gate, tx/arm policy)
+/core/ran/ @HyperonX-Team
+/deploy/scripts/ @HyperonX-Team
+/deploy/docker-compose.rf.yml @HyperonX-Team
+/deploy/docker/srs-entry.sh @HyperonX-Team
+
+# Credential handling (HSS seed, subscriber store)
+/core/open5gs/ @HyperonX-Team
+
+# Mesh identity (WireGuard keys, peering)
+/core/peering/ @HyperonX-Team
+
+# Deploy assets that run on production-like nodes
+/deploy/helm/ @HyperonX-Team
+/deploy/ansible/ @HyperonX-Team
+/deploy/terraform/ @HyperonX-Team
+/hw/image/ @HyperonX-Team
+
+# Security policy documents
+SECURITY.md @HyperonX-Team
+GOVERNANCE.md @HyperonX-Team

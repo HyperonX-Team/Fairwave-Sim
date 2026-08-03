@@ -1,0 +1,16 @@
+# Fairwave community-build BOM — cost-optimized tier, one unit, USD, Q3-2026.
+# Community tier targets ~$600 total. Budget SDRs below are for lab/community
+# trials only: transmit eligibility still requires the full RF gate.
+part,qty,unit_usd,vendor_hint,notes
+LimeSDR-mini SDR,1,150.00,Crowd Supply (if available),LMS7002M, 10 MHz-3.5 GHz; or BladeRF x40 (see hw/sdr-notes)
+Raspberry Pi 5 4 GB,1,80.00,Raspberry Pi (approved resellers),arm64; runs control-plane + agent
+32 GB SD card (A2),1,15.00,SanDisk,class A2 for reliable boots
+12V 3A PSU,1,20.00,Mean Well / PULS,lab-safe power
+260 mm enclosure (printed),1,30.00,Prusa/MakerWorld print,ABS/ASA; see hw/enclosure
+40 mm fan,1,6.00,Arctic,one is enough at this TDP
+SMA-SMA jumper,2,9.00,generic,panel-to-SDR
+Dipole antenna (lab RX),1,10.00,generic,no TX in lab mode
+USB3 A-C cable 1 m,1,8.00,generic
+Thermal pad sheet,1,10.00,generic,0.5 W/mK
+Standoffs + screws kit,1,12.00,generic
+Optional: BladeRF x40 instead of LimeSDR-mini,1,480.00,Nuand,add if you need 2x2 or higher sample rates

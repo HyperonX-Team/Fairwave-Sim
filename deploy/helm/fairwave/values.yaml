@@ -1,0 +1,96 @@
+# Fairwave Helm values — lab defaults. No secrets here; tokens come from a
+# Secret referenced by control.tokenSecretName.
+
+# ---------------------------------------------------------------------------
+# Control plane (fairwave-control, REST API :8080)
+# ---------------------------------------------------------------------------
+control:
+  replicas: 1
+  image:
+    repository: fairwave/control
+    tag: 0.1.0
+    pullPolicy: IfNotPresent
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: "1"
+      memory: 512Mi
+  # Persistent volume for node/peer/policy state (SQLite / JSON store).
+  dataStorage: 1Gi
+  # Secret containing a key named `token`. Empty string disables bearer auth.
+  tokenSecretName: ""
+  service:
+    type: ClusterIP
+    port: 8080
+  # Rendered into /etc/fairwave/fairwave-control.yaml (see
+  # configmap-control.yaml).
+  config:
+    mode: lab                 # lab = NO RF; on-air transitions are blocked
+    listenAddr: ":8080"
+    dataDir: /var/lib/fairwave
+    plmn:
+      mcc: 999
+      mnc: 99
+    tac: 7
+    apns: [internet, ims]
+    maxUes: 128
+    localBreakout: true
+    hubPeer: ""
+
+# ---------------------------------------------------------------------------
+# Open5GS EPC + MongoDB (disabled when an external core is used)
+# ---------------------------------------------------------------------------
+open5gs:
+  enabled: true
+  image:
+    repository: open5gs
+    tag: lab
+    pullPolicy: IfNotPresent
+  mongoImage:
+    repository: mongo
+    tag: "6.0"
+    pullPolicy: IfNotPresent
+  mongoStorage: 8Gi
+
+# ---------------------------------------------------------------------------
+# Radio (srsRAN). mode: zmq = virtual radio, no antenna, lab only.
+# mode: rf requires the RF gate (FAIRWAVE_RF_MODE=hardware + ack file) —
+# configure via extra env, never via these defaults.
+# ---------------------------------------------------------------------------
+enb:
+  enabled: true
+  mode: zmq                    # zmq | rf
+  image:
+    repository: fairwave/srsran
+    tag: lab
+    pullPolicy: IfNotPresent
+  resources:
+    requests:
+      cpu: 500m
+      memory: 512Mi
+    limits:
+      cpu: "4"
+      memory: 2Gi
+  # Per-UE uplink ports for the ZMQ source (comma-separated).
+  zmqRxPorts: "tcp://ue1:2000,tcp://ue2:2000"
+  # Uncomment for hardware radio access (host USB passthrough).
+  # privileged: true
+
+# ---------------------------------------------------------------------------
+# Network policy / ingress / metrics
+# ---------------------------------------------------------------------------
+networkPolicies:
+  enabled: true
+
+ingress:
+  enabled: false
+  host: fairwave.example.com
+  annotations: {}
+
+metrics:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+    interval: 30s

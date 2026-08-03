@@ -1,0 +1,60 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+  packages: write
+  id-token: write # keyless cosign signing
+
+jobs:
+  release:
+    name: Build + SBOM + sign
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+      - name: Derive version
+        id: version
+        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Build binaries
+        run: |
+          mkdir -p dist
+          for os in linux windows darwin; do
+            for arch in amd64 arm64; do
+              GOOS=$os GOARCH=$arch CGO_ENABLED=0 go build \
+                -ldflags "-X github.com/HyperonX-Team/Fairwave-Sim/core/fairwave-control/internal/api.Version=${{ steps.version.outputs.VERSION }} -X github.com/HyperonX-Team/Fairwave-Sim/apps/fairwave-cli/internal/cli.Version=${{ steps.version.outputs.VERSION }}" \
+                -o dist/fairwave-control-${os}-${arch} ./core/fairwave-control/cmd/fairwave-control
+              GOOS=$os GOARCH=$arch CGO_ENABLED=0 go build \
+                -ldflags "-X github.com/HyperonX-Team/Fairwave-Sim/apps/fairwave-cli/internal/cli.Version=${{ steps.version.outputs.VERSION }}" \
+                -o dist/fairwave-agent-${os}-${arch} ./core/fairwave-agent/cmd/fairwave-agent
+              GOOS=$os GOARCH=$arch CGO_ENABLED=0 go build \
+                -ldflags "-X github.com/HyperonX-Team/Fairwave-Sim/apps/fairwave-cli/internal/cli.Version=${{ steps.version.outputs.VERSION }}" \
+                -o dist/fairwave-${os}-${arch} ./apps/fairwave-cli/cmd/fairwave
+            done
+          done
+
+      - name: Generate SBOM
+        uses: anchore/sbom-action@v0.17.2
+        with:
+          path: .
+          format: spdx-json
+          output-file: sbom.spdx.json
+
+      - name: Attest SBOM (cosign keyless)
+        uses: sigstore/cosign-installer@v3
+      - run: cosign attest-blob --yes sbom.spdx.json
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/*
+            sbom.spdx.json
+          body_path: CHANGELOG.md
+          draft: true

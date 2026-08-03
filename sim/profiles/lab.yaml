@@ -1,0 +1,29 @@
+# Fairwave SIM profile — lab.
+#
+# LAB-ONLY. IMSIs under the 999 test range are non-routable; nothing here
+# may ever be used outside a lab/campus testbed. The control plane refuses
+# to issue prod-class SIMs from this profile (class: lab_only).
+
+name: lab
+description: Non-routable test range for the Fairwave lab (ZMQ virtual radio).
+class: lab_only            # controls what the control plane allows it to do
+
+imsi_prefix: "9999912"     # expands to 99999123456XXXX (15 digits max)
+plmn:
+  mcc: 999
+  mnc: 99
+
+security:
+  algorithm: milenage      # 3GPP TS 35.205/35.206
+  key_size: 128            # Ki length in bits (AES-128)
+  opc_derivation: true     # store OPc, derive per 3GPP TS 33.102
+
+apns:
+  - internet
+  - ims
+
+validity_days: 365
+
+# Attach behavior: lab SIMs may be auto-loaded into the lab HSS (see
+# core/open5gs/hss-init.sh + docs/sim-lifecycle/provisioner.md).
+hss_auto_load: true

@@ -1,0 +1,43 @@
+{{- if .Values.metrics.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "fairwave.fullname" . }}-metrics
+  labels:
+    {{- include "fairwave.labels" . | nindent 4 }}
+  {{- if .Values.metrics.serviceMonitor.enabled }}
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8080"
+    prometheus.io/path: "/metrics"
+  {{- end }}
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - name: metrics
+      port: 8080
+      targetPort: http
+      protocol: TCP
+  selector:
+    {{- include "fairwave.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: control
+{{- end }}
+{{- if and .Values.metrics.enabled .Values.metrics.serviceMonitor.enabled }}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "fairwave.fullname" . }}
+  labels:
+    {{- include "fairwave.labels" . | nindent 4 }}
+spec:
+  jobLabel: {{ include "fairwave.fullname" . }}
+  selector:
+    matchLabels:
+      {{- include "fairwave.selectorLabels" . | nindent 6 }}
+  endpoints:
+    - port: metrics
+      path: /metrics
+      interval: {{ .Values.metrics.serviceMonitor.interval }}
+{{- end }}

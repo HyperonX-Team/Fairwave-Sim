@@ -1,0 +1,245 @@
+openapi: 3.0.3
+info:
+  title: Fairwave Control Plane API
+  description: |
+    Northbound API for the Fairwave community carrier. All endpoints are
+    JSON; auth is `Authorization: Bearer <token>` unless loopback-lab mode.
+    Errors use the envelope `{"error":{"code":"...","message":"..."}}`.
+    TX endpoints refuse by default — see spectrum gate docs.
+  version: 0.1.0
+  license:
+    name: Apache-2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+servers:
+  - url: http://localhost:8080
+    description: Local control plane (lab default)
+security:
+  - bearerAuth: []
+paths:
+  /v1/healthz:
+    get:
+      summary: Liveness probe
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean }
+  /v1/version:
+    get:
+      summary: Version info
+      responses:
+        "200":
+          description: Version and node identity
+  /v1/status:
+    get:
+      summary: Cluster status
+      responses:
+        "200":
+          description: Status object (mode, phase, tx_armed, counts)
+  /v1/nodes:
+    get:
+      summary: List nodes
+    post:
+      summary: Create node
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Node"
+      responses:
+        "201": { description: Created }
+  /v1/nodes/{id}:
+    get:
+      summary: Get node
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+  /v1/nodes/{id}/enroll:
+    post:
+      summary: Enroll node with bootstrap token
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EnrollRequest"
+  /v1/nodes/{id}/leave:
+    post:
+      summary: Decommission node
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+  /v1/sims:
+    get:
+      summary: List SIMs (vault view; no Ki/OPc)
+    post:
+      summary: Issue SIMs
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SimIssueRequest"
+  /v1/sims/{imsi}/revoke:
+    post:
+      summary: Revoke a SIM
+      parameters:
+        - { name: imsi, in: path, required: true, schema: { type: string } }
+  /v1/peers:
+    get:
+      summary: List peers
+    post:
+      summary: Add peer (or discovered)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Peer"
+  /v1/sessions:
+    get:
+      summary: Active UE sessions (privacy-preserving)
+  /v1/policy:
+    get:
+      summary: Get policy
+    put:
+      summary: Set policy
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Policy"
+  /v1/spectrum/check:
+    post:
+      summary: Query whether a band may transmit
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SpectrumCheckRequest"
+      responses:
+        "200":
+          description: Allowed verdict with reasons
+  /v1/tx/arm:
+    post:
+      summary: Arm TX (requires acknowledgment; lab mode refuses)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TxArmRequest"
+      responses:
+        "200":
+          description: Armed verdict with reasons
+  /v1/lifecycle/transition:
+    post:
+      summary: Move node through lifecycle phases
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LifecycleTransitionRequest"
+  /metrics:
+    get:
+      summary: Prometheus metrics
+      security: []
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: opaque
+  schemas:
+    Node:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        role: { type: string, enum: [edge, hub, lab] }
+        country: { type: string }
+        phase: { type: string, enum: [provision, register, on-air, peer, breakout] }
+        tx_armed: { type: boolean }
+        created_at: { type: string, format: date-time }
+    EnrollRequest:
+      type: object
+      required: [bootstrap_token]
+      properties:
+        bootstrap_token: { type: string }
+    SimIssueRequest:
+      type: object
+      required: [profile, count]
+      properties:
+        profile: { type: string, enum: [lab, prod] }
+        prefix: { type: string }
+        count: { type: integer, minimum: 1, maximum: 1000 }
+    SIM:
+      type: object
+      properties:
+        imsi: { type: string }
+        msisdn: { type: string }
+        profile: { type: string }
+        status: { type: string }
+        apn: { type: string }
+        expires_at: { type: string, format: date-time }
+    Peer:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        endpoint: { type: string }
+        pub_key: { type: string }
+        allowed_ips: { type: array, items: { type: string } }
+        status: { type: string }
+    Policy:
+      type: object
+      properties:
+        local_breakout: { type: boolean }
+        hub_peer: { type: string }
+        max_ues: { type: integer }
+        apns: { type: array, items: { type: string } }
+        qos_dl_mbps: { type: integer }
+        qos_ul_mbps: { type: integer }
+    SpectrumCheckRequest:
+      type: object
+      required: [country, band]
+      properties:
+        country: { type: string }
+        band: { type: string }
+        indoor: { type: boolean }
+        license_ref: { type: string }
+    SpectrumCheckResponse:
+      type: object
+      properties:
+        allowed: { type: boolean }
+        reasons: { type: array, items: { type: string } }
+    TxArmRequest:
+      type: object
+      required: [country, band, acknowledgment]
+      properties:
+        country: { type: string }
+        band: { type: string }
+        acknowledgment: { type: string }
+        license_ref: { type: string }
+    TxArmResponse:
+      type: object
+      properties:
+        armed: { type: boolean }
+        reasons: { type: array, items: { type: string } }
+    LifecycleTransitionRequest:
+      type: object
+      required: [phase]
+      properties:
+        phase: { type: string, enum: [provision, register, on-air, peer, breakout] }
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code: { type: string }
+            message: { type: string }

@@ -1,0 +1,133 @@
+syntax = "proto3";
+
+package fairwave.control.v1;
+
+option go_package = "github.com/HyperonX-Team/Fairwave-Sim/api/gen/fairwave/control/v1;controlv1";
+
+// ControlService is the gRPC northbound API (v0.1: REST is canonical;
+// gRPC generated stubs are produced by `make gen` and documented in
+// docs/api/grpc.md. The REST handlers map 1:1 to these methods.)
+service ControlService {
+  rpc GetStatus(GetStatusRequest) returns (Status);
+  rpc ListNodes(ListNodesRequest) returns (ListNodesResponse);
+  rpc CreateNode(CreateNodeRequest) returns (Node);
+  rpc ListSims(ListSimsRequest) returns (ListSimsResponse);
+  rpc IssueSims(IssueSimsRequest) returns (ListSimsResponse);
+  rpc RevokeSim(RevokeSimRequest) returns (SIM);
+  rpc ListPeers(ListPeersRequest) returns (ListPeersResponse);
+  rpc AddPeer(AddPeerRequest) returns (Peer);
+  rpc SpectrumCheck(SpectrumCheckRequest) returns (SpectrumCheckResponse);
+  rpc TxArm(TxArmRequest) returns (TxArmResponse);
+  rpc SetPolicy(SetPolicyRequest) returns (Policy);
+}
+
+message GetStatusRequest {}
+
+message Status {
+  string version = 1;
+  string mode = 2; // lab | rf
+  string phase = 3;
+  bool tx_armed = 4;
+  string country = 5;
+  int32 nodes = 6;
+  int32 ues = 7;
+  int32 peers = 8;
+  int64 uptime_sec = 9;
+}
+
+message Node {
+  string id = 1;
+  string name = 2;
+  string role = 3;
+  string country = 4;
+  string phase = 5;
+  bool tx_armed = 6;
+  string created_at = 7;
+  string updated_at = 8;
+}
+
+message CreateNodeRequest {
+  string name = 1;
+  string role = 2;
+  string country = 3;
+}
+
+message ListNodesRequest {}
+message ListNodesResponse { repeated Node nodes = 1; }
+
+message SIM {
+  string imsi = 1;
+  string msisdn = 2;
+  string profile = 3;
+  string status = 4;
+  string apn = 5;
+  string sqn = 6;
+  string created_at = 7;
+  string expires_at = 8;
+}
+
+message ListSimsRequest {}
+message ListSimsResponse { repeated SIM sims = 1; }
+
+message IssueSimsRequest {
+  string profile = 1; // lab | prod
+  int32 count = 2;
+  string prefix = 3;
+}
+
+message RevokeSimRequest { string imsi = 1; }
+
+message Peer {
+  string id = 1;
+  string name = 2;
+  string endpoint = 3;
+  string pub_key = 4;
+  repeated string allowed_ips = 5;
+  string status = 6;
+  string last_seen = 7;
+}
+
+message ListPeersRequest {}
+message ListPeersResponse { repeated Peer peers = 1; }
+
+message AddPeerRequest {
+  string name = 1;
+  string endpoint = 2;
+  string pub_key = 3;
+  repeated string allowed_ips = 4;
+}
+
+message SpectrumCheckRequest {
+  string country = 1;
+  string band = 2;
+  bool indoor = 3;
+  string license_ref = 4;
+}
+
+message SpectrumCheckResponse {
+  bool allowed = 1;
+  repeated string reasons = 2;
+}
+
+message TxArmRequest {
+  string country = 1;
+  string band = 2;
+  string acknowledgment = 3;
+  string license_ref = 4;
+}
+
+message TxArmResponse {
+  bool armed = 1;
+  repeated string reasons = 2;
+}
+
+message Policy {
+  bool local_breakout = 1;
+  string hub_peer = 2;
+  int32 max_ues = 3;
+  repeated string apns = 4;
+  int32 qos_dl_mbps = 5;
+  int32 qos_ul_mbps = 6;
+}
+
+message SetPolicyRequest { Policy policy = 1; }

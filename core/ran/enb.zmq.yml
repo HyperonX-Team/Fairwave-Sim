@@ -1,0 +1,33 @@
+# Fairwave srsENB config — ZMQ VIRTUAL RADIO (lab). No antenna, no RF.
+#
+# This file is the stock srsRAN_4G release_23_11 enb.conf.example with the
+# lab overrides applied via CLI flags in deploy/docker/srs-entry.sh
+# (mcc/mnc/mme_addr/device args). Tracked here so operators can review
+# exactly what the lab runs.
+
+[enb]
+enb_id = 0x19B
+mcc = 999
+mnc = 99
+mme_addr = 10.10.0.2
+gtp_bind_addr = 0.0.0.0
+s1c_bind_addr = 0.0.0.0
+# 10 MHz LTE = 15.36 Msps; ZMQ base_srate 23.04e6 decimates x2 -> 11.52 MHz
+# exactly. Do NOT use n_prb=100 with base_srate 23.04e6: 20 MHz LTE needs
+# 30.72 Msps and the x1 decimation corrupts the stream.
+n_prb = 50
+
+[enb_files]
+sib_config = /etc/fairwave/ran/sib.conf
+rr_config  = /etc/fairwave/ran/rr.conf
+rb_config = /etc/fairwave/ran/rb.conf
+
+[rf]
+device_name = zmq
+tx_gain = 80
+rx_gain = 40
+dl_earfcn = 3350
+
+[log]
+all_level = info
+all_hex_limit = 0

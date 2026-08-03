@@ -1,0 +1,13 @@
+# Core runtime state — never committed.
+data/
+*.key
+*.pem
+*.jwt
+# WireGuard and operator identities
+wg0.conf
+*.wgtunnel
+# Local node state
+*.db
+*.sqlite
+*.sqlite3
+*.log

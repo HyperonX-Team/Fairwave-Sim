@@ -1,0 +1,39 @@
+# Fairwave control-plane image — fairwave-control (API :8080) + fairwave-cli.
+#
+# Build context is the REPO ROOT (compose sets context: ..):
+#   docker build -f deploy/docker/Dockerfile.control -t fairwave/control:0.1.0 .
+
+FROM golang:1.22-alpine AS build
+
+RUN apk add --no-cache git ca-certificates
+WORKDIR /src
+
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY core ./core
+COPY apps ./apps
+
+ARG VERSION=0.1.0
+RUN CGO_ENABLED=0 GOOS=linux go build -trimpath \
+        -ldflags "-s -w -X github.com/HyperonX-Team/Fairwave-Sim/core/fairwave-control/internal/api.Version=${VERSION}" \
+        -o /out/fairwave-control ./core/fairwave-control/cmd/fairwave-control
+RUN CGO_ENABLED=0 GOOS=linux go build -trimpath \
+        -ldflags "-s -w -X github.com/HyperonX-Team/Fairwave-Sim/apps/fairwave-cli/internal/cli.Version=${VERSION}" \
+        -o /out/fairwave ./apps/fairwave-cli/cmd/fairwave
+
+# Runtime: alpine (busybox wget serves the healthcheck; fully static Go
+# binaries). Non-root, UID 10001. The entrypoint chowns the data volume
+# (root step) then drops privileges.
+FROM alpine:3.20 AS runtime
+
+RUN adduser -D -u 10001 fairwave && apk add --no-cache ca-certificates su-exec
+COPY --from=build /out/fairwave-control /usr/local/bin/fairwave-control
+COPY --from=build /out/fairwave /usr/local/bin/fairwave
+
+COPY deploy/docker/control-entry.sh /usr/local/bin/control-entry.sh
+RUN chmod +x /usr/local/bin/control-entry.sh
+
+EXPOSE 8080
+
+ENTRYPOINT ["/usr/local/bin/control-entry.sh"]

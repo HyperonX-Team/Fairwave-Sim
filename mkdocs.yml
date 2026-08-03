@@ -1,0 +1,131 @@
+site_name: Fairwave
+site_description: Open-source community small-cell carrier in a pizza box
+site_url: https://hyperonx-team.github.io/Fairwave-Sim/
+repo_url: https://github.com/HyperonX-Team/Fairwave-Sim
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.expand
+    - navigation.indexes
+    - toc.follow
+    - search.suggest
+    - content.code.annotate
+    - content.tabs.link
+  palette:
+    - scheme: slate
+      primary: deep orange
+      accent: amber
+      toggle:
+        icon: material/weather-night
+        name: Switch to light mode
+    - scheme: default
+      primary: deep orange
+      accent: amber
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to dark mode
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+  - toc:
+      permalink: true
+  - attr_list
+  - md_in_html
+
+plugins:
+  - search
+  - awesome-pages
+
+extra:
+  generator: false
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/HyperonX-Team
+
+nav:
+  - Home: index.md
+  - Vision: vision.md
+  - Quickstart: tutorials/quickstart-no-rf.md
+  - Architecture:
+      - architecture/overview.md
+      - architecture/control-plane.md
+      - architecture/mobile-core.md
+      - architecture/ran.md
+      - architecture/peering.md
+      - architecture/security.md
+      - architecture/telemetry.md
+  - Hardware:
+      - hardware/index.md
+      - hardware/bom-tiers.md
+      - hardware/enclosure.md
+      - hardware/sdr-notes.md
+      - hardware/image.md
+  - Software:
+      - software/index.md
+      - software/fairwave-control.md
+      - software/fairwave-agent.md
+      - software/fairwave-cli.md
+      - software/operator-ui.md
+      - software/captive-portal.md
+  - Spectrum & Law:
+      - spectrum-and-law/index.md
+      - spectrum-and-law/regional.md
+      - spectrum-and-law/cbrs.md
+      - spectrum-and-law/compliance-checklist.md
+  - Ops:
+      - ops/index.md
+      - ops/cafe-pilot.md
+      - ops/incident-response.md
+      - ops/backup-restore.md
+      - ops/monitoring.md
+  - SIM Lifecycle:
+      - sim-lifecycle/index.md
+      - sim-lifecycle/provisioner.md
+      - sim-lifecycle/bureau-runbook.md
+      - sim-lifecycle/revocation.md
+      - sim-lifecycle/esim.md
+  - Peering:
+      - peering/index.md
+      - peering/mesh-runbook.md
+      - peering/rendezvous.md
+      - peering/roaming-future.md
+  - Security:
+      - security/index.md
+      - security/operator-auth.md
+      - security/privacy.md
+      - security/release-signing.md
+  - API:
+      - api/index.md
+      - api/rest.md
+      - api/grpc.md
+  - Tutorials:
+      - tutorials/lab-attach.md
+      - tutorials/two-box-peering.md
+      - tutorials/sim-issue-first.md
+      - tutorials/customization.md
+  - Reference:
+      - reference/glossary.md
+      - reference/faq-regulators.md
+      - reference/faq-carriers.md
+      - reference/not-fairwave.md
+      - reference/troubleshooting.md
+      - adr/0000-index.md
+      - design/threat-model.md
+      - design/spectrum-matrix.md
+      - design/roadmap.md

@@ -1,0 +1,86 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  go:
+    name: Go build + test + vet
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+          cache: true
+      - name: Vet
+        run: go vet ./...
+      - name: Test
+        run: go test ./... -count=1
+      - name: Build binaries
+        run: |
+          mkdir -p bin
+          go build -o bin/fairwave-control ./core/fairwave-control/cmd/fairwave-control
+          go build -o bin/fairwave-agent ./core/fairwave-agent/cmd/fairwave-agent
+          go build -o bin/fairwave ./apps/fairwave-cli/cmd/fairwave
+      - name: Upload binaries
+        uses: actions/upload-artifact@v4
+        with:
+          name: fairwave-binaries
+          path: bin/
+
+  compose:
+    name: Compose config validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate lab compose
+        run: docker compose -f deploy/docker-compose.yml config -q
+      - name: Validate RF compose (gate)
+        run: |
+          set +e
+          docker compose -f deploy/docker-compose.rf.yml config -q 2>/dev/null
+          rc=$?
+          set -e
+          # Without FAIRWAVE_RF_MODE the RF stack must REFUSE (gate test)
+          if [ "$rc" -eq 0 ]; then
+            echo "RF compose unexpectedly validated without the TX gate env — gate broken"
+            exit 1
+          fi
+          echo "RF gate correctly refuses without FAIRWAVE_RF_MODE=hardware"
+      - name: Validate Helm chart
+        run: helm lint deploy/helm/fairwave
+
+  markdown:
+    name: Docs sanity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check all nav targets exist
+        run: |
+          cd docs
+          python3 - <<'EOF'
+          import glob, re
+          nav = open('../mkdocs.yml').read()
+          files = set(glob.glob('**/*.md', recursive=True))
+          for m in re.finditer(r'(?:[\w./-]+\.md)', nav):
+              p = m.group(0)
+              if not (p in files or p in {f.replace('\\','/') for f in files}):
+                  print('MISSING:', p)
+          print('nav target check done')
+          EOF
+
+  secrets:
+    name: Secrets scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

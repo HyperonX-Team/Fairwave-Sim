@@ -1,0 +1,59 @@
+# Fairwave srsRAN image — srsENB / srsEPC / srsUE (one build, three binaries).
+# Branch pinned: srsRAN_4G release_23_10, Debian 12 base.
+#
+# PROFILE is a runtime env var consumed by docker/srs-entry.sh:
+#   enb-zmq | ue-zmq | enb-rf
+#
+# Build (from deploy/): docker build -f docker/Dockerfile.srsran -t fairwave/srsran:lab .
+
+FROM debian:12 AS build
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        git ca-certificates cmake build-essential pkg-config \
+        libfftw3-dev libmbedtls-dev libboost-program-options-dev libboost-system-dev \
+        libconfig++-dev libsctp-dev libpcsclite-dev \
+        libzmq3-dev \
+        # SDR backends — all optional at link time, all installed here so a
+        # single image supports UHD (USRP), SoapySDR and BladeRF radios.
+        libuhd-dev libsoapysdr-dev libbladerf-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# srsRAN_4G is pinned to the master commit proven with the docker_open5gs
+# reference stack (release_23_11 has a ZMQ attach race: the eNB times out
+# the InitialContextSetup and drops the UE after RRC security completes).
+ARG SRS_TAG=master
+ARG SRS_COMMIT=ec29b0c1ff79cebcbe66caa6d6b90778261c42b8
+RUN git clone https://github.com/srsRAN/srsRAN_4G.git /src \
+    && cd /src && git checkout ${SRS_COMMIT}
+
+WORKDIR /src
+RUN mkdir build \
+    && cd build \
+    && cmake .. -DCMAKE_BUILD_TYPE=Release \
+    && make -j"$(nproc)" srsenb srsepc srsue \
+    && make install \
+    && install -m 0755 srsenb/src/srsenb srsue/src/srsue srsepc/src/srsepc /usr/local/bin/
+
+# ---------------------------------------------------------------------------
+# Runtime: Debian 12 slim. procps provides pgrep (used by healthchecks).
+# Version-matched runtime libs — run `apt-cache policy <lib>` if the base
+# drifts and adjust.
+# ---------------------------------------------------------------------------
+FROM debian:12-slim AS runtime
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        procps ca-certificates \
+        libfftw3-single3 libmbedtls14 libboost-program-options1.74.0 \
+        libconfig++9v5 libsctp1 libpcsclite1 \
+        libzmq5 \
+        libuhd4.3.0 libsoapysdr0.8 libbladerf2 \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=build /usr/local/bin/srsenb /usr/local/bin/srsenb
+COPY --from=build /usr/local/bin/srsue /usr/local/bin/srsue
+COPY --from=build /usr/local/bin/srsepc /usr/local/bin/srsepc
+COPY --from=build /usr/local/lib /usr/local/lib
+COPY docker/srs-entry.sh /usr/local/bin/srs-entry.sh
+RUN ldconfig
+
+ENTRYPOINT ["/usr/local/bin/srs-entry.sh"]

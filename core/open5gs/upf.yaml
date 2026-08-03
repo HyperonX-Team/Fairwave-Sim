@@ -1,0 +1,24 @@
+# Fairwave Open5GS v2.7.x — UPF (lab, ZMQ virtual). Loopback 127.0.0.7.
+# dev: ogstun — the tun interface carrying UE data; created by the
+# entrypoint. The lab never transmits on RF.
+logger:
+  file:
+    path: /var/log/open5gs/upf.log
+  level: info
+
+global:
+  max:
+    ue: 1024
+
+upf:
+  pfcp:
+    server:
+      - address: 127.0.0.7
+  gtpu:
+    server:
+      - address: 127.0.0.7
+  session:
+    - subnet: 10.45.0.0/16
+      gateway: 10.45.0.1
+      dnn: internet
+      dev: ogstun

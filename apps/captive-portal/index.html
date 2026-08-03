@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>Fairwave — Welcome</title>
+<style>
+  :root { --bg:#0f1420; --panel:#171e2e; --line:#2a3654; --text:#dbe4f5;
+    --muted:#8fa0bd; --accent:#4dd0e1; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--text);
+    font:16px/1.6 system-ui,"Segoe UI",Roboto,sans-serif; }
+  main { max-width:680px; margin:0 auto; padding:48px 22px; }
+  h1 { font-size:26px; margin:0 0 4px; }
+  .logo { color:var(--accent); font-weight:700; }
+  .card { background:var(--panel); border:1px solid var(--line);
+    border-radius:12px; padding:22px; margin:22px 0; }
+  h2 { font-size:15px; text-transform:uppercase; letter-spacing:1px;
+    color:var(--muted); margin:0 0 12px; }
+  label { display:block; font-size:13px; color:var(--muted); margin:12px 0 4px; }
+  input, select { width:100%; padding:10px 12px; border-radius:8px;
+    border:1px solid var(--line); background:#0f1420; color:var(--text);
+    font-size:15px; }
+  button { margin-top:16px; background:var(--accent); color:#06222b;
+    border:none; border-radius:8px; padding:11px 18px; font-size:15px;
+    font-weight:600; cursor:pointer; }
+  button:hover { filter:brightness(1.1); }
+  .status { display:flex; gap:8px; align-items:center; font-size:13px;
+    color:var(--muted); }
+  .dot { width:10px; height:10px; border-radius:50%; background:var(--muted); }
+  .dot.up { background:#2ecc71; }
+  .privacy { font-size:13px; color:var(--muted); border-top:1px solid var(--line);
+    padding-top:14px; margin-top:24px; }
+  a { color:var(--accent); }
+</style>
+</head>
+<body>
+<main>
+  <h1><span class="logo">Fairwave</span> network</h1>
+  <p>Welcome. You have reached the Fairwave community small-cell at this
+     site. This hotspot is operated by a community network; it provides
+     local connectivity and never transmits without the required
+     authorizations.</p>
+
+  <div class="card">
+    <h2>Network status</h2>
+    <div class="status">
+      <span class="dot" id="dot"></span><span id="netStatus">checking…</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Connect with Wi-Fi calling</h2>
+    <p>On your phone, enable Wi-Fi calling, then join this network's SSID.
+       Onboarding instructions are shown by your device's carrier screen.</p>
+    <form id="onboard" novalidate>
+      <label for="name">Name (optional, for the operator's records)</label>
+      <input id="name" name="name" type="text" autocomplete="name"
+             placeholder="e.g. Alex" aria-describedby="nameHint">
+      <span id="nameHint" class="privacy" style="display:none">
+        Stored only on the access point, deleted on request.
+      </span>
+      <label for="os">Device</label>
+      <select id="os" name="os">
+        <option value="ios">iPhone / iOS</option>
+        <option value="android">Android</option>
+        <option value="other">Other</option>
+      </select>
+      <button type="submit">Get onboarding instructions</button>
+    </form>
+    <p id="formResult" class="muted" style="color:var(--muted)" role="status"></p>
+  </div>
+
+  <div class="card">
+    <h2>About this site</h2>
+    <p>Fairwave nodes form a mesh and default to <em>local breakout</em>:
+       your traffic exits at this site rather than a distant hub. The
+       network is provided as-is for community use. Spectrum transmission
+       is gated by operator authorization and applicable law.
+       <a href="/" target="_blank" rel="noopener">Fairwave project</a></p>
+  </div>
+
+  <div class="privacy">
+    <strong>Privacy notice.</strong> This hotspot observes standard Wi-Fi
+    operator practices: connection logs (time, MAC hash) are kept briefly
+    for abuse prevention, contain no subscriber credentials, and are never
+    sold. SIM material on this network is provisioned under strict vault
+    rules; see the Fairwave privacy policy for details.
+  </div>
+</main>
+
+<script>
+"use strict";
+const dot = document.getElementById("dot");
+const status = document.getElementById("netStatus");
+fetch("/v1/status", { headers: { "Accept": "application/json" } })
+  .then((r) => r.json())
+  .then((s) => {
+    const up = s.phase && s.phase !== "bootstrap";
+    dot.classList.toggle("up", up);
+    status.textContent = up
+      ? "Network is up (phase: " + s.phase + ", " + (s.ues || 0) + " UE(s))."
+      : "Network is being provisioned — check back soon.";
+  })
+  .catch(() => {
+    dot.classList.remove("up");
+    status.textContent = "Status temporarily unavailable.";
+  });
+
+document.getElementById("onboard").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const os = document.getElementById("os").value;
+  const name = document.getElementById("name").value.trim();
+  const result = document.getElementById("formResult");
+  result.textContent =
+    os === "ios"
+      ? "On iPhone: Settings → Phone → Wi-Fi Calling → On, then select this network's SSID in Wi-Fi settings."
+      : os === "android"
+      ? "On Android: Settings → Network → Calls & SMS → Wi-Fi calling → On, then join this network's SSID."
+      : "Enable Wi-Fi calling in your device's calling settings, then join this network's SSID.";
+  result.style.display = "block";
+  result.setAttribute("aria-live", "polite");
+  if (name) result.textContent += " Thanks, " + name + ".";
+});
+</script>
+</body>
+</html>

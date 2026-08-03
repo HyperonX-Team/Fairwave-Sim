@@ -1,0 +1,26 @@
+---
+# Example inventory — copy, fill in, NEVER commit with real values.
+# Secrets (tokens, wg keys) belong in an ansible-vault file:
+#   ansible-vault create host_vars/cell-01/vault.yml
+#   # fairwave_env: ["FAIRWAVE_AGENT_TOKEN=<token>", "WG_PRIVATE_KEY=<key>"]
+all:
+  children:
+    fairwave:
+      hosts:
+        cell-01:
+          ansible_host: 10.0.0.10
+          ansible_user: debian
+          ansible_become: true
+          node_name: cell-01
+          # control_endpoint: http://127.0.0.1:8080
+          # fairwave_mode: lab
+          # fairwave_plmn_mcc: 999
+          # fairwave_plmn_mnc: 99
+          # fairwave_tac: 7
+          # fairwave_env: []           # set via vault, e.g. ["FAIRWAVE_AGENT_TOKEN=..."]
+
+        cell-02:
+          ansible_host: 10.0.0.11
+          ansible_user: debian
+          ansible_become: true
+          node_name: cell-02

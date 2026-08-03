@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>Fairwave Operator Dashboard</title>
+<!-- Served statically by fairwave-control (see apps/fairwave-ui/README.md).
+     CSP is set by the control plane; keep this file framework-free. -->
+<style>
+  :root {
+    --bg: #0f1420; --panel: #171e2e; --panel2: #1e2740;
+    --line: #2a3654; --text: #dbe4f5; --muted: #8fa0bd;
+    --accent: #4dd0e1; --ok: #2ecc71; --warn: #f39c12; --bad: #e74c3c;
+    --radius: 10px;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+    font: 15px/1.5 system-ui, "Segoe UI", Roboto, sans-serif; }
+  header { display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+    justify-content: space-between; padding: 14px 22px;
+    border-bottom: 1px solid var(--line); background: var(--panel); }
+  h1 { font-size: 18px; margin: 0; letter-spacing: .3px; }
+  h2 { font-size: 14px; text-transform: uppercase; letter-spacing: 1px;
+    color: var(--muted); margin: 26px 0 10px; }
+  .pill { padding: 4px 10px; border-radius: 999px; font-size: 12px;
+    border: 1px solid var(--line); background: var(--panel2); }
+  .pill.ok { color: var(--ok); border-color: var(--ok); }
+  .pill.warn { color: var(--warn); border-color: var(--warn); }
+  .pill.bad { color: var(--bad); border-color: var(--bad); }
+  main { padding: 18px 22px 40px; max-width: 1180px; margin: 0 auto; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 12px; }
+  .card { background: var(--panel); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 14px 16px; }
+  .card .label { font-size: 12px; color: var(--muted); }
+  .card .value { font-size: 26px; font-weight: 600; margin-top: 2px; }
+  .card .sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+    margin: 16px 0; }
+  button { background: var(--panel2); color: var(--text); border: 1px solid var(--line);
+    border-radius: 8px; padding: 8px 14px; font-size: 14px; cursor: pointer; }
+  button:hover { border-color: var(--accent); }
+  button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  button.primary { background: var(--accent); color: #06222b; border-color: var(--accent);
+    font-weight: 600; }
+  button.danger { border-color: var(--bad); color: var(--bad); }
+  table { width: 100%; border-collapse: collapse; background: var(--panel);
+    border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+  th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line);
+    font-size: 13px; }
+  th { color: var(--muted); font-weight: 600; letter-spacing: .5px;
+    text-transform: uppercase; font-size: 11px; background: var(--panel2); }
+  tr:last-child td { border-bottom: none; }
+  code { background: var(--panel2); border: 1px solid var(--line);
+    border-radius: 5px; padding: 1px 6px; font-size: 12px; }
+  #error { display: none; background: #2b1420; border: 1px solid var(--bad);
+    color: #ffb3c1; border-radius: 8px; padding: 10px 14px; margin: 12px 0; }
+  #error.show { display: block; }
+  .muted { color: var(--muted); }
+  #banner { font-size: 13px; }
+  #uptime { font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Fairwave <span class="muted">operator dashboard</span></h1>
+  <div id="banner">
+    <span class="pill" id="statusPill" role="status" aria-live="polite">loading…</span>
+    <span class="pill" id="modePill"></span>
+    <span class="pill" id="txPill"></span>
+  </div>
+</header>
+
+<main>
+  <div id="error" role="alert"></div>
+
+  <section aria-label="System status">
+    <h2>Status</h2>
+    <div class="grid" id="statusGrid"></div>
+  </section>
+
+  <section aria-label="Actions">
+    <div class="toolbar">
+      <button id="refreshBtn" type="button">Refresh</button>
+      <button id="tokenBtn" type="button">Set API token</button>
+      <button id="lifecycleBtn" type="button" class="primary"
+              aria-label="Transition the network to on-air (lab gating applies)">
+        Transition to on-air
+      </button>
+      <button id="breakoutBtn" type="button">Toggle local breakout</button>
+      <span class="muted" id="policyHint"></span>
+    </div>
+  </section>
+
+  <section aria-label="Nodes">
+    <h2>Nodes</h2>
+    <div class="card" style="padding:0">
+      <table aria-label="Enrolled nodes">
+        <thead><tr><th>Name</th><th>State</th><th>PLMN</th><th>Last seen</th></tr></thead>
+        <tbody id="nodesBody"><tr><td colspan="4" class="muted">—</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section aria-label="SIMs">
+    <h2>SIMs</h2>
+    <div class="card" style="padding:0">
+      <table aria-label="Issued SIMs">
+        <thead><tr><th>IMSI (sha256:12)</th><th>Profile</th><th>State</th>
+          <th>APNs</th><th>Expires</th></tr></thead>
+        <tbody id="simsBody"><tr><td colspan="5" class="muted">—</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section aria-label="Peers">
+    <h2>Peers</h2>
+    <div class="card" style="padding:0">
+      <table aria-label="WireGuard mesh peers">
+        <thead><tr><th>Name</th><th>State</th><th>Endpoint</th>
+          <th>Handshake age (s)</th></tr></thead>
+        <tbody id="peersBody"><tr><td colspan="4" class="muted">—</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<script>
+"use strict";
+const API = "/v1";
+const TOKEN_KEY = "fairwave_token";
+let token = localStorage.getItem(TOKEN_KEY) || "";
+
+const $ = (id) => document.getElementById(id);
+
+function setToken() {
+  const value = window.prompt("Bearer token (leave empty to clear):", token);
+  if (value === null) return;
+  token = value.trim();
+  localStorage.setItem(TOKEN_KEY, token);
+  refreshAll();
+}
+
+async function api(path, options) {
+  const headers = { "Accept": "application/json" };
+  if (token) headers["Authorization"] = "Bearer " + token;
+  if (options && options.body) headers["Content-Type"] = "application/json";
+  const res = await fetch(API + path, Object.assign({ headers }, options));
+  const text = await res.text();
+  const body = text ? JSON.parse(text) : null;
+  if (!res.ok) {
+    const msg = body && body.error ? `${body.error.code}: ${body.error.message}` : res.status;
+    throw new Error(msg);
+  }
+  return body;
+}
+
+function showError(err) {
+  const box = $("error");
+  box.textContent = "Error: " + (err && err.message ? err.message : err);
+  box.classList.add("show");
+  window.setTimeout(() => box.classList.remove("show"), 8000);
+}
+
+function pill(el, ok, text) {
+  el.textContent = text;
+  el.className = "pill " + (ok ? "ok" : ok === null ? "warn" : "bad");
+}
+
+function fmtUptime(sec) {
+  const h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), s = sec % 60;
+  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+}
+
+function renderStatus(s) {
+  const grid = $("statusGrid");
+  const cards = [
+    ["Version", s.version || "—", "mode " + (s.mode || "?")],
+    ["Phase", s.phase || "—", "lifecycle state"],
+    ["TX armed", s.tx_armed === true ? "YES" : "no", "requires spectrum gate + ack"],
+    ["Nodes", String(s.nodes ?? 0), "enrolled"],
+    ["UEs", String(s.ues ?? 0), "registered"],
+    ["Peers", String(s.peers ?? 0), "wireguard mesh"],
+    ["Uptime", fmtUptime(s.uptime_sec || 0), "control plane"],
+  ];
+  grid.innerHTML = cards.map(([l, v, sub]) =>
+    `<div class="card"><div class="label">${l}</div><div class="value">${escapeHtml(v)}</div>
+     <div class="sub">${sub}</div></div>`).join("");
+  pill($("statusPill"), s.phase === "on-air", "phase: " + (s.phase || "unknown"));
+  pill($("modePill"), s.mode === "lab", "mode: " + (s.mode || "?"));
+  pill($("txPill"), s.tx_armed === true, "TX " + (s.tx_armed === true ? "ARMED" : "off"));
+}
+
+function escapeHtml(v) {
+  return String(v).replace(/[&<>"']/g, (c) =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+function rows(data, key, render, emptyCols) {
+  const list = (data && data[key]) || [];
+  if (!list.length) return `<tr><td colspan="${emptyCols}" class="muted">—</td></tr>`;
+  return list.map(render).join("");
+}
+
+async function refreshAll() {
+  try {
+    const [status, nodes, sims, peers, policy] = await Promise.all([
+      api("/status"), api("/nodes"), api("/sims"), api("/peers"), api("/policy"),
+    ]);
+    renderStatus(status);
+    $("nodesBody").innerHTML = rows(nodes, "nodes",
+      (n) => `<tr><td>${escapeHtml(n.name || "—")}</td><td>${escapeHtml(n.state || "—")}</td>
+              <td>${escapeHtml(n.plmn || "—")}</td><td>${escapeHtml(n.last_seen || "—")}</td></tr>`, 4);
+    $("simsBody").innerHTML = rows(sims, "sims",
+      (s) => `<tr><td><code>${escapeHtml(s.imsi_sha256_12 || "—")}</code></td>
+              <td>${escapeHtml(s.profile || "—")}</td><td>${escapeHtml(s.state || "—")}</td>
+              <td>${escapeHtml((s.apns || []).join(", ") || "—")}</td>
+              <td>${escapeHtml(s.expires_at || "—")}</td></tr>`, 5);
+    $("peersBody").innerHTML = rows(peers, "peers",
+      (p) => `<tr><td>${escapeHtml(p.name || "—")}</td><td>${escapeHtml(p.state || "—")}</td>
+              <td>${escapeHtml(p.endpoint || "—")}</td>
+              <td>${escapeHtml(p.handshake_age_s ?? "—")}</td></tr>`, 4);
+    if (policy && policy.local_breakout !== undefined) {
+      $("policyHint").textContent = "policy: local_breakout=" + policy.local_breakout +
+        (policy.hub_peer ? ", hub=" + policy.hub_peer : "");
+    }
+  } catch (err) {
+    showError(err);
+  }
+}
+
+async function lifecycle() {
+  try {
+    const phase = "on-air"; // lab gate: only lab-compatible transitions apply
+    const res = await api("/lifecycle/transition", {
+      method: "POST",
+      body: JSON.stringify({ phase }),
+    });
+    showError({ message: "transition ok: " + JSON.stringify(res) });
+    refreshAll();
+  } catch (err) { showError(err); }
+}
+
+async function toggleBreakout() {
+  try {
+    const policy = await api("/policy");
+    await api("/policy", {
+      method: "PUT",
+      body: JSON.stringify(Object.assign({}, policy, { local_breakout: !policy.local_breakout })),
+    });
+    refreshAll();
+  } catch (err) { showError(err); }
+}
+
+$("refreshBtn").addEventListener("click", refreshAll);
+$("tokenBtn").addEventListener("click", setToken);
+$("lifecycleBtn").addEventListener("click", lifecycle);
+$("breakoutBtn").addEventListener("click", toggleBreakout);
+
+refreshAll();
+window.setInterval(refreshAll, 15000);
+</script>
+</body>
+</html>

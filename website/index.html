@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<meta name="description" content="Fairwave — a community-owned small-cell network. Open5GS EPC, srsRAN radio, lab-first, spectrum-safe.">
+<title>Fairwave — community small cells</title>
+<style>
+  :root { --bg:#0d1117; --panel:#161c27; --line:#263248; --text:#e6edf7;
+    --muted:#93a3bd; --accent:#4dd0e1; --accent2:#7c4dff; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--text);
+    font:16px/1.65 system-ui,"Segoe UI",Roboto,sans-serif; }
+  header, footer { padding:20px 28px; border-bottom:1px solid var(--line);
+    display:flex; justify-content:space-between; align-items:center; }
+  .logo { font-size:20px; font-weight:700; letter-spacing:.5px; }
+  .logo b { color:var(--accent); }
+  nav a { color:var(--muted); text-decoration:none; margin-left:18px; font-size:14px; }
+  nav a:hover { color:var(--text); }
+  main { max-width:960px; margin:0 auto; padding:56px 24px 80px; }
+  .hero h1 { font-size:40px; line-height:1.15; margin:0 0 16px; }
+  .hero p { font-size:18px; color:var(--muted); max-width:640px; }
+  .cta { margin-top:28px; display:flex; gap:14px; flex-wrap:wrap; }
+  .btn { background:var(--accent); color:#06222b; border:none; border-radius:10px;
+    padding:13px 22px; font-size:16px; font-weight:600; text-decoration:none; }
+  .btn.ghost { background:transparent; border:1px solid var(--line); color:var(--text); }
+  .btn:hover { filter:brightness(1.08); }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:16px; margin-top:56px; }
+  .card { background:var(--panel); border:1px solid var(--line); border-radius:14px;
+    padding:22px; }
+  .card h2 { margin:0 0 8px; font-size:17px; }
+  .card p { color:var(--muted); font-size:14.5px; margin:0; }
+  .tag { display:inline-block; font-size:11px; letter-spacing:1px;
+    text-transform:uppercase; color:var(--accent); border:1px solid var(--line);
+    border-radius:999px; padding:3px 10px; margin-bottom:12px; }
+  .legal { background:var(--panel); border:1px solid var(--line); border-radius:14px;
+    padding:18px 22px; margin-top:56px; font-size:13.5px; color:var(--muted); }
+  footer { border-top:1px solid var(--line); border-bottom:none; font-size:13px;
+    color:var(--muted); }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">fair<b>wave</b></div>
+  <nav>
+    <a href="#features">Features</a>
+    <a href="#law">Spectrum &amp; law</a>
+    <a href="#status">Status</a>
+    <a href="https://github.com/fairwave/fairwave" rel="noopener">GitHub</a>
+  </nav>
+</header>
+
+<main>
+  <section class="hero">
+    <h1>Community-owned small cells.<br>Spectrum-safe by design.</h1>
+    <p>Fairwave is an open-source small-cell network you can run on a desk:
+       Open5GS EPC, srsRAN radio, a Go control plane, and a lab-first
+       workflow where RF stays off unless every legal gate has passed.</p>
+    <div class="cta">
+      <a class="btn" href="/v1/status">Live API status</a>
+      <a class="btn ghost" href="https://github.com/fairwave/fairwave" rel="noopener">Get started in the lab</a>
+    </div>
+  </section>
+
+  <section class="grid" id="features">
+    <div class="card"><span class="tag">Lab first</span>
+      <h2>No RF until you say so</h2>
+      <p>ZMQ virtual radio by default. Transmit is off until country, license
+         acknowledgment and band allow-list all pass — enforced in code, not
+         by policy.</p></div>
+    <div class="card"><span class="tag">Real 4G core</span>
+      <h2>Open5GS EPC</h2>
+      <p>MME, SGW, PGW, HSS, PCRF with a Mongo subscriber store. Lab PLMN
+         999-99, APNs internet + ims, ready for your test SIMs.</p></div>
+    <div class="card"><span class="tag">Mesh</span>
+      <h2>Peer and share</h2>
+      <p>WireGuard mesh with control-plane-managed keys. Local breakout by
+         default; optional cloud rendezvous hub for distributed sites.</p></div>
+    <div class="card"><span class="tag">Operator tools</span>
+      <h2>One dashboard, one CLI</h2>
+      <p>REST API v1, single-file operator UI, offline-first SIM provisioner
+         with HSM-gated production profiles, Prometheus metrics.</p></div>
+    <div class="card"><span class="tag">Hardware</span>
+      <h2>Community builds</h2>
+      <p>260 mm pizza-box enclosure, BOM tiers from ~$350 community builds to
+         CBRS-ready radios, SDR notes for USRP, LimeSDR and BladeRF.</p></div>
+    <div class="card"><span class="tag">Transparency</span>
+      <h2>Open governance</h2>
+      <p>ADRs for every architectural decision, threat model, privacy design,
+         and a spectrum compliance checklist in the repo.</p></div>
+  </section>
+
+  <section class="legal" id="law">
+    <strong>Legal banner.</strong> Fairwave is not carrier equipment and is
+    not certified for unlicensed operation. Transmitting on licensed
+    spectrum without authorization is unlawful in most jurisdictions. The
+    project ships with RF disabled by default; hardware transmit requires
+    explicit country, license acknowledgment and band allow-list gates.
+    Use only in compliance with local law. 3GPP, Open5GS, srsRAN and other
+    marks belong to their owners; Fairwave is independent.
+  </section>
+</main>
+
+<footer>
+  <span>Fairwave — open source, community operated.</span>
+  <span><a href="https://github.com/fairwave/fairwave" rel="noopener">GitHub</a> · <a href="#top">top</a></span>
+</footer>
+</body>
+</html>

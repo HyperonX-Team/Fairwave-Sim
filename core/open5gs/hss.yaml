@@ -1,0 +1,14 @@
+# Fairwave Open5GS v2.7.x — HSS (lab). Loopback 127.0.0.8 (S6a).
+# Subscribers are seeded by hss-init.sh into MongoDB (the `mongo` service).
+db_uri: mongodb://mongo:27017/open5gs
+logger:
+  file:
+    path: /var/log/open5gs/hss.log
+  level: info
+
+global:
+  max:
+    ue: 1024
+
+hss:
+  freeDiameter: /usr/local/etc/freeDiameter/hss.conf

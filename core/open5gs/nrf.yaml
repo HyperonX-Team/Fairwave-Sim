@@ -1,0 +1,20 @@
+# Fairwave Open5GS v2.7.x — NRF (lab). Needed because v2.7 SMF/UPF register
+# with the NRF via SBI even in 4G mode. Loopback 127.0.0.10.
+logger:
+  file:
+    path: /var/log/open5gs/nrf.log
+  level: info
+
+global:
+  max:
+    ue: 1024
+
+nrf:
+  serving:
+    - plmn_id:
+        mcc: 999
+        mnc: 99
+  sbi:
+    server:
+      - address: 127.0.0.10
+        port: 7777

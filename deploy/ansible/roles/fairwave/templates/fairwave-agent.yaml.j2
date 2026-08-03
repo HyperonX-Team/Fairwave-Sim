@@ -1,0 +1,9 @@
+# Rendered by ansible from deploy/ansible/roles/fairwave/templates/.
+# The agent token is read from /etc/fairwave/env (env_file, 0600) — never
+# commit a token here.
+version: 1
+node_id: {{ node_id | default('auto') }}
+control_endpoint: {{ fairwave_control_endpoint | default('http://127.0.0.1:8080') }}
+data_dir: {{ fairwave_data_dir | default('/var/lib/fairwave') }}/agent
+heartbeat_interval_sec: 30
+token_env: FAIRWAVE_AGENT_TOKEN

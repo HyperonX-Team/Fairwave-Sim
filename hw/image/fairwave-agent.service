@@ -1,0 +1,26 @@
+[Unit]
+Description=Fairwave node agent
+Documentation=https://github.com/fairwave/fairwave
+After=network-online.target fairwave-control.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=fairwave
+Group=fairwave
+# Token comes from /etc/fairwave/env (0600, first-boot provisioned).
+EnvironmentFile=/etc/fairwave/env
+ExecStart=/usr/local/bin/fairwave-agent
+Restart=on-failure
+RestartSec=10
+LimitNOFILE=65536
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/fairwave-agent /etc/fairwave
+PrivateTmp=true
+PrivateDevices=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+
+[Install]
+WantedBy=multi-user.target

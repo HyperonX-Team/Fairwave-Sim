@@ -1,0 +1,157 @@
+---
+# Debian 12 host prep + fairwave systemd services.
+
+- name: Apt cache update
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Install base packages (docker, compose, curl)
+  ansible.builtin.apt:
+    name:
+      - docker.io
+      - docker-compose-v2
+      - curl
+      - ufw
+      - wireguard
+      - jq
+    state: present
+
+- name: Create fairwave system user
+  ansible.builtin.user:
+    name: "{{ fairwave_user }}"
+    system: true
+    shell: /usr/sbin/nologin
+    groups: docker
+    append: true
+
+- name: Enable docker on boot
+  ansible.builtin.systemd:
+    name: docker
+    enabled: true
+    state: started
+
+- name: Ensure runtime directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ fairwave_user }}"
+    group: "{{ fairwave_user }}"
+    mode: "0750"
+  loop:
+    - "{{ fairwave_dir }}"
+    - "{{ fairwave_data_dir }}"
+    - "{{ fairwave_data_dir }}/agent"
+
+- name: Render fairwave-control.yaml
+  ansible.builtin.template:
+    src: fairwave-control.yaml.j2
+    dest: "{{ fairwave_dir }}/fairwave-control.yaml"
+    owner: "{{ fairwave_user }}"
+    group: "{{ fairwave_user }}"
+    mode: "0640"
+  notify: Restart fairwave-control
+
+- name: Render fairwave-agent.yaml
+  ansible.builtin.template:
+    src: fairwave-agent.yaml.j2
+    dest: "{{ fairwave_dir }}/fairwave-agent.yaml"
+    owner: "{{ fairwave_user }}"
+    group: "{{ fairwave_user }}"
+    mode: "0640"
+  notify: Restart fairwave-agent
+
+- name: Install fairwave-control systemd unit
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/fairwave-control.service
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      [Unit]
+      Description=Fairwave control plane
+      After=network-online.target docker.service
+      Wants=network-online.target
+      [Service]
+      User={{ fairwave_user }}
+      Group={{ fairwave_user }}
+      EnvironmentFile={{ fairwave_dir }}/env
+      ExecStart=/usr/local/bin/fairwave-control
+      Restart=on-failure
+      RestartSec=5
+      NoNewPrivileges=true
+      ProtectSystem=strict
+      ProtectHome=true
+      ReadWritePaths={{ fairwave_data_dir }}
+      PrivateTmp=true
+      [Install]
+      WantedBy=multi-user.target
+  notify: Restart fairwave-control
+
+- name: Install fairwave-agent systemd unit
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/fairwave-agent.service
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      [Unit]
+      Description=Fairwave node agent
+      After=network-online.target
+      Wants=network-online.target
+      [Service]
+      User={{ fairwave_user }}
+      Group={{ fairwave_user }}
+      EnvironmentFile={{ fairwave_dir }}/env
+      ExecStart=/usr/local/bin/fairwave-agent
+      Restart=on-failure
+      RestartSec=10
+      NoNewPrivileges=true
+      ProtectSystem=strict
+      ProtectHome=true
+      ReadWritePaths={{ fairwave_data_dir }}/agent
+      PrivateTmp=true
+      [Install]
+      WantedBy=multi-user.target
+  notify: Restart fairwave-agent
+
+- name: Create secrets env file (0600 — never render secrets via templates)
+  ansible.builtin.copy:
+    dest: "{{ fairwave_dir }}/env"
+    owner: "{{ fairwave_user }}"
+    group: "{{ fairwave_user }}"
+    mode: "0600"
+    content: |
+      {% for line in fairwave_env %}{{ line }}
+      {% endfor %}# Populate via ansible-vault, never via git.
+  when: fairwave_env | length > 0
+
+- name: UFW — allow SSH
+  ansible.builtin.ufw:
+    rule: allow
+    port: "22"
+    proto: tcp
+    from_ip: "{{ fairwave_ufw_ssh_from | default('0.0.0.0/0') }}"
+
+- name: UFW — allow service ports (internal only unless overridden)
+  ansible.builtin.ufw:
+    rule: "{{ item.rule }}"
+    port: "{{ item.port }}"
+    proto: "{{ item.proto }}"
+    from_ip: "{{ item.from_ip }}"
+  loop: "{{ fairwave_ufw_rules }}"
+
+- name: UFW — enable
+  ansible.builtin.ufw:
+    state: enabled
+    policy: deny
+
+- name: Reload systemd, enable services
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    enabled: true
+    state: started
+    daemon_reload: true
+  loop:
+    - fairwave-control
+    - fairwave-agent
