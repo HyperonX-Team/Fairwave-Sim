@@ -1,4 +1,4 @@
-<h1 align="center">Fairwave — a community carrier in a pizza box</h1>
+<h1 align="center">Fairwave  a community carrier in a pizza box</h1>
 
 <p align="center">
   <strong>Open-source private LTE: plug it into Ethernet, emit 4G, welcome your neighbors.</strong>
@@ -51,16 +51,16 @@ entire carrier in Docker with zero RF.
 
 ## What you get
 
-- 📦 **A pizza box that is a carrier**: node identity, enrollment, lifecycle
+-  **A pizza box that is a carrier**: node identity, enrollment, lifecycle
   (`provision → register → on-air → peer → breakout`) managed by `fairwave-control`.
-- 📶 **Real LTE attach**: Open5GS EPC + srsRAN eNB, configurable PLMN, tracking areas,
+-  **Real LTE attach**: Open5GS EPC + srsRAN eNB, configurable PLMN, tracking areas,
   `internet` + `ims` APNs, local breakout at the edge.
-- 💳 **Fairwave SIM ops**: offline-first provisioner; generates Ki/OPc, batches CSV/JSON for
+-  **Fairwave SIM ops**: offline-first provisioner; generates Ki/OPc, batches CSV/JSON for
   card bureaus, writes HSS/UDM, revocation and swap controls. Lab vs. production hard-separated.
-- 🕸️ **Neighborhood mesh**: mDNS discovery, mTLS control, WireGuard data plane, route exchange.
-- 📊 **Operator portal**: local-first dashboard — UEs (privacy-preserving), backhaul, peers, lab mode.
-- 🔬 **Full lab mode**: entire network on pure IP (zmq) with srsUE — no radio, no license, CI-friendly.
-- 🧭 **Regulatory gates in code**: TX arming requires country code, license acknowledgment,
+-  **Neighborhood mesh**: mDNS discovery, mTLS control, WireGuard data plane, route exchange.
+-  **Operator portal**: local-first dashboard — UEs (privacy-preserving), backhaul, peers, lab mode.
+-  **Full lab mode**: entire network on pure IP (zmq) with srsUE — no radio, no license, CI-friendly.
+-  **Regulatory gates in code**: TX arming requires country code, license acknowledgment,
   frequency allow-list. Compiled-in refusal otherwise.
 
 ## Why it threatens incumbents
@@ -136,10 +136,10 @@ on dev hardware but **disabled by default**. See the [roadmap](design/roadmap.md
 
 ## What Fairwave is NOT
 
-- ❌ **Not an IMSI catcher** — there is no passive interrogation; UEs must authenticate against credentials you provisioned.
-- ❌ **Not a spectrum free-for-all** — TX is gated, and we refuse regulatory bypass features.
-- ❌ **Not a free national carrier** — it is local coverage with optional breakout.
-- ❌ **Not a replacement for emergency calling** — plan 911/112 behavior in every deployment ([docs/ops/incident-response.md](docs/ops/incident-response.md)).
+-     **Not an IMSI catcher** — there is no passive interrogation; UEs must authenticate against credentials you provisioned.
+-  **Not a spectrum free-for-all** — TX is gated, and we refuse regulatory bypass features.
+-  **Not a free national carrier** — it is local coverage with optional breakout.
+-  **Not a replacement for emergency calling** — plan 911/112 behavior in every deployment ([docs/ops/incident-response.md](docs/ops/incident-response.md)).
 
 ## Contributing & governance
 
