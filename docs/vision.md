@@ -33,15 +33,15 @@ hundreds of millions of people.
 
 ```mermaid
 flowchart LR
-    subgraph Cafe["☕ Café / Co-op / Township"]
+    subgraph Cafe["Café / Co-op / Township"]
         BOX["Fairwave pizza box<br/>x86/ARM + SDR"]
-        UE1["📱 Resident phones"]
+        UE1["Resident phones"]
         UE1 -- LTE --> BOX
     end
     BOX -- Ethernet --> LAN{{Community LAN}}
     LAN -- WireGuard --> HUB["Fairwave hub<br/>(internet breakout)"]
-    BOX -- WG mesh --> PIX["🍕 Neighbor box"]
-    PIX --> UE2["📱 Neighbor phones"]
+    BOX -- WG mesh --> PIX["Neighbor box"]
+    PIX --> UE2["Neighbor phones"]
 ```
 
 - **Own the last mile yourself.** One box, ordinary Ethernet, local PLMN. Your SIM, your
@@ -60,13 +60,13 @@ flowchart LR
 
 | | |
 |---|---|
-| 🧠 Control plane | Go: identity, enrollment, reconcile loop, REST+gRPC, Prometheus/OTLP |
-| 📡 RAN | srsRAN Project eNB/gNB; RF (USRP/LimeSDR/BladeRF) or zmq loopback |
-| 🏛️ Core | Open5GS EPC (4G-first); 5G SA/NSA stubs behind flags |
-| 💳 SIM | Offline provisioner, Ki/OPc generation (or HSM import), bureau CSV/JSON |
-| 🕸️ Peering | mDNS rendezvous → mTLS control → WireGuard data plane, route exchange |
-| 👁️ Portal | Local-first operator UI, captive portal for onboarding/Wi-Fi-calling path |
-| 🧪 Lab | Docker Compose: core + zmq eNB + srsUE; attach asserted in CI |
+| Control plane | Go: identity, enrollment, reconcile loop, REST+gRPC, Prometheus/OTLP |
+| RAN | srsRAN Project eNB/gNB; RF (USRP/LimeSDR/BladeRF) or zmq loopback |
+| Core | Open5GS EPC (4G-first); 5G SA/NSA stubs behind flags |
+| SIM | Offline provisioner, Ki/OPc generation (or HSM import), bureau CSV/JSON |
+| Peering | mDNS rendezvous → mTLS control → WireGuard data plane, route exchange |
+| Portal | Local-first operator UI, captive portal for onboarding/Wi-Fi-calling path |
+| Lab | Docker Compose: core + zmq eNB + srsUE; attach asserted in CI |
 
 ## Why it threatens incumbents
 

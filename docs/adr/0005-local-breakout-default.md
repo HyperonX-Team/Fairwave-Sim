@@ -20,11 +20,11 @@ Default to **Edge NAT local-first breakout**:
 
 ## Consequences
 
-- ✅ There is no mandatory Fairwave-operated backbone; boxes don’t phone home.
-- ✅ Latency low and local content (mirror server, kiosk, printer, IoT) never leaves the site.
-- ✅ Legal exposure reduced: traffic stays geographically local unless opted-out.
-- ⚠️ UE roaming across boxes without reattach is hard without hub anchoring; unanswered until M6.
-- ⚠️ ISP CGNAT may block inbound; `fairwave-agent` needs NAT traversal skill + optional public relays (locked down).
+- [+] There is no mandatory Fairwave-operated backbone; boxes don’t phone home.
+- [+] Latency low and local content (mirror server, kiosk, printer, IoT) never leaves the site.
+- [+] Legal exposure reduced: traffic stays geographically local unless opted-out.
+- [!] UE roaming across boxes without reattach is hard without hub anchoring; unanswered until M6.
+- [!] ISP CGNAT may block inbound; `fairwave-agent` needs NAT traversal skill + optional public relays (locked down).
 
 ## Alternatives considered
 

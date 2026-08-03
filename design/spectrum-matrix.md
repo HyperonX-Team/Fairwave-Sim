@@ -14,13 +14,13 @@ code; the configuration layer will refuse to set ARFCN/band outside the allowed 
 
 | Region | Regime | Band / Frequency (LTE) | Typical Power Limits | Fairwave posture |
 |--------|--------|------------------------|----------------------|-------------------|
-| 🇺🇸 USA | Private LTE / CBRS | Band 48 (3550–3700 MHz) | ≤10W EIRP (SAS-controlled) | Lab mode + SAS client stub; certified SAS integration roadmap (M4) |
-| 🇺🇸 USA | MLS/WCS / unlicensed | Band 46 (5150–5925 MHz), Band 28 lab attenuated | Strict EMI/EMC rules | Lab-only; attenuated bench test only |
-| 🇬🇧 UK | Shared Access License | Band 1 (2100 MHz), Band 3 (1800 MHz), Band 7 (2600 MHz), Band 38 (2600 MHz) | 2–10W EIRP depending on geo | Ofcom SAL handled by operator; Fairwave gates by country code |
-| 🇬🇧 UK | Local access licensing | Band 3 / 38; dynamic | Site-specific | Manual config; requires proof-of-license |
-| 🇩🇪 🇫🇷 etc | Experimental / campus | Band 3/7/38/40, limited | ≤1W EIRP for campus | Lab mode default; local regulators must approve |
-| 🇮🇳 India | In-building captive use | Band 3/40 | <5W with paperwork | Lab default; deployment needs DoT private-captive approval |
-| 🇦🇺 Australia | ACMA apparatus licence | Band 28/3/7/40 | 1–5W typical | Lab default; licence-holder gates TX |
+| USA | Private LTE / CBRS | Band 48 (3550–3700 MHz) | ≤10W EIRP (SAS-controlled) | Lab mode + SAS client stub; certified SAS integration roadmap (M4) |
+| USA | MLS/WCS / unlicensed | Band 46 (5150–5925 MHz), Band 28 lab attenuated | Strict EMI/EMC rules | Lab-only; attenuated bench test only |
+| UK | Shared Access License | Band 1 (2100 MHz), Band 3 (1800 MHz), Band 7 (2600 MHz), Band 38 (2600 MHz) | 2–10W EIRP depending on geo | Ofcom SAL handled by operator; Fairwave gates by country code |
+| UK | Local access licensing | Band 3 / 38; dynamic | Site-specific | Manual config; requires proof-of-license |
+| DE / FR etc | Experimental / campus | Band 3/7/38/40, limited | ≤1W EIRP for campus | Lab mode default; local regulators must approve |
+| India | In-building captive use | Band 3/40 | <5W with paperwork | Lab default; deployment needs DoT private-captive approval |
+| Australia | ACMA apparatus licence | Band 28/3/7/40 | 1–5W typical | Lab default; licence-holder gates TX |
 
 ## Spectrum-Hardening Design
 
@@ -59,20 +59,20 @@ generated Open5GS config to disk unless `node.is_lab=true && country_code == XX`
 
 ## Technical summary by country
 
-### 🇺🇸 USA — CBRS (48/3550–3700)
+### USA — CBRS (48/3550–3700)
 
 - Requires SAS client: proof-of-certified-GAA/PPA.
 - Fairwave stub has SAS **interface** + **mock**, with signed key exchange stub; distribution
   is subject to SAS vendor contract (CommScope, Google, Amdocs, Federated, etc.).
 - Self-hosted open SAS is not permitted—SAS must be certified per FCC Part 96.
 
-### 🇬🇧 UK — Shared Access License (SAL)
+### UK — Shared Access License (SAL)
 
 - Operator completes Ofcom online form; receives a licence with permitted frequency/power.
 - Fairwave gates: `country_code=UK`, profile has `ofcom_licence_ref`, license number stored
   as part of tx-arm signed blob.
 
-### 🇪🇺 EU — various local / experimental licenses
+### EU — various local / experimental licenses
 
 - Most regimes require bundle with detailed technical annex; Fairwave accepts PDF upload
   as docs-only (not machine-parsed) and requires `licence_annex_version` token to sign.

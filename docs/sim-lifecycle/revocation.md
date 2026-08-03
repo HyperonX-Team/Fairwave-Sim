@@ -17,7 +17,7 @@ fairwave sim revoke --expired                                        # by profil
 Expected output:
 
 ```
-✓ revoked 1 SIM (9999912345678901)
+revoked 1 SIM (9999912345678901)
   reason        lost-card
   effect        HSS auth blocked; active sessions terminated (immediate)
   audit ref     audit/2026-08-02/revoke-000042.json

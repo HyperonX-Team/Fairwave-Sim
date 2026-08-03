@@ -19,7 +19,7 @@ fairwave sim issue --profile lab --count 1 --label first-sim
 Expected output:
 
 ```
-✓ issued 1 lab SIM
+issued 1 lab SIM
   IMSI    9999912345678901  (lab, 15 digits)
   ICCID   8999990123456789012
   output  sims/2026-08-02/

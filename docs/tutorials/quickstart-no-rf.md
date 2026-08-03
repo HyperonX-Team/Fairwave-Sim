@@ -62,11 +62,11 @@ Expected output (abridged):
 
 ```
 [+] Running 6/6
- ✔ Container fairwave-mongo-1          Started
- ✔ Container fairwave-open5gs-1        Started
- ✔ Container fairwave-enb-1            Started
- ✔ Container fairwave-ue-1             Started
- ✔ Container fairwave-control-plane-1  Started
+ Container fairwave-mongo-1          Started
+ Container fairwave-open5gs-1        Started
+ Container fairwave-enb-1            Started
+ Container fairwave-ue-1             Started
+ Container fairwave-control-plane-1  Started
 lab stack up: control-plane http://127.0.0.1:8080/v1/healthz
 ```
 
@@ -93,7 +93,7 @@ fairwave sim issue --profile lab --count 1
 Expected output:
 
 ```
-✓ issued 1 lab SIM
+issued 1 lab SIM
   IMSI    9999912345678901  (lab)
   ICCID   8999990123456789012
   output  sims/2026-08-02/  (sims.csv, sims.json, hss-hook.sh)

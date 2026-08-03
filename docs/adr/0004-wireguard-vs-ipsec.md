@@ -23,12 +23,12 @@ with TCP fallback (via `wstunnel` or user-supplied SSH) handled by `fairwave-age
 
 ## Consequences
 
-- ✅ Extremely low CPU + memory footprint on pizza boxes.
-- ✅ Audited codebase, widely understood ops story.
-- ✅ PSK support for post-quantum hardening (`wg ... preshared-key`)
-- ⚠️ UDP blocking on some residential NATs → fallback tunnels for those peers.
-- ⚠️ Key rotation must be managed by our control plane, not `wg-quick`.
-- ⚠️ GTP-over-S1 handoff across WAN-grade mesh is not implemented yet (future ADR may add GRE/GTP-U bridging for roaming).
+- [+] Extremely low CPU + memory footprint on pizza boxes.
+- [+] Audited codebase, widely understood ops story.
+- [+] PSK support for post-quantum hardening (`wg ... preshared-key`)
+- [!] UDP blocking on some residential NATs → fallback tunnels for those peers.
+- [!] Key rotation must be managed by our control plane, not `wg-quick`.
+- [!] GTP-over-S1 handoff across WAN-grade mesh is not implemented yet (future ADR may add GRE/GTP-U bridging for roaming).
 
 ## Alternatives considered
 

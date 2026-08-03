@@ -19,12 +19,12 @@ on constrained box, parser hardening), migrate that path to a Rust FFI later.
 
 ## Consequences
 
-- ✅ Faster development velocity for a community ops tool.
-- ✅ Trivially cross-compiles to ARM (CM4, CM5, routers).
-- ✅ Ecosystem alignment: Prometheus, gRPC, container tooling.
-- ⚠️ Runtime GC pauses must be measured under heavy signaling; if they appear in benchmarks
+- [+] Faster development velocity for a community ops tool.
+- [+] Trivially cross-compiles to ARM (CM4, CM5, routers).
+- [+] Ecosystem alignment: Prometheus, gRPC, container tooling.
+- [!] Runtime GC pauses must be measured under heavy signaling; if they appear in benchmarks
   we rework hot paths (object pooling, arena buffers) rather than default to unsafe Rust.
-- ⚠️ Type safety over `map[string]interface{}` config must be enforced with `go-playground/validator` and codegen.
+- [!] Type safety over `map[string]interface{}` config must be enforced with `go-playground/validator` and codegen.
 
 ## Alternatives considered
 

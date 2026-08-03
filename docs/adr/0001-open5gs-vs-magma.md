@@ -19,12 +19,12 @@ templating, Helm, and Compose.
 
 ## Consequences
 
-- ✅ Small memory footprint — fits pizza-box targets (NUC, CM4/5).
-- ✅ Single repo with MME+SGW+PGW+HSS+PCRF+SMF+UPF+UDM+AUSF; simpler mental model.
-- ✅ AGPL-3.0 is acceptable for Fairwave's posture (we configure and drive; no source modification by default).
-- ✅ Fast gNB/eNB interoperability via srsRAN containers.
-- ⚠️ No built-in northbound REST for provisioning; we must implement it in `fairwave-control`.
-- ⚠️ Upstream CVEs propagate; hence pinned digests, SBOM, cosign signing.
+- [+] Small memory footprint — fits pizza-box targets (NUC, CM4/5).
+- [+] Single repo with MME+SGW+PGW+HSS+PCRF+SMF+UPF+UDM+AUSF; simpler mental model.
+- [+] AGPL-3.0 is acceptable for Fairwave's posture (we configure and drive; no source modification by default).
+- [+] Fast gNB/eNB interoperability via srsRAN containers.
+- [!] No built-in northbound REST for provisioning; we must implement it in `fairwave-control`.
+- [!] Upstream CVEs propagate; hence pinned digests, SBOM, cosign signing.
 
 ## Alternatives considered
 
