@@ -22,6 +22,10 @@ versions follow [SemVer](https://semver.org/spec/v2.0.0.html).
   Spanish, French, German, and Hindi; landing page (website/index.html)
   gained a language switcher, the lab eSIM feature card, and corrected
   GitHub links.
+- **More translations (12 new languages):** README and landing page now
+  also in Italian, Portuguese, Russian, Japanese, Korean, Turkish, Polish,
+  Dutch, Ukrainian, Swedish, Indonesian, and Vietnamese (19 languages
+  total).
 
 ## [0.1.0] - 2026-08-02
 
