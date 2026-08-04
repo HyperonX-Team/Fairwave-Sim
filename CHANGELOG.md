@@ -18,6 +18,10 @@ versions follow [SemVer](https://semver.org/spec/v2.0.0.html).
   (`LPA:1$...`); CLI `fairwave esim issue|serve`; file-backed profile
   registry (0600). Lab-only: dummy MCC 999 vectors, JSON transport pending
   GSMA conformance. See docs/adr/0013-esim.md.
+- **README + landing page translations:** README in Arabic, Chinese,
+  Spanish, French, German, and Hindi; landing page (website/index.html)
+  gained a language switcher, the lab eSIM feature card, and corrected
+  GitHub links.
 
 ## [0.1.0] - 2026-08-02
 

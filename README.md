@@ -19,6 +19,8 @@
 > HyperonX and contributors provide software **as-is** for lawful private networks, research,
 > and shared-spectrum regimes only. See [docs/spectrum-and-law/](docs/spectrum-and-law/index.md).
 
+**Read this in:** [العربية](README.ar.md) · [中文](README.zh.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [हिन्दी](README.hi.md)
+
 ---
 
 ## The broken system
@@ -57,6 +59,9 @@ entire carrier in Docker with zero RF.
   `internet` + `ims` APNs, local breakout at the edge.
 - **Fairwave SIM ops**: offline-first provisioner; generates Ki/OPc, batches CSV/JSON for
   card bureaus, writes HSS/UDM, revocation and swap controls. Lab vs. production hard-separated.
+- **Lab eSIM (SM-DP+)**: your own SGP.22-shaped profile server and a software eUICC - encrypted
+  bound profile packages, QR activation codes (`LPA:1$...`), full download loop CI-verified
+  without hardware. Lab-only by design; GSMA conformance tracked as open items.
 - **Neighborhood mesh**: mDNS discovery, mTLS control, WireGuard data plane, route exchange.
 - **Operator portal**: local-first dashboard - UEs (privacy-preserving), backhaul, peers, lab mode.
 - **Full lab mode**: entire network on pure IP (zmq) with srsUE - no radio, no license, CI-friendly.

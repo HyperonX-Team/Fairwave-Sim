@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="dark">
-<meta name="description" content="Fairwave - a community-owned small-cell network. Open5GS EPC, srsRAN radio, lab-first, spectrum-safe.">
+<meta name="description" content="Fairwave - a community-owned small-cell network. Open5GS EPC, srsRAN radio, lab eSIM, lab-first, spectrum-safe.">
 <title>Fairwave - community small cells</title>
 <style>
   :root { --bg:#0d1117; --panel:#161c27; --line:#263248; --text:#e6edf7;
@@ -12,12 +12,15 @@
   * { box-sizing:border-box; }
   body { margin:0; background:var(--bg); color:var(--text);
     font:16px/1.65 system-ui,"Segoe UI",Roboto,sans-serif; }
+  [dir="rtl"] body { font-family:"Segoe UI","Tahoma","Noto Naskh Arabic",system-ui,sans-serif; }
   header, footer { padding:20px 28px; border-bottom:1px solid var(--line);
-    display:flex; justify-content:space-between; align-items:center; }
+    display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; }
   .logo { font-size:20px; font-weight:700; letter-spacing:.5px; }
   .logo b { color:var(--accent); }
-  nav a { color:var(--muted); text-decoration:none; margin-left:18px; font-size:14px; }
+  nav a { color:var(--muted); text-decoration:none; margin-inline-start:18px; font-size:14px; }
   nav a:hover { color:var(--text); }
+  #lang { background:var(--panel); color:var(--text); border:1px solid var(--line);
+    border-radius:8px; padding:6px 10px; font-size:13px; cursor:pointer; }
   main { max-width:960px; margin:0 auto; padding:56px 24px 80px; }
   .hero h1 { font-size:40px; line-height:1.15; margin:0 0 16px; }
   .hero p { font-size:18px; color:var(--muted); max-width:640px; }
@@ -45,67 +48,212 @@
 <header>
   <div class="logo">fair<b>wave</b></div>
   <nav>
-    <a href="#features">Features</a>
-    <a href="#law">Spectrum &amp; law</a>
-    <a href="#status">Status</a>
-    <a href="https://github.com/fairwave/fairwave" rel="noopener">GitHub</a>
+    <a href="#features" data-i18n="nav.features">Features</a>
+    <a href="#law" data-i18n="nav.law">Spectrum &amp; law</a>
+    <a href="#status" data-i18n="nav.status">Status</a>
+    <a href="https://github.com/HyperonX-Team/Fairwave-Sim" rel="noopener" data-i18n="nav.github">GitHub</a>
+    <select id="lang" aria-label="Language">
+      <option value="en">English</option>
+      <option value="ar">العربية</option>
+      <option value="zh">中文</option>
+      <option value="es">Español</option>
+      <option value="fr">Français</option>
+      <option value="de">Deutsch</option>
+      <option value="hi">हिन्दी</option>
+    </select>
   </nav>
 </header>
 
 <main>
   <section class="hero">
-    <h1>Community-owned small cells.<br>Spectrum-safe by design.</h1>
-    <p>Fairwave is an open-source small-cell network you can run on a desk:
-       Open5GS EPC, srsRAN radio, a Go control plane, and a lab-first
-       workflow where RF stays off unless every legal gate has passed.</p>
+    <h1 data-i18n="hero.title">Community-owned small cells.<br>Spectrum-safe by design.</h1>
+    <p data-i18n="hero.sub">Fairwave is an open-source small-cell network you can run on a desk:
+       Open5GS EPC, srsRAN radio, a Go control plane, lab eSIM provisioning,
+       and a lab-first workflow where RF stays off unless every legal gate has passed.</p>
     <div class="cta">
-      <a class="btn" href="/v1/status">Live API status</a>
-      <a class="btn ghost" href="https://github.com/fairwave/fairwave" rel="noopener">Get started in the lab</a>
+      <a class="btn" href="/v1/status" data-i18n="hero.api">Live API status</a>
+      <a class="btn ghost" href="https://github.com/HyperonX-Team/Fairwave-Sim" rel="noopener" data-i18n="hero.start">Get started in the lab</a>
     </div>
   </section>
 
   <section class="grid" id="features">
-    <div class="card"><span class="tag">Lab first</span>
-      <h2>No RF until you say so</h2>
-      <p>ZMQ virtual radio by default. Transmit is off until country, license
+    <div class="card"><span class="tag" data-i18n="card1.tag">Lab first</span>
+      <h2 data-i18n="card1.title">No RF until you say so</h2>
+      <p data-i18n="card1.body">ZMQ virtual radio by default. Transmit is off until country, license
          acknowledgment and band allow-list all pass - enforced in code, not
          by policy.</p></div>
-    <div class="card"><span class="tag">Real 4G core</span>
-      <h2>Open5GS EPC</h2>
-      <p>MME, SGW, PGW, HSS, PCRF with a Mongo subscriber store. Lab PLMN
+    <div class="card"><span class="tag" data-i18n="card2.tag">Real 4G core</span>
+      <h2 data-i18n="card2.title">Open5GS EPC</h2>
+      <p data-i18n="card2.body">MME, SGW, PGW, HSS, PCRF with a Mongo subscriber store. Lab PLMN
          999-99, APNs internet + ims, ready for your test SIMs.</p></div>
-    <div class="card"><span class="tag">Mesh</span>
-      <h2>Peer and share</h2>
-      <p>WireGuard mesh with control-plane-managed keys. Local breakout by
+    <div class="card"><span class="tag" data-i18n="card3.tag">Lab eSIM</span>
+      <h2 data-i18n="card3.title">eSIM via your own SM-DP+</h2>
+      <p data-i18n="card3.body">A Go SM-DP+ and software eUICC run the full SGP.22-shaped
+         profile download: encrypted bound profile packages, QR activation codes,
+         CI-verified end to end.</p></div>
+    <div class="card"><span class="tag" data-i18n="card4.tag">Mesh</span>
+      <h2 data-i18n="card4.title">Peer and share</h2>
+      <p data-i18n="card4.body">WireGuard mesh with control-plane-managed keys. Local breakout by
          default; optional cloud rendezvous hub for distributed sites.</p></div>
-    <div class="card"><span class="tag">Operator tools</span>
-      <h2>One dashboard, one CLI</h2>
-      <p>REST API v1, single-file operator UI, offline-first SIM provisioner
+    <div class="card"><span class="tag" data-i18n="card5.tag">Operator tools</span>
+      <h2 data-i18n="card5.title">One dashboard, one CLI</h2>
+      <p data-i18n="card5.body">REST API v1, single-file operator UI, offline-first SIM provisioner
          with HSM-gated production profiles, Prometheus metrics.</p></div>
-    <div class="card"><span class="tag">Hardware</span>
-      <h2>Community builds</h2>
-      <p>260 mm pizza-box enclosure, BOM tiers from ~$350 community builds to
+    <div class="card"><span class="tag" data-i18n="card6.tag">Hardware</span>
+      <h2 data-i18n="card6.title">Community builds</h2>
+      <p data-i18n="card6.body">260 mm pizza-box enclosure, BOM tiers from ~$350 community builds to
          CBRS-ready radios, SDR notes for USRP, LimeSDR and BladeRF.</p></div>
-    <div class="card"><span class="tag">Transparency</span>
-      <h2>Open governance</h2>
-      <p>ADRs for every architectural decision, threat model, privacy design,
+    <div class="card"><span class="tag" data-i18n="card7.tag">Transparency</span>
+      <h2 data-i18n="card7.title">Open governance</h2>
+      <p data-i18n="card7.body">ADRs for every architectural decision, threat model, privacy design,
          and a spectrum compliance checklist in the repo.</p></div>
   </section>
 
   <section class="legal" id="law">
-    <strong>Legal banner.</strong> Fairwave is not carrier equipment and is
+    <strong data-i18n="law.title">Legal banner.</strong>
+    <span data-i18n="law.body">Fairwave is not carrier equipment and is
     not certified for unlicensed operation. Transmitting on licensed
     spectrum without authorization is unlawful in most jurisdictions. The
     project ships with RF disabled by default; hardware transmit requires
     explicit country, license acknowledgment and band allow-list gates.
     Use only in compliance with local law. 3GPP, Open5GS, srsRAN and other
-    marks belong to their owners; Fairwave is independent.
+    marks belong to their owners; Fairwave is independent.</span>
   </section>
 </main>
 
 <footer>
-  <span>Fairwave - open source, community operated.</span>
-  <span><a href="https://github.com/fairwave/fairwave" rel="noopener">GitHub</a> · <a href="#top">top</a></span>
+  <span data-i18n="footer.left">Fairwave - open source, community operated.</span>
+  <span><a href="https://github.com/HyperonX-Team/Fairwave-Sim" rel="noopener" data-i18n="nav.github">GitHub</a> · <a href="#top" data-i18n="footer.top">top</a></span>
 </footer>
+
+<script>
+const I18N = {
+en: {
+  "nav.features":"Features","nav.law":"Spectrum & law","nav.status":"Status","nav.github":"GitHub",
+  "hero.title":"Community-owned small cells.<br>Spectrum-safe by design.",
+  "hero.sub":"Fairwave is an open-source small-cell network you can run on a desk: Open5GS EPC, srsRAN radio, a Go control plane, lab eSIM provisioning, and a lab-first workflow where RF stays off unless every legal gate has passed.",
+  "hero.api":"Live API status","hero.start":"Get started in the lab",
+  "card1.tag":"Lab first","card1.title":"No RF until you say so","card1.body":"ZMQ virtual radio by default. Transmit is off until country, license acknowledgment and band allow-list all pass - enforced in code, not by policy.",
+  "card2.tag":"Real 4G core","card2.title":"Open5GS EPC","card2.body":"MME, SGW, PGW, HSS, PCRF with a Mongo subscriber store. Lab PLMN 999-99, APNs internet + ims, ready for your test SIMs.",
+  "card3.tag":"Lab eSIM","card3.title":"eSIM via your own SM-DP+","card3.body":"A Go SM-DP+ and software eUICC run the full SGP.22-shaped profile download: encrypted bound profile packages, QR activation codes, CI-verified end to end.",
+  "card4.tag":"Mesh","card4.title":"Peer and share","card4.body":"WireGuard mesh with control-plane-managed keys. Local breakout by default; optional cloud rendezvous hub for distributed sites.",
+  "card5.tag":"Operator tools","card5.title":"One dashboard, one CLI","card5.body":"REST API v1, single-file operator UI, offline-first SIM provisioner with HSM-gated production profiles, Prometheus metrics.",
+  "card6.tag":"Hardware","card6.title":"Community builds","card6.body":"260 mm pizza-box enclosure, BOM tiers from ~$350 community builds to CBRS-ready radios, SDR notes for USRP, LimeSDR and BladeRF.",
+  "card7.tag":"Transparency","card7.title":"Open governance","card7.body":"ADRs for every architectural decision, threat model, privacy design, and a spectrum compliance checklist in the repo.",
+  "law.title":"Legal banner.","law.body":"Fairwave is not carrier equipment and is not certified for unlicensed operation. Transmitting on licensed spectrum without authorization is unlawful in most jurisdictions. The project ships with RF disabled by default; hardware transmit requires explicit country, license acknowledgment and band allow-list gates. Use only in compliance with local law. 3GPP, Open5GS, srsRAN and other marks belong to their owners; Fairwave is independent.",
+  "footer.left":"Fairwave - open source, community operated.","footer.top":"top"
+},
+ar: {
+  "nav.features":"الميزات","nav.law":"الطيف والقانون","nav.status":"الحالة","nav.github":"غيت‌هاب",
+  "hero.title":"شبكات صغيرة مملوكة للمجتمع.<br>آمنة طيفيًا بالتصميم.",
+  "hero.sub":"فيرويف شبكة صغيرة مفتوحة المصدر يمكنك تشغيلها على مكتبك: نواة Open5GS، راديو srsRAN، طائرة تحكم بلغة Go، وتوفير eSIM مخبري، وسير عمل يبدأ من المختبر حيث يبقى البث الراديوي متوقفًا حتى تمر جميع البوابات القانونية.",
+  "hero.api":"حالة واجهة API المباشرة","hero.start":"ابدأ في المختبر",
+  "card1.tag":"المختبر أولًا","card1.title":"لا بث راديوي حتى تقرر","card1.body":"راديو افتراضي ZMQ افتراضيًا. البث يبقى متوقفًا حتى تمر الدولة والترخيص وقائمة النطاقات المسموحة - مفروض في الكود، ليس بسياسة.",
+  "card2.tag":"نواة 4G حقيقية","card2.title":"Open5GS EPC","card2.body":"MME وSGW وPGW وHSS وPCRF مع مخزن مشتركين Mongo. PLMN مخبري 999-99، ونقاط وصول internet وims، جاهز لبطاقات الاختبار الخاصة بك.",
+  "card3.tag":"eSIM مخبري","card3.title":"eSIM عبر خادم SM-DP+ الخاص بك","card3.body":"خادم SM-DP+ بلغة Go ومحاكي eUICC يشغّلان دورة تنزيل الملف الشخصي كاملة بشكل SGP.22: حزم ملفات مشفّرة، رموز تفعيل QR، ومتحقق منها في CI من البداية للنهاية.",
+  "card4.tag":"شبكة نظير","card4.title":"شارك مع الجيران","card4.body":"شبكة WireGuard مع مفاتيح يديرها طائرة التحكم. تفريغ محلي افتراضيًا؛ ومحور التقاء سحابي اختياري للمواقع الموزعة.",
+  "card5.tag":"أدوات المشغّل","card5.title":"لوحة واحدة، واجهة أوامر واحدة","card5.body":"REST API v1، وواجهة مشغّل من ملف واحد، ومزوّد بطاقات SIM يعمل دون اتصال مع ملفات إنتاج محمية بـ HSM، ومقاييس Prometheus.",
+  "card6.tag":"عتاد","card6.title":"بنى مجتمعية","card6.body":"صندوق بيتزا 260 مم، وفئات مكونات من ~350 دولار للبنى المجتمعية حتى راديوات جاهزة لـ CBRS، وملاحظات SDR لـ USRP وLimeSDR وBladeRF.",
+  "card7.tag":"شفافية","card7.title":"حوكمة مفتوحة","card7.body":"سجلات ADR لكل قرار معماري، ونموذج تهديد، وتصميم خصوصية، وقائمة تحقق لامتثال الطيف في المستودع.",
+  "law.title":"بيان قانوني.","law.body":"فيرويف ليست معدات مشغّل شبكات وليست معتمدة للتشغيل بدون ترخيص. البث على طيف مرخّص دون إذن غير قانوني في معظم الدول. المشروع يُشحن مع إيقاف البث افتراضيًا؛ البث عبر العتاد يتطلب البلد والاعتراف بالترخيص وقائمة النطاقات المسموحة. استخدم فقط بما يتوافق مع القانون المحلي. العلامات 3GPP وOpen5GS وsrsRAN وغيرها مملوكة لأصحابها؛ فيرويف مستقل.",
+  "footer.left":"فيرويف - مفتوح المصدر، يديره المجتمع.","footer.top":"الأعلى"
+},
+zh: {
+  "nav.features":"功能","nav.law":"频谱与法律","nav.status":"状态","nav.github":"GitHub",
+  "hero.title":"社区拥有的小基站。<br>设计上就是频谱安全的。",
+  "hero.sub":"Fairwave 是一个开源的桌面级小基站网络：Open5GS 核心网、srsRAN 无线、Go 控制面、实验室 eSIM 配置，以及默认实验室优先的工作流——除非所有法律关卡通过，射频保持关闭。",
+  "hero.api":"实时 API 状态","hero.start":"在实验室开始",
+  "card1.tag":"实验室优先","card1.title":"你说开才开射频","card1.body":"默认使用 ZMQ 虚拟无线电。只有国家、许可确认和频段白名单全部通过后才会发射——由代码强制，而非政策。",
+  "card2.tag":"真正的 4G 核心","card2.title":"Open5GS EPC","card2.body":"MME、SGW、PGW、HSS、PCRF，搭配 Mongo 用户存储。实验室 PLMN 999-99，APN internet + ims，可随时接入你的测试 SIM 卡。",
+  "card3.tag":"实验室 eSIM","card3.title":"用自己的 SM-DP+ 提供 eSIM","card3.body":"Go 编写的 SM-DP+ 与软件 eUICC 完整执行 SGP.22 形态的配置下载流程：加密的绑定配置包、QR 激活码，端到端 CI 验证。",
+  "card4.tag":"组网","card4.title":"对等互联、共享","card4.body":"WireGuard 网状网络，密钥由控制面管理。默认本地分流；分布式站点可选云端汇聚中心。",
+  "card5.tag":"运维工具","card5.title":"一个仪表盘，一个 CLI","card5.body":"REST API v1、单文件运维界面、离线优先的 SIM 配置器（生产档案由 HSM 保护）、Prometheus 指标。",
+  "card6.tag":"硬件","card6.title":"社区套件","card6.body":"260 毫米披萨盒机箱，从约 350 美元的社区套件到 CBRS 就绪无线电的分层 BOM，以及 USRP、LimeSDR、BladeRF 的 SDR 笔记。",
+  "card7.tag":"透明","card7.title":"开放治理","card7.body":"每个架构决策都有 ADR、威胁模型、隐私设计，以及仓库内的频谱合规检查清单。",
+  "law.title":"法律声明。","law.body":"Fairwave 不是运营商设备，未获准在未授权频段运行。在大多数司法辖区，未经授权在授权频谱上发射是违法的。项目默认关闭射频；硬件发射需要明确的国家、许可确认和频段白名单关卡。请仅遵守当地法律使用。3GPP、Open5GS、srsRAN 等商标归其所有者所有；Fairwave 独立运营。",
+  "footer.left":"Fairwave - 开源，社区运营。","footer.top":"返回顶部"
+},
+es: {
+  "nav.features":"Funciones","nav.law":"Espectro y ley","nav.status":"Estado","nav.github":"GitHub",
+  "hero.title":"Small cells propiedad de la comunidad.<br>Seguros por diseño en el espectro.",
+  "hero.sub":"Fairwave es una red de small cells de código abierto que puedes ejecutar en un escritorio: EPC Open5GS, radio srsRAN, plano de control en Go, aprovisionamiento eSIM de laboratorio y un flujo de trabajo lab-first donde la RF permanece apagada hasta que se superan todas las compuertas legales.",
+  "hero.api":"Estado de la API en vivo","hero.start":"Empieza en el laboratorio",
+  "card1.tag":"Lab primero","card1.title":"Sin RF hasta que tú lo decidas","card1.body":"Radio virtual ZMQ por defecto. La transmisión está apagada hasta que el país, el reconocimiento de licencia y la lista de bandas permitidas pasen, aplicado en código, no por política.",
+  "card2.tag":"Núcleo 4G real","card2.title":"Open5GS EPC","card2.body":"MME, SGW, PGW, HSS y PCRF con almacén de suscriptores Mongo. PLMN de laboratorio 999-99, APNs internet + ims, listo para tus SIM de prueba.",
+  "card3.tag":"eSIM de laboratorio","card3.title":"eSIM con tu propio SM-DP+","card3.body":"Un SM-DP+ en Go y una eUICC de software ejecutan el ciclo completo de descarga de perfiles con forma SGP.22: paquetes de perfil cifrados, códigos de activación QR, verificado de extremo a extremo en CI.",
+  "card4.tag":"Malla","card4.title":"Conéctate y comparte","card4.body":"Malla WireGuard con claves gestionadas por el plano de control. Desvío local por defecto; hub de reunión en la nube opcional para sitios distribuidos.",
+  "card5.tag":"Herramientas del operador","card5.title":"Un panel, una CLI","card5.body":"REST API v1, panel de operador de archivo único, aprovisionador SIM offline-first con perfiles de producción protegidos por HSM y métricas Prometheus.",
+  "card6.tag":"Hardware","card6.title":"Construcciones comunitarias","card6.body":"Gabinete de pizza box de 260 mm, niveles de BOM desde ~350 USD hasta radios listos para CBRS, notas SDR para USRP, LimeSDR y BladeRF.",
+  "card7.tag":"Transparencia","card7.title":"Gobernanza abierta","card7.body":"ADR para cada decisión arquitectónica, modelo de amenazas, diseño de privacidad y una lista de verificación de cumplimiento espectral en el repositorio.",
+  "law.title":"Aviso legal.","law.body":"Fairwave no es equipo de operador y no está certificado para operación sin licencia. Transmitir en espectro licenciado sin autorización es ilegal en la mayoría de jurisdicciones. El proyecto se distribuye con RF desactivada por defecto; la transmisión por hardware exige país, reconocimiento de licencia y listas de bandas permitidas. Úsalo solo conforme a la ley local. 3GPP, Open5GS, srsRAN y otras marcas pertenecen a sus dueños; Fairwave es independiente.",
+  "footer.left":"Fairwave - código abierto, operado por la comunidad.","footer.top":"arriba"
+},
+fr: {
+  "nav.features":"Fonctionnalités","nav.law":"Spectre et loi","nav.status":"État","nav.github":"GitHub",
+  "hero.title":"Des small cells appartenant à la communauté.<br>Sûres par conception pour le spectre.",
+  "hero.sub":"Fairwave est un réseau de small cells open source que vous pouvez faire tourner sur un bureau : EPC Open5GS, radio srsRAN, plan de contrôle Go, approvisionnement eSIM de laboratoire, et un flux lab-first où la RF reste coupée tant que toutes les portes légales ne sont pas franchies.",
+  "hero.api":"État de l'API en direct","hero.start":"Commencer en laboratoire",
+  "card1.tag":"Lab d'abord","card1.title":"Pas de RF avant d'avoir donné votre accord","card1.body":"Radio virtuelle ZMQ par défaut. La transmission reste coupée tant que le pays, la reconnaissance de licence et la liste des bandes autorisées ne passent pas - appliqué dans le code, pas par politique.",
+  "card2.tag":"Cœur 4G réel","card2.title":"Open5GS EPC","card2.body":"MME, SGW, PGW, HSS, PCRF avec un stockage d'abonnés Mongo. PLMN de labo 999-99, APN internet + ims, prêt pour vos SIM de test.",
+  "card3.tag":"eSIM de laboratoire","card3.title":"eSIM via votre propre SM-DP+","card3.body":"Un SM-DP+ en Go et une eUICC logicielle exécutent tout le cycle de téléchargement de profils façon SGP.22 : profils liés chiffrés, codes d'activation QR, vérifié de bout en bout en CI.",
+  "card4.tag":"Maille","card4.title":"S'appairer et partager","card4.body":"Maille WireGuard avec clés gérées par le plan de contrôle. Rupture locale par défaut ; hub de rendez-vous cloud optionnel pour les sites distribués.",
+  "card5.tag":"Outils opérateur","card5.title":"Un tableau de bord, une CLI","card5.body":"REST API v1, interface opérateur en un fichier, provisionneur SIM offline-first avec profils de production protégés HSM, métriques Prometheus.",
+  "card6.tag":"Matériel","card6.title":"Constructions communautaires","card6.body":"Boîtier pizza box 260 mm, niveaux de BOM d'environ 350 USD jusqu'aux radios prêtes pour le CBRS, notes SDR pour USRP, LimeSDR et BladeRF.",
+  "card7.tag":"Transparence","card7.title":"Gouvernance ouverte","card7.body":"ADR pour chaque décision d'architecture, modèle de menaces, conception de la confidentialité et liste de contrôle de conformité spectrale dans le dépôt.",
+  "law.title":"Mention légale.","law.body":"Fairwave n'est pas un équipement d'opérateur et n'est pas certifié pour une exploitation sans licence. Émettre sur un spectre sous licence sans autorisation est illégal dans la plupart des juridictions. Le projet est livré avec la RF désactivée par défaut ; la transmission matérielle exige pays, reconnaissance de licence et listes de bandes autorisées. À utiliser uniquement en conformité avec la loi locale. 3GPP, Open5GS, srsRAN et autres marques appartiennent à leurs propriétaires ; Fairwave est indépendant.",
+  "footer.left":"Fairwave - open source, opéré par la communauté.","footer.top":"haut"
+},
+de: {
+  "nav.features":"Funktionen","nav.law":"Spektrum und Recht","nav.status":"Status","nav.github":"GitHub",
+  "hero.title":"Community-eigene Small Cells.<br>Von Natur aus spektrumsicher.",
+  "hero.sub":"Fairwave ist ein Open-Source-Small-Cell-Netz, das Sie auf einem Schreibtisch betreiben können: Open5GS-EPC, srsRAN-Funk, Go-Control-Plane, Lab-eSIM-Provisionierung und ein Lab-First-Workflow, bei dem HF aus bleibt, bis alle rechtlichen Gateways passiert sind.",
+  "hero.api":"Live-API-Status","hero.start":"Im Labor starten",
+  "card1.tag":"Lab zuerst","card1.title":"Kein HF bis Sie es sagen","card1.body":"Standardmäßig virtuelles ZMQ-Radio. Senden bleibt aus, bis Land, Lizenzbestätigung und Band-Whitelist bestehen - im Code erzwungen, nicht per Richtlinie.",
+  "card2.tag":"Echtes 4G-Kernnetz","card2.title":"Open5GS EPC","card2.body":"MME, SGW, PGW, HSS, PCRF mit Mongo-Teilnehmerdatenbank. Labor-PLMN 999-99, APNs internet + ims, bereit für Ihre Test-SIMs.",
+  "card3.tag":"Lab-eSIM","card3.title":"eSIM über Ihren eigenen SM-DP+","card3.body":"Ein SM-DP+ in Go und eine Software-eUICC führen den vollständigen SGP.22-förmigen Profil-Download durch: verschlüsselte Bound-Profile-Pakete, QR-Aktivierungscodes, durchgängig CI-verifiziert.",
+  "card4.tag":"Mesh","card4.title":"Peeren und teilen","card4.body":"WireGuard-Mesh mit Schlüsseln, die von der Control-Plane verwaltet werden. Lokale Ausleitung standardmäßig; optionaler Cloud-Rendezvous-Hub für verteilte Standorte.",
+  "card5.tag":"Operator-Werkzeuge","card5.title":"Ein Dashboard, eine CLI","card5.body":"REST-API v1, Operator-UI in einer Datei, Offline-First-SIM-Provisionierer mit HSM-geschützten Produktionsprofilen, Prometheus-Metriken.",
+  "card6.tag":"Hardware","card6.title":"Community-Bauten","card6.body":"260-mm-Pizza-Box-Gehäuse, BOM-Stufen von ca. 350 USD bis CBRS-fähigen Funkgeräten, SDR-Notizen für USRP, LimeSDR und BladeRF.",
+  "card7.tag":"Transparenz","card7.title":"Offene Governance","card7.body":"ADRs für jede Architekturentscheidung, Bedrohungsmodell, Datenschutzdesign und eine Spektrum-Compliance-Checkliste im Repo.",
+  "law.title":"Rechtlicher Hinweis.","law.body":"Fairwave ist keine Betreiberausrüstung und nicht für den Betrieb ohne Lizenz zertifiziert. Das Senden auf lizenziertem Spektrum ohne Genehmigung ist in den meisten Ländern rechtswidrig. Das Projekt wird mit standardmäßig deaktivierter HF ausgeliefert; Hardware-Senden erfordert Land, Lizenzbestätigung und Band-Whitelists. Nur in Übereinstimmung mit lokalem Recht verwenden. 3GPP, Open5GS, srsRAN und andere Marken gehören ihren Eigentümern; Fairwave ist unabhängig.",
+  "footer.left":"Fairwave - Open Source, von der Community betrieben.","footer.top":"nach oben"
+},
+hi: {
+  "nav.features":"विशेषताएं","nav.law":"स्पेक्ट्रम और कानून","nav.status":"स्थिति","nav.github":"GitHub",
+  "hero.title":"समुदाय के स्वामित्व वाले छोटे सेल।<br>डिज़ाइन से ही स्पेक्ट्रम-सुरक्षित।",
+  "hero.sub":"Fairwave एक ओपन-सोर्स छोटा-सेल नेटवर्क है जिसे आप डेस्क पर चला सकते हैं: Open5GS EPC, srsRAN रेडियो, Go कंट्रोल प्लेन, लैब eSIM प्रोविज़निंग, और लैब-फर्स्ट वर्कफ़्लो जहाँ सभी कानूनी गेट पास होने तक RF बंद रहता है।",
+  "hero.api":"लाइव API स्थिति","hero.start":"लैब में शुरू करें",
+  "card1.tag":"पहले लैब","card1.title":"आपके कहने तक कोई RF नहीं","card1.body":"डिफ़ॉल्ट रूप से ZMQ वर्चुअल रेडियो। देश, लाइसेंस स्वीकृति और बैंड-अनुमति सूची सभी पास होने तक ट्रांसमिट बंद रहता है - नीति से नहीं, कोड से लागू।",
+  "card2.tag":"असली 4G कोर","card2.title":"Open5GS EPC","card2.body":"Mongo सब्सक्राइबर स्टोर के साथ MME, SGW, PGW, HSS, PCRF। लैब PLMN 999-99, APN internet + ims, आपके टेस्ट SIM के लिए तैयार।",
+  "card3.tag":"लैब eSIM","card3.title":"अपने खुद के SM-DP+ से eSIM","card3.body":"Go में SM-DP+ और सॉफ़्टवेयर eUICC पूरी SGP.22-आकार की प्रोफ़ाइल डाउनलोड प्रक्रिया चलाते हैं: एन्क्रिप्टेड बाउंड प्रोफ़ाइल पैकेज, QR एक्टिवेशन कोड, CI में एंड-टू-एंड सत्यापित।",
+  "card4.tag":"मेश","card4.title":"जुड़ें और साझा करें","card4.body":"WireGuard मेश जिसकी कुंजियाँ कंट्रोल प्लेन प्रबंधित करता है। डिफ़ॉल्ट रूप से लोकल ब्रेकआउट; वितरित साइटों के लिए वैकल्पिक क्लाउड रेंडेवज़ हब।",
+  "card5.tag":"ऑपरेटर टूल्स","card5.title":"एक डैशबोर्ड, एक CLI","card5.body":"REST API v1, सिंगल-फ़ाइल ऑपरेटर UI, HSM-सुरक्षित प्रोडक्शन प्रोफ़ाइल वाला ऑफ़लाइन-फर्स्ट SIM प्रोविज़नर, Prometheus मेट्रिक्स।",
+  "card6.tag":"हार्डवेयर","card6.title":"सामुदायिक निर्माण","card6.body":"260 मिमी पिज़्ज़ा-बॉक्स एनक्लोज़र, ~$350 सामुदायिक बिल्ड से CBRS-रेडी रेडियो तक BOM स्तर, USRP, LimeSDR और BladeRF के लिए SDR नोट्स।",
+  "card7.tag":"पारदर्शिता","card7.title":"खुला शासन","card7.body":"हर आर्किटेक्चर निर्णय के लिए ADR, थ्रेट मॉडल, प्राइवेसी डिज़ाइन, और रिपो में स्पेक्ट्रम अनुपालन चेकलिस्ट।",
+  "law.title":"कानूनी बैनर।","law.body":"Fairwave कैरियर उपकरण नहीं है और बिना लाइसेंस संचालन के लिए प्रमाणित नहीं है। अधिकांश क्षेत्राधिकारों में बिना प्राधिकरण के लाइसेंस प्राप्त स्पेक्ट्रम पर ट्रांसमिट करना अवैध है। परियोजना डिफ़ॉल्ट रूप से RF बंद करके आती है; हार्डवेयर ट्रांसमिट के लिए देश, लाइसेंस स्वीकृति और बैंड अनुमति गेट आवश्यक हैं। केवल स्थानीय कानून के अनुपालन में उपयोग करें। 3GPP, Open5GS, srsRAN और अन्य ट्रेडमार्क उनके स्वामियों के हैं; Fairwave स्वतंत्र है।",
+  "footer.left":"Fairwave - ओपन सोर्स, समुदाय द्वारा संचालित।","footer.top":"ऊपर"
+}
+};
+
+function applyLang(lang) {
+  const t = I18N[lang] || I18N.en;
+  document.documentElement.lang = lang;
+  document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
+  document.querySelectorAll("[data-i18n]").forEach(el => {
+    const key = el.getAttribute("data-i18n");
+    if (t[key] !== undefined) el.innerHTML = t[key];
+  });
+}
+
+const saved = (localStorage && localStorage.getItem("fairwave-lang")) || "en";
+const sel = document.getElementById("lang");
+sel.value = I18N[sel.value] ? sel.value : "en";
+sel.value = I18N[saved] ? saved : "en";
+applyLang(sel.value);
+sel.addEventListener("change", () => {
+  applyLang(sel.value);
+  if (localStorage) localStorage.setItem("fairwave-lang", sel.value);
+});
+</script>
 </body>
 </html>
