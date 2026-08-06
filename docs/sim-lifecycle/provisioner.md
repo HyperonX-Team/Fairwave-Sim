@@ -73,6 +73,24 @@ bash sims/2026-08-02/hss-hook.sh
 
 The hook is the only component that decrypts the vault, and only for the exact SIMs in its manifest. After loading, the bundle's one-time decryption flag is set.
 
+## Automatic HSS write-back
+
+Since v0.2 the control plane can seed Open5GS by itself - no manual `hss-init.sh` run needed:
+
+- **`POST /v1/sims`** (issue) upserts each subscriber into the HSS database, and
+  **`POST /v1/sims/{imsi}/revoke`** deletes it, driven by the same document shape
+  as `core/open5gs/hss-init.sh` (`core/sim-ops/hsswrite`).
+- Config (`fairwave-control.yaml`): `hss.driver` = `mongosh` (upsert via mongosh in
+  the mongo container) or `dbctl` (`open5gs-dbctl add/remove` in the open5gs
+  container); `hss.container` names the container. `none` (default) disables it.
+  Env overrides: `FAIRWAVE_HSS_DRIVER`, `FAIRWAVE_HSS_CONTAINER`.
+- The standalone `fairwave esim issue` mints eSIM profiles with the same vectors;
+  pass `--hss-driver mongosh` (or set `FAIRWAVE_HSS_DRIVER`) to seed the HSS in
+  the same command.
+- Credentials never cross the network: the write-back `docker exec`s into the
+  local container. Ki/OPc briefly appear in the docker exec argv on the node -
+  acceptable in the lab, never logged.
+
 ## No network required
 
 The provisioner is fully offline-capable: no API calls, no telemetry, no DNS. Network use is limited to the optional HSS hook (loopback) and to operators explicitly pushing bundles to a bureau transport of their choosing. Air-gapped issuance is a first-class scenario.

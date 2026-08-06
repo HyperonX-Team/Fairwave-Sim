@@ -16,6 +16,9 @@ auth:
   admin_token_env: FAIRWAVE_ADMIN_TOKEN
 southbound:
   driver: none
+hss:
+  driver: mongosh
+  container: mongo
 peering:
   enabled: true
   mdns: false

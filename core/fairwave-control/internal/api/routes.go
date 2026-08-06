@@ -278,6 +278,12 @@ func (s *Server) handleIssueSIMs(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	for _, sub := range subs {
+		// Write back to the HSS first so a failed store never leaves an
+		// orphan subscriber; on store failure roll the HSS entry back.
+		if err := s.hss.Add(r.Context(), sub); err != nil {
+			writeErr(w, http.StatusBadGateway, "hss_writeback", err.Error())
+			return
+		}
 		sim := &api.SIM{
 			IMSI:      sub.IMSI,
 			MSISDN:    sub.MSISDN,
@@ -289,6 +295,7 @@ func (s *Server) handleIssueSIMs(w http.ResponseWriter, r *http.Request) {
 			ExpiresAt: time.Now().Add(365 * 24 * time.Hour),
 		}
 		if err := s.store.UpsertSIM(sim); err != nil {
+			_ = s.hss.Remove(r.Context(), sub.IMSI)
 			writeErr(w, http.StatusInternalServerError, "persist", err.Error())
 			return
 		}
@@ -301,6 +308,12 @@ func (s *Server) handleRevokeSIM(w http.ResponseWriter, r *http.Request) {
 	sim, ok := s.store.GetSIM(imsi)
 	if !ok {
 		writeErr(w, http.StatusNotFound, "not_found", "no such SIM")
+		return
+	}
+	// Remove from the HSS first; only mark revoked once the network can
+	// no longer accept the SIM (idempotent on retry).
+	if err := s.hss.Remove(r.Context(), imsi); err != nil {
+		writeErr(w, http.StatusBadGateway, "hss_writeback", err.Error())
 		return
 	}
 	sim.Status = "revoked"

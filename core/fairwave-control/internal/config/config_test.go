@@ -90,3 +90,43 @@ func TestEnvOverrides(t *testing.T) {
 		t.Fatalf("mcc: %s", c.PLMN.MCC)
 	}
 }
+
+func TestHSSDriverValidation(t *testing.T) {
+	c := Default()
+	c.HSS.Driver = "mongosh"
+	c.HSS.Container = "mongo"
+	if err := c.Validate(); err != nil {
+		t.Fatalf("mongosh driver should validate: %v", err)
+	}
+	c.HSS.Container = ""
+	if err := c.Validate(); err == nil {
+		t.Fatal("missing container with a real driver must fail")
+	}
+	c.HSS.Container = "mongo"
+	c.HSS.Driver = "sanity-check"
+	if err := c.Validate(); err == nil {
+		t.Fatal("unknown driver must fail")
+	}
+	c.HSS.Driver = "none"
+	c.HSS.Container = ""
+	if err := c.Validate(); err != nil {
+		t.Fatalf("none driver must validate without container: %v", err)
+	}
+}
+
+func TestEnvOverridesHSS(t *testing.T) {
+	dir := t.TempDir()
+	t.Setenv("FAIRWAVE_HSS_DRIVER", "dbctl")
+	t.Setenv("FAIRWAVE_HSS_CONTAINER", "open5gs")
+	c, err := Load(filepath.Join(dir, "nope.yaml"))
+	if err == nil {
+		t.Fatal("expected load error for missing file")
+	}
+	_ = c
+	// Load from a valid file with env overrides.
+	cfg := Default()
+	applyEnv(cfg)
+	if cfg.HSS.Driver != "dbctl" || cfg.HSS.Container != "open5gs" {
+		t.Fatalf("env overrides not applied: %+v", cfg.HSS)
+	}
+}

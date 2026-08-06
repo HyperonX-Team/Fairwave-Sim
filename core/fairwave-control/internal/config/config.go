@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/HyperonX-Team/Fairwave-Sim/core/sim-ops/hsswrite"
 	"github.com/xeipuuv/gojsonschema"
 	"gopkg.in/yaml.v3"
 )
@@ -52,6 +53,11 @@ type ControlConfig struct {
 		SrsranConfigDir  string `yaml:"srsran_config_dir" json:"srsran_config_dir"`
 		Driver           string `yaml:"driver" json:"driver"` // docker | none
 	} `yaml:"southbound" json:"southbound"`
+
+	HSS struct {
+		Driver    string `yaml:"driver" json:"driver"`       // mongosh | dbctl | none
+		Container string `yaml:"container" json:"container"` // container to exec into
+	} `yaml:"hss" json:"hss"`
 
 	Peering struct {
 		Enabled    bool     `yaml:"enabled" json:"enabled"`
@@ -98,6 +104,8 @@ func Default() *ControlConfig {
 	c.Southbound.Open5GSConfigDir = "./data/open5gs"
 	c.Southbound.SrsranConfigDir = "./data/srsran"
 	c.Southbound.Driver = "none"
+	c.HSS.Driver = "none"
+	c.HSS.Container = "mongo"
 	c.Peering.Enabled = true
 	c.Peering.MDNS = true
 	c.Peering.WGIface = "fw-mesh"
@@ -153,6 +161,8 @@ func applyEnv(c *ControlConfig) {
 		"FAIRWAVE_COUNTRY":           func(v string) { c.Server.Country = v },
 		"FAIRWAVE_ADMIN_TOKEN":       func(v string) { _ = v }, // consumed by api auth, not config
 		"FAIRWAVE_SOUTHBOUND_DRIVER": func(v string) { c.Southbound.Driver = v },
+		"FAIRWAVE_HSS_DRIVER":        func(v string) { c.HSS.Driver = v },
+		"FAIRWAVE_HSS_CONTAINER":     func(v string) { c.HSS.Container = v },
 		"FAIRWAVE_PEERING_DISABLED": func(v string) {
 			if b, err := strconv.ParseBool(v); err == nil {
 				c.Peering.Enabled = !b
@@ -222,6 +232,14 @@ func (c *ControlConfig) Validate() error {
 	}
 	if c.TAC <= 0 || c.TAC > 65535 {
 		return fmt.Errorf("tac out of range: %d", c.TAC)
+	}
+	switch c.HSS.Driver {
+	case hsswrite.DriverNone, hsswrite.DriverMongosh, hsswrite.DriverDBCTL:
+	default:
+		return fmt.Errorf("hss.driver must be mongosh, dbctl or none (got %q)", c.HSS.Driver)
+	}
+	if c.HSS.Driver != hsswrite.DriverNone && c.HSS.Container == "" {
+		return fmt.Errorf("hss.container required when hss.driver is %q", c.HSS.Driver)
 	}
 	return nil
 }

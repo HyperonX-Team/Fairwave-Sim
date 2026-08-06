@@ -26,6 +26,13 @@ versions follow [SemVer](https://semver.org/spec/v2.0.0.html).
   also in Italian, Portuguese, Russian, Japanese, Korean, Turkish, Polish,
   Dutch, Ukrainian, Swedish, Indonesian, and Vietnamese (19 languages
   total).
+- **Automatic HSS write-back:** SIM issuance and revocation now seed
+  Open5GS automatically (`core/sim-ops/hsswrite`): `mongosh` upsert driver
+  (hss-init.sh document shape) and `dbctl` driver, both via docker exec so
+  Ki/OPc never leave the node; wired into the control plane (`/v1/sims`
+  issue/revoke) and `fairwave esim issue --hss-driver`; config
+  `hss.driver`/`hss.container` + `FAIRWAVE_HSS_*` env; lab compose config
+  enables it.
 
 ## [0.1.0] - 2026-08-02
 

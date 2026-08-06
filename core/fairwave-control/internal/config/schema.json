@@ -51,6 +51,14 @@
       },
       "additionalProperties": false
     },
+    "hss": {
+      "type": "object",
+      "properties": {
+        "driver": { "type": "string", "enum": ["mongosh", "dbctl", "none"] },
+        "container": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    },
     "peering": {
       "type": "object",
       "properties": {

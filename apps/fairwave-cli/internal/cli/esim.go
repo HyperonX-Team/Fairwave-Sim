@@ -10,6 +10,7 @@ import (
 	"github.com/HyperonX-Team/Fairwave-Sim/core/esim/profile"
 	"github.com/HyperonX-Team/Fairwave-Sim/core/esim/registry"
 	"github.com/HyperonX-Team/Fairwave-Sim/core/esim/smdp"
+	"github.com/HyperonX-Team/Fairwave-Sim/core/sim-ops/hsswrite"
 	"github.com/HyperonX-Team/Fairwave-Sim/core/sim-ops/simprov"
 	"github.com/spf13/cobra"
 )
@@ -26,13 +27,16 @@ func esimCmd() *cobra.Command {
 }
 
 // esimIssueCmd mints a lab eSIM profile + activation code for a lab vector
-// IMSI and registers it in the local SM-DP+ registry.
+// IMSI and registers it in the local SM-DP+ registry. With an HSS driver
+// configured the subscriber is written back to Open5GS automatically.
 func esimIssueCmd() *cobra.Command {
 	var (
-		imsi    string
-		address string
-		eid     string
-		qrOut   string
+		imsi         string
+		address      string
+		eid          string
+		qrOut        string
+		hssDriver    string
+		hssContainer string
 	)
 	cmd := &cobra.Command{
 		Use:   "issue",
@@ -75,6 +79,15 @@ func esimIssueCmd() *cobra.Command {
 				}
 				fmt.Printf("  qr:     %s\n", qrOut)
 			}
+			if hssDriver != "" && hssDriver != "none" {
+				writer := hsswrite.New(hssDriver, hssContainer)
+				if err := writer.Add(cmd.Context(), sub); err != nil {
+					return fmt.Errorf("hss write-back: %w", err)
+				}
+				fmt.Printf("  hss:    subscriber %s written to Open5GS (%s/%s)\n", sub.IMSI, hssDriver, hssContainer)
+			} else {
+				fmt.Printf("note: HSS write-back skipped; pass --hss-driver mongosh to auto-seed Open5GS\n")
+			}
 			fmt.Printf("next: run `fairwave esim serve` and scan the QR with a phone's eSIM setup\n")
 			return nil
 		},
@@ -83,6 +96,8 @@ func esimIssueCmd() *cobra.Command {
 	cmd.Flags().StringVar(&address, "address", "fairwave.local:8443", "SM-DP+ address in the activation code")
 	cmd.Flags().StringVar(&eid, "eid", "", "pin the profile to a target eUICC EID (optional)")
 	cmd.Flags().StringVar(&qrOut, "qr", "", "write the activation QR PNG to this path (optional)")
+	cmd.Flags().StringVar(&hssDriver, "hss-driver", envOr("FAIRWAVE_HSS_DRIVER", "none"), "HSS write-back driver: mongosh | dbctl | none")
+	cmd.Flags().StringVar(&hssContainer, "hss-container", envOr("FAIRWAVE_HSS_CONTAINER", "mongo"), "container to exec the HSS write-back into")
 	_ = cmd.MarkFlagRequired("imsi")
 	return cmd
 }

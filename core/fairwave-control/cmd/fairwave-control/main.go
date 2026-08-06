@@ -19,6 +19,7 @@ import (
 	"github.com/HyperonX-Team/Fairwave-Sim/core/fairwave-control/internal/identity"
 	"github.com/HyperonX-Team/Fairwave-Sim/core/fairwave-control/internal/store"
 	"github.com/HyperonX-Team/Fairwave-Sim/core/policy"
+	"github.com/HyperonX-Team/Fairwave-Sim/core/sim-ops/hsswrite"
 )
 
 func main() {
@@ -46,7 +47,12 @@ func main() {
 		log.Fatalf("spectrum: %v", err)
 	}
 
-	srv := api.New(cfg, st, id, policyAdapter{reg})
+	hss := hsswrite.New(cfg.HSS.Driver, cfg.HSS.Container)
+	if _, ok := hss.(hsswrite.None); !ok {
+		log.Printf("hss write-back enabled: driver=%s container=%s", cfg.HSS.Driver, cfg.HSS.Container)
+	}
+
+	srv := api.New(cfg, st, id, policyAdapter{reg}, hss)
 
 	httpSrv := &http.Server{
 		Addr:              cfg.Server.Listen,

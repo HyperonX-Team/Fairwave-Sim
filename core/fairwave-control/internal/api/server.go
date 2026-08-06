@@ -19,6 +19,7 @@ import (
 	"github.com/HyperonX-Team/Fairwave-Sim/core/fairwave-control/internal/config"
 	"github.com/HyperonX-Team/Fairwave-Sim/core/fairwave-control/internal/identity"
 	"github.com/HyperonX-Team/Fairwave-Sim/core/fairwave-control/internal/store"
+	"github.com/HyperonX-Team/Fairwave-Sim/core/sim-ops/hsswrite"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -46,16 +47,22 @@ type Server struct {
 	txArmed  bool
 	started  time.Time
 	spectrum SpectrumChecker
+	hss      hsswrite.Writer
 	mux      *http.ServeMux
 }
 
 // New creates the API server. sc may be nil (all spectrum checks denied).
-func New(cfg *config.ControlConfig, st *store.Store, id *identity.Identity, sc SpectrumChecker) *Server {
+// hss may be nil (SIM issuance/revocation is store-only).
+func New(cfg *config.ControlConfig, st *store.Store, id *identity.Identity, sc SpectrumChecker, hss hsswrite.Writer) *Server {
+	if hss == nil {
+		hss = hsswrite.None{}
+	}
 	s := &Server{
 		cfg:      cfg,
 		store:    st,
 		id:       id,
 		spectrum: sc,
+		hss:      hss,
 		started:  time.Now(),
 	}
 	s.adminTok = strings.TrimSpace(os.Getenv(cfg.Auth.AdminTokenEnv))
