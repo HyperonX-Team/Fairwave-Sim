@@ -1,0 +1,22 @@
+# free5GC UPF config, Fairwave lab adaptation (canonical free5gc-compose
+# shape). The gtp5g forwarder requires the gtp5g kernel module v0.9.5 on
+# the host - see README.md in this directory.
+version: 1.0.3
+description: UPF initial local configuration
+pfcp:
+  addr: upf.free5gc.org
+  nodeID: upf.free5gc.org
+  retransTimeout: 1s
+  maxRetrans: 3
+gtpu:
+  forwarder: gtp5g
+  ifList:
+    - addr: upf.free5gc.org
+      type: N3
+dnnList:
+  - dnn: internet
+    cidr: 10.60.0.0/16
+logger:
+  enable: true
+  level: info
+  reportCaller: false

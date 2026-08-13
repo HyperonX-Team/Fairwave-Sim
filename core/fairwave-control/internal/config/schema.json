@@ -4,6 +4,7 @@
   "title": "fairwave-control configuration",
   "type": "object",
   "properties": {
+    "core": { "type": "string", "enum": ["open5gs", "free5gc"], "default": "open5gs" },
     "server": {
       "type": "object",
       "properties": {
@@ -54,7 +55,7 @@
     "hss": {
       "type": "object",
       "properties": {
-        "driver": { "type": "string", "enum": ["mongosh", "dbctl", "none"] },
+        "driver": { "type": "string", "enum": ["mongosh", "dbctl", "free5gc", "none"] },
         "container": { "type": "string", "minLength": 1 }
       },
       "additionalProperties": false
@@ -87,7 +88,65 @@
       "type": "object",
       "properties": {
         "metrics": { "type": "boolean" },
-        "otlp_endpoint": { "type": "string" }
+        "otlp_endpoint": { "type": "string" },
+        "stale_after": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "collector": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "interval": { "type": "string" },
+        "mme_url": { "type": "string" },
+        "smf_url": { "type": "string" },
+        "upf": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "iface": { "type": "string" }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "free5gc": {
+      "type": "object",
+      "properties": {
+        "amf_oam_url": { "type": "string", "minLength": 1 },
+        "cdr_dir": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "esim": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "registry_path": { "type": "string" },
+        "smdp_address": { "type": "string" },
+        "smdp_id": { "type": "string" },
+        "single_use": { "type": "boolean" },
+        "code_ttl": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "alerts": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "webhooks": { "type": "array", "items": { "type": "string" } },
+        "temp_high_c": { "type": "number" },
+        "sim_expiry_warn_days": { "type": "integer", "minimum": 0 },
+        "ues_capacity_pct": { "type": "integer", "minimum": 1, "maximum": 100 }
+      },
+      "additionalProperties": false
+    },
+    "fairuse": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "usage_interval": { "type": "string" }
       },
       "additionalProperties": false
     }

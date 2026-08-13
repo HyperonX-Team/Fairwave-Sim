@@ -21,6 +21,11 @@ var schemaJSON []byte
 
 // ControlConfig is the top-level fairwave-control.yaml structure.
 type ControlConfig struct {
+	// Core selects the mobile-core backend the control plane supervises.
+	// open5gs keeps the existing 4G/5G lab core; free5gc switches the HSS
+	// write-back and session collector to free5GC (5G SA).
+	Core string `yaml:"core" json:"core"` // open5gs | free5gc
+
 	Server struct {
 		Listen    string        `yaml:"listen" json:"listen"`
 		DataDir   string        `yaml:"data_dir" json:"data_dir"`
@@ -78,9 +83,50 @@ type ControlConfig struct {
 	} `yaml:"policy" json:"policy"`
 
 	Telemetry struct {
-		Metrics      bool   `yaml:"metrics" json:"metrics"`
-		OTLPEndpoint string `yaml:"otlp_endpoint" json:"otlp_endpoint"`
+		Metrics      bool          `yaml:"metrics" json:"metrics"`
+		OTLPEndpoint string        `yaml:"otlp_endpoint" json:"otlp_endpoint"`
+		StaleAfter   time.Duration `yaml:"stale_after" json:"stale_after"` // node marked down after this silence
 	} `yaml:"telemetry" json:"telemetry"`
+
+	Collector struct {
+		Enabled  bool          `yaml:"enabled" json:"enabled"`
+		Interval time.Duration `yaml:"interval" json:"interval"`
+		MMEURL   string        `yaml:"mme_url" json:"mme_url"`
+		SMFURL   string        `yaml:"smf_url" json:"smf_url"`
+		UPF      struct {
+			Enabled bool   `yaml:"enabled" json:"enabled"` // per-UE GTP-U accounting tap
+			Iface   string `yaml:"iface" json:"iface"`     // interface carrying GTP-U (S1-U/S5-U)
+		} `yaml:"upf" json:"upf"`
+	} `yaml:"collector" json:"collector"`
+
+	// Free5GC holds the free5GC-specific knobs, active when core is
+	// "free5gc".
+	Free5GC struct {
+		AMFOAMURL string `yaml:"amf_oam_url" json:"amf_oam_url"` // AMF OAM HTTP base, e.g. http://amf:8000
+		CDRDir    string `yaml:"cdr_dir" json:"cdr_dir"`         // CHF CDR dir (shared volume); enables core-metered usage
+	} `yaml:"free5gc" json:"free5gc"`
+
+	ESIM struct {
+		Enabled      bool          `yaml:"enabled" json:"enabled"`
+		RegistryPath string        `yaml:"registry_path" json:"registry_path"`
+		SMDPAddress  string        `yaml:"smdp_address" json:"smdp_address"` // host[:port] embedded in activation codes
+		SMDPID       string        `yaml:"smdp_id" json:"smdp_id"`
+		SingleUse    bool          `yaml:"single_use" json:"single_use"` // codes die after one download
+		CodeTTL      time.Duration `yaml:"code_ttl" json:"code_ttl"`     // codes expire after this long
+	} `yaml:"esim" json:"esim"`
+
+	Alerts struct {
+		Enabled           bool     `yaml:"enabled" json:"enabled"`
+		Webhooks          []string `yaml:"webhooks" json:"webhooks"`
+		TempHighC         float64  `yaml:"temp_high_c" json:"temp_high_c"`
+		SimExpiryWarnDays int      `yaml:"sim_expiry_warn_days" json:"sim_expiry_warn_days"`
+		UesCapacityPct    int      `yaml:"ues_capacity_pct" json:"ues_capacity_pct"`
+	} `yaml:"alerts" json:"alerts"`
+
+	FairUse struct {
+		Enabled       bool          `yaml:"enabled" json:"enabled"`
+		UsageInterval time.Duration `yaml:"usage_interval" json:"usage_interval"`
+	} `yaml:"fairuse" json:"fairuse"`
 
 	Version string `yaml:"-" json:"-"`
 }
@@ -88,6 +134,7 @@ type ControlConfig struct {
 // Default returns a safe, RF-disabled configuration.
 func Default() *ControlConfig {
 	c := &ControlConfig{}
+	c.Core = "open5gs"
 	c.Server.Listen = ":8080"
 	c.Server.DataDir = "./data"
 	c.Server.Mode = "lab"
@@ -117,6 +164,27 @@ func Default() *ControlConfig {
 	c.Policy.QoSDLMbps = 50
 	c.Policy.QoSULMbps = 25
 	c.Telemetry.Metrics = true
+	c.Telemetry.StaleAfter = 90 * time.Second
+	c.Collector.Enabled = false
+	c.Collector.Interval = 15 * time.Second
+	c.Collector.MMEURL = "http://127.0.0.2:9090" // Open5GS MME infoAPI (lab compose pins the MME to .2)
+	c.Collector.SMFURL = "http://127.0.0.4:9090" // optional: SMF infoAPI for IP enrichment
+	c.Collector.UPF.Enabled = false              // requires CAP_NET_RAW on the tap interface
+	c.Collector.UPF.Iface = ""
+	c.Free5GC.AMFOAMURL = "http://amf:8000" // free5GC AMF OAM (SBI) port
+	c.Free5GC.CDRDir = ""                   // CHF CDR dir; unset = no core-metered usage
+	c.ESIM.Enabled = true
+	c.ESIM.RegistryPath = "" // defaults to <data_dir>/esim/registry.json
+	c.ESIM.SMDPAddress = "fairwave.local:8443"
+	c.ESIM.SMDPID = "fairwave-esim"
+	c.ESIM.SingleUse = true
+	c.ESIM.CodeTTL = 7 * 24 * time.Hour
+	c.Alerts.Enabled = true
+	c.Alerts.TempHighC = 85
+	c.Alerts.SimExpiryWarnDays = 14
+	c.Alerts.UesCapacityPct = 90
+	c.FairUse.Enabled = false // auto-suspend is opt-in: it is a heavy hammer
+	c.FairUse.UsageInterval = 60 * time.Second
 	return c
 }
 
@@ -171,6 +239,43 @@ func applyEnv(c *ControlConfig) {
 		"FAIRWAVE_POLICY_LOCAL_BREAKOUT": func(v string) {
 			if b, err := strconv.ParseBool(v); err == nil {
 				c.Policy.LocalBreakout = b
+			}
+		},
+		"FAIRWAVE_COLLECTOR_ENABLED": func(v string) {
+			if b, err := strconv.ParseBool(v); err == nil {
+				c.Collector.Enabled = b
+			}
+		},
+		"FAIRWAVE_COLLECTOR_MME_URL": func(v string) { c.Collector.MMEURL = v },
+		"FAIRWAVE_COLLECTOR_SMF_URL": func(v string) { c.Collector.SMFURL = v },
+		"FAIRWAVE_COLLECTOR_UPF_ENABLED": func(v string) {
+			if b, err := strconv.ParseBool(v); err == nil {
+				c.Collector.UPF.Enabled = b
+			}
+		},
+		"FAIRWAVE_COLLECTOR_UPF_IFACE": func(v string) { c.Collector.UPF.Iface = v },
+		"FAIRWAVE_CORE":                func(v string) { c.Core = v },
+		"FAIRWAVE_FREE5GC_AMF_OAM_URL": func(v string) { c.Free5GC.AMFOAMURL = v },
+		"FAIRWAVE_FREE5GC_CDR_DIR":     func(v string) { c.Free5GC.CDRDir = v },
+		"FAIRWAVE_ESIM_ENABLED": func(v string) {
+			if b, err := strconv.ParseBool(v); err == nil {
+				c.ESIM.Enabled = b
+			}
+		},
+		"FAIRWAVE_ESIM_SMDP_ADDRESS": func(v string) { c.ESIM.SMDPAddress = v },
+		"FAIRWAVE_ESIM_SINGLE_USE": func(v string) {
+			if b, err := strconv.ParseBool(v); err == nil {
+				c.ESIM.SingleUse = b
+			}
+		},
+		"FAIRWAVE_ALERTS_ENABLED": func(v string) {
+			if b, err := strconv.ParseBool(v); err == nil {
+				c.Alerts.Enabled = b
+			}
+		},
+		"FAIRWAVE_FAIRUSE_ENABLED": func(v string) {
+			if b, err := strconv.ParseBool(v); err == nil {
+				c.FairUse.Enabled = b
 			}
 		},
 	}
@@ -233,13 +338,44 @@ func (c *ControlConfig) Validate() error {
 	if c.TAC <= 0 || c.TAC > 65535 {
 		return fmt.Errorf("tac out of range: %d", c.TAC)
 	}
-	switch c.HSS.Driver {
-	case hsswrite.DriverNone, hsswrite.DriverMongosh, hsswrite.DriverDBCTL:
+	switch c.Core {
+	case "open5gs", "free5gc":
 	default:
-		return fmt.Errorf("hss.driver must be mongosh, dbctl or none (got %q)", c.HSS.Driver)
+		return fmt.Errorf("core must be open5gs or free5gc (got %q)", c.Core)
+	}
+	switch c.HSS.Driver {
+	case hsswrite.DriverNone, hsswrite.DriverMongosh, hsswrite.DriverDBCTL, hsswrite.DriverFree5GC:
+	default:
+		return fmt.Errorf("hss.driver must be mongosh, dbctl, free5gc or none (got %q)", c.HSS.Driver)
 	}
 	if c.HSS.Driver != hsswrite.DriverNone && c.HSS.Container == "" {
 		return fmt.Errorf("hss.container required when hss.driver is %q", c.HSS.Driver)
+	}
+	if c.Core == "free5gc" && c.Collector.Enabled && c.Free5GC.AMFOAMURL == "" {
+		return fmt.Errorf("free5gc.amf_oam_url required when core is free5gc and collector.enabled is true")
+	}
+	if c.Free5GC.CDRDir != "" {
+		if c.Core != "free5gc" {
+			return fmt.Errorf("free5gc.cdr_dir requires core free5gc")
+		}
+		if !c.Collector.Enabled {
+			return fmt.Errorf("free5gc.cdr_dir requires collector.enabled (the CDR meter runs in the collector)")
+		}
+	}
+	if c.Collector.Enabled && c.Core != "free5gc" && c.Collector.MMEURL == "" {
+		return fmt.Errorf("collector.mme_url required when collector.enabled is true (open5gs core)")
+	}
+	if c.Collector.UPF.Enabled && c.Collector.UPF.Iface == "" {
+		return fmt.Errorf("collector.upf.iface required when collector.upf.enabled is true")
+	}
+	if c.ESIM.Enabled && c.ESIM.SMDPAddress == "" {
+		return fmt.Errorf("esim.smdp_address required when esim.enabled is true")
+	}
+	if c.Alerts.UesCapacityPct <= 0 || c.Alerts.UesCapacityPct > 100 {
+		return fmt.Errorf("alerts.ues_capacity_pct must be in (0,100]")
+	}
+	if c.FairUse.Enabled && c.FairUse.UsageInterval <= 0 {
+		return fmt.Errorf("fairuse.usage_interval must be positive when fairuse.enabled")
 	}
 	return nil
 }

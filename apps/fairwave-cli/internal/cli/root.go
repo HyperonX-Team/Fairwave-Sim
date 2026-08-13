@@ -35,6 +35,12 @@ func Root() *cobra.Command {
 		peerCmd(),
 		spectrumCmd(),
 		policyCmd(),
+		auditCmd(),
+		alertsCmd(),
+		tokenCmd(),
+		complianceCmd(),
+		backupCmd(),
+		restoreCmd(),
 		doctorCmd(),
 		versionCmd(),
 	)

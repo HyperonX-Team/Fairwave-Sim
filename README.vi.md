@@ -1,7 +1,7 @@
 <h1 align="center">Fairwave - nhà khai thác cộng đồng trong một hộp pizza</h1>
 
 <p align="center">
-  <strong>LTE riêng mã nguồn mở: cắm vào Ethernet, phát 4G, chào đón hàng xóm.</strong>
+  <strong>LTE riêng mã nguồn mở: cắm vào Ethernet, phát 4G hoặc 5G, chào đón hàng xóm.</strong>
 </p>
 
 <p align="center">
@@ -135,7 +135,7 @@ Toàn bộ trang web: **chạy `make docs-serve`** - hoặc đọc trong cây d�
 ## Tình trạng
 
 **Bản phát hành thí nghiệm `v0.1.0`**: kết nối EPC + zmq RAN + srsUE hoạt động end-to-end; mặt phẳng điều khiển,
-CLI, bộ cấp phát SIM, eSIM thí nghiệm (SM-DP+) và trang tài liệu hoạt động tốt. Các đường RF thực đã được
+CLI, bộ cấp phát SIM, eSIM thí nghiệm (SM-DP+) và trang tài liệu hoạt động tốt. Kèm theo là lõi 5G SA free5GC với đo lường lưu lượng dựa trên CHF (tùy chọn, `core: free5gc`), kèm hồ sơ lab gNB/UE ZMQ và bài kiểm tra attach CI. Các đường RF thực đã được
 xác minh trên phần cứng phát triển nhưng **bị vô hiệu hóa mặc định**. Xem [lộ trình](design/roadmap.md).
 
 ## Fairwave KHÔNG phải là gì

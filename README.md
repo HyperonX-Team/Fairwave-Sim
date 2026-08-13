@@ -1,7 +1,7 @@
 <h1 align="center">Fairwave - a community carrier in a pizza box</h1>
 
 <p align="center">
-  <strong>Open-source private LTE: plug it into Ethernet, emit 4G, welcome your neighbors.</strong>
+  <strong>Open-source private LTE + 5G: plug it into Ethernet, emit 4G or 5G, welcome your neighbors.</strong>
 </p>
 
 <p align="center">
@@ -9,7 +9,7 @@
   <img alt="License: Apache-2.0" src="https://img.shields.io/badge/License-Apache_2.0-green.svg">
   <img alt="Release: v0.1.0 (lab)" src="https://img.shields.io/badge/release-v0.1.0-orange">
   <img alt="RF default" src="https://img.shields.io/badge/RF_TX-OFF_by_default-critical">
-  <img alt="Stack" src="https://img.shields.io/badge/stack-Open5GS_%2B_srsRAN_%2B_Go-informational">
+  <img alt="Stack" src="https://img.shields.io/badge/stack-Open5GS_%2B_free5GC_%2B_srsRAN_%2B_Go-informational">
 </p>
 
 > [!IMPORTANT]
@@ -47,9 +47,9 @@ A café, a housing co-op, a village hall, a township - anyone can run one:
 4. Phones attach. Traffic stays local when possible; multiple pizza boxes peer into a mesh;
    internet breakout rides a secure WireGuard tunnel when you want it.
 
-Built on proven open infrastructure - **Open5GS** (EPC) and **srsRAN** (eNB/gNB) - with a Go
-control plane, an operator dashboard, offline SIM provisioning, and lab mode that runs the
-entire carrier in Docker with zero RF.
+Built on proven open infrastructure - **Open5GS** (4G EPC), **free5GC** (5G SA core, opt-in),
+and **srsRAN** (eNB/gNB) - with a Go control plane, an operator dashboard, offline SIM
+provisioning, fair-use metering, and lab mode that runs the entire carrier in Docker with zero RF.
 
 ## What you get
 
@@ -57,6 +57,10 @@ entire carrier in Docker with zero RF.
   (`provision → register → on-air → peer → breakout`) managed by `fairwave-control`.
 - **Real LTE attach**: Open5GS EPC + srsRAN eNB, configurable PLMN, tracking areas,
   `internet` + `ims` APNs, local breakout at the edge.
+- **5G SA core (opt-in)**: free5GC AMF/SMF/UPF/NRF/PCF + UDR write-back, AMF OAM session
+  polling, and CHF CDR usage metering - all in `deploy/docker-compose.5g.yml`.
+- **Fair-use metering from the core**: per-UE byte counters (GTP-U tap on 4G, free5GC CHF CDRs
+  on 5G) feed per-SIM quotas with automatic suspend; no packet capture hacks needed.
 - **Fairwave SIM ops**: offline-first provisioner; generates Ki/OPc, batches CSV/JSON for
   card bureaus, writes HSS/UDM, revocation and swap controls. Lab vs. production hard-separated.
 - **Lab eSIM (SM-DP+)**: your own SGP.22-shaped profile server and a software eUICC - encrypted
@@ -136,8 +140,10 @@ Full site: **run `make docs-serve`** - or read it in-tree under [`docs/`](docs/i
 ## Status
 
 **Lab release `v0.1.0`**: EPC + zmq RAN + srsUE attach works end-to-end; control plane, CLI,
-SIM provisioner, peering MVP, and the docs site are functional. Real-RF paths are validated
-on dev hardware but **disabled by default**. See the [roadmap](design/roadmap.md).
+SIM provisioner, peering MVP, and the docs site are functional. A free5GC 5G SA core with
+CHF-based usage metering ships alongside (opt-in, `core: free5gc`), with ZMQ gNB/UE lab
+profiles and a CI attach test. Real-RF paths are validated on dev hardware but **disabled
+by default**. See the [roadmap](design/roadmap.md).
 
 ## What Fairwave is NOT
 

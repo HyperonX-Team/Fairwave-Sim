@@ -8,11 +8,12 @@ title: Fairwave Documentation
 
 ## What is Fairwave?
 
-Fairwave is an open-source community small-cell: a self-contained private LTE network built from commodity hardware and open-source software. A Fairwave node is an x86 or ARM mini-PC paired with an SDR (USRP, LimeSDR, or BladeRF) running:
+Fairwave is an open-source community small-cell: a self-contained private 4G/5G network built from commodity hardware and open-source software. A Fairwave node is an x86 or ARM mini-PC paired with an SDR (USRP, LimeSDR, or BladeRF) running:
 
-- **Open5GS** as the EPC (MME, SGW, PGW, HSS).
-- **srsRAN Project** as the eNB (and srsUE as a test handset).
-- **fairwave-control** (Go) as the control plane that glues the node together.
+- **Open5GS** as the 4G EPC (MME, SGW, PGW, HSS) - the default core.
+- **free5GC** as the optional 5G SA core (AMF, SMF, UPF, NRF, PCF, NSSF, AUSF, UDM, UDR; `core: free5gc`).
+- **srsRAN Project** as the eNB/gNB (and srsUE as a test handset, 4G and 5G SA over ZMQ).
+- **fairwave-control** (Go) as the control plane that glues the node together - including fair-use metering with per-UE quotas and auto-suspend, measured from the core (GTP-U tap in 4G, free5GC CHF CDRs in 5G).
 - **fairwave-agent** (Go) on each node, and **fairwave-cli** (Go) for operators.
 - An operator UI and a captive portal for subscriber onboarding.
 
@@ -22,7 +23,9 @@ Fairwave targets lawful private networks, research, education, and shared-spectr
 
 - **Release:** v0.1.0 (lab) - no-RF virtual radio only.
 - **Defaults:** PLMN `999-99`, TAC `7`, APNs `internet` and `ims`.
-- **Lab mode:** srsRAN eNB and srsUE over ZMQ virtual radio inside Docker; no SDR touched.
+- **Cores:** Open5GS EPC (4G, default) and free5GC 5G SA (opt-in via `core: free5gc`; `deploy/docker-compose.5g.yml`).
+- **Fair use:** per-UE byte counters from the core - GTP-U tap (4G) or free5GC CHF CDR files (5G) - feeding quotas with auto-suspend (`fairwave sim quota` / `usage`).
+- **Lab mode:** srsRAN eNB/gNB and srsUE over ZMQ virtual radio inside Docker; no SDR touched.
 - **TX gate:** real RF requires the `tx_arm` gate: country code + license acknowledgment + frequency allow-list, all three set.
 - **Lifecycle:** provision → register → on-air → peer → breakout, with local breakout (edge NAT) as default and WireGuard mesh peering as an option.
 - **SIMs:** offline-first provisioner, IMSI-based (15 digits), lab and prod profiles kept separate; Ki/OPc never committed or logged.

@@ -4,8 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
+	"time"
 
 	"github.com/HyperonX-Team/Fairwave-Sim/core/fairwave-control/api"
+	"github.com/HyperonX-Team/Fairwave-Sim/core/sim-ops/simprov"
 	"github.com/spf13/cobra"
 )
 
@@ -17,6 +20,7 @@ func nodeCmd() *cobra.Command {
 	cmd.AddCommand(
 		nodeInitCmd(),
 		nodeStatusCmd(),
+		nodeHealthCmd(),
 		nodeJoinCmd(),
 		nodeLeaveCmd(),
 	)
@@ -125,9 +129,9 @@ func nodeLeaveCmd() *cobra.Command {
 func simCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "sim",
-		Short: "SIM lifecycle: issue, revoke, list",
+		Short: "SIM lifecycle: issue, revoke, suspend, resume, list, export",
 	}
-	cmd.AddCommand(simIssueCmd(), simRevokeCmd(), simListCmd())
+	cmd.AddCommand(simIssueCmd(), simRevokeCmd(), simSuspendCmd(), simResumeCmd(), simGetCmd(), simListCmd(), simExportCmd(), simImportCmd(), simQuotaCmd(), simUsageCmd())
 	return cmd
 }
 
@@ -161,7 +165,7 @@ func simIssueCmd() *cobra.Command {
 func simRevokeCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "revoke",
-		Short: "Revoke a SIM by IMSI",
+		Short: "Revoke a SIM by IMSI (removed from the HSS)",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) < 1 {
 				return fmt.Errorf("usage: fairwave sim revoke <imsi>")
@@ -175,6 +179,135 @@ func simRevokeCmd() *cobra.Command {
 			return nil
 		},
 	}
+}
+
+func simSuspendCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "suspend",
+		Short: "Suspend a SIM (deactivate, credentials kept)",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) < 1 {
+				return fmt.Errorf("usage: fairwave sim suspend <imsi>")
+			}
+			c := newClient(cmd)
+			var sim api.SIM
+			if err := c.post("/v1/sims/"+args[0]+"/suspend", nil, &sim); err != nil {
+				return err
+			}
+			fmt.Printf("suspended imsi=%s status=%s\n", sim.IMSI, sim.Status)
+			return nil
+		},
+	}
+}
+
+func simResumeCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "resume",
+		Short: "Resume a suspended SIM",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) < 1 {
+				return fmt.Errorf("usage: fairwave sim resume <imsi>")
+			}
+			c := newClient(cmd)
+			var sim api.SIM
+			if err := c.post("/v1/sims/"+args[0]+"/resume", nil, &sim); err != nil {
+				return err
+			}
+			fmt.Printf("resumed imsi=%s status=%s\n", sim.IMSI, sim.Status)
+			return nil
+		},
+	}
+}
+
+func simGetCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "get",
+		Short: "Show one SIM by IMSI",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) < 1 {
+				return fmt.Errorf("usage: fairwave sim get <imsi>")
+			}
+			c := newClient(cmd)
+			var sim api.SIM
+			if err := c.get("/v1/sims/"+args[0], &sim); err != nil {
+				return err
+			}
+			enc := json.NewEncoder(os.Stdout)
+			enc.SetIndent("", "  ")
+			return enc.Encode(sim)
+		},
+	}
+}
+
+// simExportCmd writes bureau-friendly batch files for a card vendor.
+// Ki/OPc are only available from the provisioner/vault, never the control
+// plane; --lab-creds fills them from the public lab test vectors for
+// testing/demos (never for real cards).
+func simExportCmd() *cobra.Command {
+	var format, out string
+	var labCreds bool
+	cmd := &cobra.Command{
+		Use:   "export",
+		Short: "Export issued SIMs as a bureau batch (CSV/JSON)",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if format != "csv" && format != "json" {
+				return fmt.Errorf("format must be csv or json (got %q)", format)
+			}
+			c := newClient(cmd)
+			var sims []api.SIM
+			if err := c.get("/v1/sims", &sims); err != nil {
+				return err
+			}
+			if len(sims) == 0 {
+				return fmt.Errorf("no SIMs in the store to export")
+			}
+			subs := make([]simprov.Subscriber, 0, len(sims))
+			for _, s := range sims {
+				sub := simprov.Subscriber{
+					IMSI:   s.IMSI,
+					MSISDN: s.MSISDN,
+					APN:    s.APN,
+					Class:  s.Profile,
+				}
+				if labCreds {
+					if vec, err := simprov.LoadTestVector(s.IMSI); err == nil {
+						sub.Ki, sub.OPc, sub.AMF, sub.SQN = vec.Ki, vec.OPc, vec.AMF, vec.SQN
+					} else {
+						return fmt.Errorf("SIM %s has no lab vector; --lab-creds only works for lab test IMSIs", s.IMSI)
+					}
+				}
+				subs = append(subs, sub)
+			}
+			if out == "" {
+				out = simprov.DefaultOutputDir()
+			}
+			if err := os.MkdirAll(out, 0o750); err != nil {
+				return err
+			}
+			stamp := time.Now().Format("20060102-150405")
+			var path string
+			if format == "csv" {
+				path = filepath.Join(out, "fairwave-sims-"+stamp+".csv")
+				if err := simprov.WriteCSV(path, subs); err != nil {
+					return err
+				}
+			} else {
+				path = filepath.Join(out, "fairwave-sims-"+stamp+".json")
+				if err := simprov.WriteJSON(path, subs); err != nil {
+					return err
+				}
+			}
+			fmt.Printf("exported %d SIMs -> %s\n", len(subs), path)
+			if !labCreds {
+				fmt.Println("note: Ki/OPc are not in the control plane; merge them from the provisioner/vault (--lab-creds for lab vectors only)")
+			}
+			return nil
+		},
+	}
+	cmd.Flags().StringVar(&format, "format", "csv", "output format: csv | json")
+	cmd.Flags().StringVar(&out, "out", "", "output dir (default out/<date>)")
+	cmd.Flags().BoolVar(&labCreds, "lab-creds", false, "fill Ki/OPc from public lab test vectors (lab only!)")
+	return cmd
 }
 
 func simListCmd() *cobra.Command {
@@ -248,9 +381,9 @@ func peerAddCmd() *cobra.Command {
 func spectrumCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "spectrum",
-		Short: "Spectrum gate checks (read-only)",
+		Short: "Spectrum gate checks and TX arming",
 	}
-	cmd.AddCommand(spectrumCheckCmd(), spectrumArmCmd())
+	cmd.AddCommand(spectrumCheckCmd(), spectrumArmCmd(), spectrumDisarmCmd())
 	return cmd
 }
 
@@ -353,11 +486,16 @@ func policyGetCmd() *cobra.Command {
 }
 
 func policySetCmd() *cobra.Command {
-	var localBreakout bool
-	var maxUEs int
+	var (
+		localBreakout bool
+		maxUEs        int
+		hubPeer       string
+		qosDL         int
+		qosUL         int
+	)
 	cmd := &cobra.Command{
 		Use:   "set",
-		Short: "Set policy (only the supported knobs)",
+		Short: "Set policy knobs (only the ones you pass change)",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			c := newClient(cmd)
 			var p api.Policy
@@ -370,15 +508,28 @@ func policySetCmd() *cobra.Command {
 			if cmd.Flags().Changed("max-ues") {
 				p.MaxUEs = maxUEs
 			}
+			if cmd.Flags().Changed("hub-peer") {
+				p.HubPeer = hubPeer
+			}
+			if cmd.Flags().Changed("qos-dl-mbps") {
+				p.QoSDLMbps = qosDL
+			}
+			if cmd.Flags().Changed("qos-ul-mbps") {
+				p.QoSULMbps = qosUL
+			}
 			var updated api.Policy
 			if err := c.do("PUT", "/v1/policy", p, &updated); err != nil {
 				return err
 			}
-			fmt.Printf("policy updated: local_breakout=%v max_ues=%d\n", updated.LocalBreakout, updated.MaxUEs)
+			fmt.Printf("policy updated: local_breakout=%v max_ues=%d hub=%q qos=%d/%d Mbps\n",
+				updated.LocalBreakout, updated.MaxUEs, updated.HubPeer, updated.QoSDLMbps, updated.QoSULMbps)
 			return nil
 		},
 	}
 	cmd.Flags().BoolVar(&localBreakout, "local-breakout", true, "break out at edge NAT")
 	cmd.Flags().IntVar(&maxUEs, "max-ues", 128, "fair-use UE cap")
+	cmd.Flags().StringVar(&hubPeer, "hub-peer", "", "optional hub peer id for off-site traffic")
+	cmd.Flags().IntVar(&qosDL, "qos-dl-mbps", 0, "default DL cap per UE (Mbps)")
+	cmd.Flags().IntVar(&qosUL, "qos-ul-mbps", 0, "default UL cap per UE (Mbps)")
 	return cmd
 }

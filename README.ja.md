@@ -1,7 +1,7 @@
 <h1 align="center">Fairwave - ピザボックスに入ったコミュニティ・キャリア</h1>
 
 <p align="center">
-  <strong>オープンソースのプライベートLTE：イーサネットに挿して、4Gを出し、隣人を迎え入れよう。</strong>
+  <strong>オープンソースのプライベートLTE：イーサネットに挿して、4G/5Gを出し、隣人を迎え入れよう。</strong>
 </p>
 
 <p align="center">
@@ -134,7 +134,7 @@ make lab-down                            # すべて停止
 ## ステータス
 
 **ラボリリース `v0.1.0`**：EPC + zmq RAN + srsUEアタッチがエンドツーエンドで動作；コントロールプレーン、
-CLI、SIM発行者、ラボeSIM（SM-DP+）、ドキュメントサイトが機能。実RFパスは開発ハードウェアで検証済み
+CLI、SIM発行者、ラボeSIM（SM-DP+）、ドキュメントサイトが機能。さらに、free5GC ベースの 5G SA コアと CHF ベースの利用量計測がオプションで同梱されます（`core: free5gc`）。ZMQ の gNB/UE ラボプロファイルと CI 接続テスト付き。実RFパスは開発ハードウェアで検証済み
 ですが、**デフォルトで無効**です。[ロードマップ](design/roadmap.md)を参照。
 
 ## Fairwaveが「ではない」もの

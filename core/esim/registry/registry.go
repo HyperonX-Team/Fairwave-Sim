@@ -8,6 +8,7 @@ package registry
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -23,7 +24,14 @@ type Entry struct {
 	Profile      *profile.Profile `json:"profile"`
 	CreatedAt    time.Time        `json:"created_at"`
 	DownloadedAt *time.Time       `json:"downloaded_at,omitempty"`
+	ExpiresAt    *time.Time       `json:"expires_at,omitempty"` // code-level expiry (may be nil)
 }
+
+// ErrActivationCodeUsed means a single-use code was already downloaded.
+var ErrActivationCodeUsed = errors.New("registry: activation code already used")
+
+// ErrActivationCodeExpired means the code's validity window has passed.
+var ErrActivationCodeExpired = errors.New("registry: activation code expired")
 
 // Registry is a file-backed map of activation codes to profiles.
 type Registry struct {
@@ -59,19 +67,43 @@ func Open(path string) (*Registry, error) {
 	return r, nil
 }
 
-// Add registers an activation code with its profile.
+// Add registers an activation code with its profile (no code-level expiry).
 func (r *Registry) Add(token string, p *profile.Profile) error {
+	return r.AddWithExpiry(token, p, time.Time{})
+}
+
+// AddWithExpiry registers an activation code with an optional code-level
+// expiry (zero time = never expires at the code level; the profile's own
+// ExpiresAt still applies at download time).
+func (r *Registry) AddWithExpiry(token string, p *profile.Profile, expiresAt time.Time) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	if _, exists := r.entries[token]; exists {
 		return fmt.Errorf("registry: activation code %s already registered", token)
 	}
-	r.entries[token] = &Entry{
+	e := &Entry{
 		Token:     token,
 		Profile:   p,
 		CreatedAt: time.Now().UTC(),
 	}
+	if !expiresAt.IsZero() {
+		t := expiresAt.UTC()
+		e.ExpiresAt = &t
+	}
+	r.entries[token] = e
 	return r.saveLocked()
+}
+
+// Entry returns the raw entry for a token (for policy layers: single-use
+// checks, expiry enforcement, auditing).
+func (r *Registry) Entry(token string) (*Entry, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	e, ok := r.entries[token]
+	if !ok {
+		return nil, fmt.Errorf("registry: unknown activation code")
+	}
+	return e, nil
 }
 
 // Resolve implements the SM-DP+ ProfileSource: it returns the profile for
@@ -82,6 +114,25 @@ func (r *Registry) Resolve(token string) (*profile.Profile, error) {
 	e, ok := r.entries[token]
 	if !ok {
 		return nil, fmt.Errorf("registry: unknown activation code")
+	}
+	return e.Profile, nil
+}
+
+// ResolvePolicy enforces the code-level policy: single-use codes refuse a
+// second download, and expired codes refuse everything. now is injected so
+// tests can control time.
+func (r *Registry) ResolvePolicy(token string, singleUse bool, now time.Time) (*profile.Profile, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	e, ok := r.entries[token]
+	if !ok {
+		return nil, fmt.Errorf("registry: unknown activation code")
+	}
+	if e.ExpiresAt != nil && now.After(*e.ExpiresAt) {
+		return nil, ErrActivationCodeExpired
+	}
+	if singleUse && e.DownloadedAt != nil {
+		return nil, ErrActivationCodeUsed
 	}
 	return e.Profile, nil
 }

@@ -55,17 +55,29 @@ Codes are machine-readable and stable within a major version. HTTP status codes 
 | --- | --- |
 | Health | `GET /v1/healthz` |
 | Node | `GET /v1/status`, `GET /v1/version` |
-| Nodes | `GET /v1/nodes` |
-| Subscribers | `GET|POST /v1/sims` |
-| Peering | `GET /v1/peers` |
-| Sessions | `GET /v1/sessions` |
-| Policy | `GET|PUT /v1/policy` |
+| Nodes | `GET /v1/nodes`, `GET|POST /v1/nodes/{id}/enroll|leave` |
+| Telemetry | `POST /v1/telemetry` (agent heartbeats), `GET /v1/health` |
+| Subscribers | `GET|POST /v1/sims`, `GET /v1/sims/{imsi}`, `POST /v1/sims/{imsi}/revoke|suspend|resume`, `POST /v1/sims/import`, `POST /v1/sims/{imsi}/quota|usage`, `GET /v1/sims/{imsi}/usage` |
+| eSIM | `POST /v1/esim/issue`, `GET /v1/esim/codes`, `GET /v1/esim/codes/{token}/qr`, `POST /v1/esim/revoke`, `POST /es9plus/...` (SM-DP+ ES9+ loop) |
+| Peering | `GET|POST /v1/peers`, `DELETE /v1/peers/{id}` |
+| Sessions | `GET /v1/sessions` (live UEs; per-UE byte counters from the GTP-U accounting tap when `collector.upf` is enabled, or from the free5GC AMF OAM + CHF CDR collectors when `core: free5gc`) |
+| Policy | `GET|PUT /v1/policy` (QoS AMBR caps are pushed to HSS at SIM issuance) |
 | Spectrum | `POST /v1/spectrum/check` |
-| TX gate | `GET|POST /v1/tx/arm` |
+| TX gate | `POST /v1/tx/arm`, `POST /v1/tx/disarm` |
 | Lifecycle | `POST /v1/lifecycle/transition` |
+| Alerts | `GET /v1/alerts` (threshold engine + webhook delivery, `alerts.*` config) |
+| Tokens | `GET|POST /v1/tokens`, `DELETE /v1/tokens/{id}` (scoped admin/operator/viewer tokens; actions audited per principal) |
+| Compliance | `GET /v1/compliance/export` (regulator-ready CSV) |
+| Backup | `GET /v1/backup`, `POST /v1/restore` (tar.gz, optional AES-256-GCM passphrase) |
+| Audit | `GET /v1/audit` (append-only operator trail) |
 | Metrics | `GET /metrics` (Prometheus) |
 
-Full reference with examples: [REST reference](rest.md).
+## Core backends
+
+The control plane supervises one mobile core at a time, selected by `core:` in the config (`open5gs`, default, or `free5gc`). The northbound API is core-agnostic; only the southbound drivers differ:
+
+- **Open5GS** (4G/5G lab): sessions from the MME/SMF infoAPI (`collector.mme_url`/`smf_url`); per-UE byte counters from the GTP-U tap (`collector.upf`) when fair-use metering is wanted.
+- **free5GC** (5G SA, `core: free5gc`): sessions from the AMF OAM API (`GET /namf-oam/v1/registered-ue-context` on `free5gc.amf_oam_url`); per-UE usage from the CHF CDR files (`free5gc.cdr_dir`, a volume shared with the CHF — PFCP URR → SMF → CHF → CDR, no packet tap) feeding the fair-use quota/auto-suspend pipeline; SIM provisioning via the `free5gc` HSS driver (`hss.driver: free5gc`) against the UDR's MongoDB collections. Deployment: `deploy/docker-compose.5g.yml`, configs in `core/free5gc/`.
 
 ## gRPC
 

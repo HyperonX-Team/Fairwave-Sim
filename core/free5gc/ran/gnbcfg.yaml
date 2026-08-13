@@ -1,0 +1,19 @@
+# UERANSIM gNB config for the Fairwave 5G lab.
+# PLMN must match core/free5gc/amfcfg.yaml and the SIM test vectors.
+mcc: '999'
+mnc: '99'
+nci: '0x10'
+idLength: 32
+tac: 1
+linkIp: 10.100.200.101
+ngapIp: 10.100.200.101
+gtpIp: 10.100.200.101
+amfConfigs:
+  - address: 10.100.200.16
+    port: 38412
+slices:
+  - sst: 1
+    sd: 0x010203
+log:
+  filename: /tmp/gnb.log
+  level: info

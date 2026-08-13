@@ -1,7 +1,7 @@
 <h1 align="center">Fairwave - bir pizza kutusundaki topluluk operatörü</h1>
 
 <p align="center">
-  <strong>Açık kaynak özel LTE: Ethernet'e tak, 4G yay, komşularını karşıla.</strong>
+  <strong>Açık kaynak özel LTE: Ethernet'e tak, 4G/5G yay, komşularını karşıla.</strong>
 </p>
 
 <p align="center">
@@ -134,7 +134,7 @@ Tam site: **`make docs-serve` çalıştırın** - veya ağaç içinde [`docs/`](
 ## Durum
 
 **Laboratuvar sürümü `v0.1.0`**: EPC + zmq RAN + srsUE bağlantısı uçtan uca çalışır; kontrol düzlemi, CLI,
-SIM sağlayıcı, laboratuvar eSIM (SM-DP+) ve dokümantasyon sitesi işlevseldir. Gerçek RF yolları geliştirme
+SIM sağlayıcı, laboratuvar eSIM (SM-DP+) ve dokümantasyon sitesi işlevseldir. Ayrıca CHF tabanlı kullanım ölçümüne sahip bir free5GC 5G SA çekirdeği isteğe bağlı olarak sunulur (`core: free5gc`), ZMQ gNB/UE laboratuvar profilleri ve bir CI bağlanma testiyle birlikte. Gerçek RF yolları geliştirme
 donanımında doğrulanmıştır ancak **varsayılan olarak devre dışıdır**. [Yol haritasına](design/roadmap.md) bakın.
 
 ## Fairwave NE DEĞİLDİR

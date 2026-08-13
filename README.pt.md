@@ -1,7 +1,7 @@
 <h1 align="center">Fairwave - uma operadora comunitária em uma caixa de pizza</h1>
 
 <p align="center">
-  <strong>LTE privado de código aberto: conecte ao Ethernet, emita 4G, dê boas-vindas aos seus vizinhos.</strong>
+  <strong>LTE privado de código aberto: conecte ao Ethernet, emita 4G ou 5G, dê boas-vindas aos seus vizinhos.</strong>
 </p>
 
 <p align="center">
@@ -136,7 +136,7 @@ Site completo: **execute `make docs-serve`** - ou leia na árvore sob [`docs/`](
 ## Status
 
 **Versão de laboratório `v0.1.0`**: attach EPC + zmq RAN + srsUE funciona de ponta a ponta; plano de controle,
-CLI, provisionador de SIM, eSIM de laboratório (SM-DP+) e o site de documentação são funcionais. Os caminhos
+CLI, provisionador de SIM, eSIM de laboratório (SM-DP+) e o site de documentação são funcionais. Junto a ele é incluído um núcleo 5G SA free5GC com medição de uso baseada em CHF (opcional, `core: free5gc`), com perfis de laboratório gNB/UE em ZMQ e um teste de attach no CI. Os caminhos
 de RF real são validados em hardware de desenvolvimento, mas **desabilitados por padrão**.
 Veja o [roadmap](design/roadmap.md).
 

@@ -4,44 +4,75 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="dark">
-<meta name="description" content="Fairwave - a community-owned small-cell network. Open5GS EPC, srsRAN radio, lab eSIM, lab-first, spectrum-safe.">
+<meta name="description" content="Fairwave - a community-owned 4G/5G small-cell network. Open5GS EPC + free5GC 5G core, srsRAN radio, lab eSIM, fair-use metering, lab-first, spectrum-safe.">
 <title>Fairwave - community small cells</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230d1117'/%3E%3Cpath d='M5 20c4-7 8-7 12 0s8 7 12 0' stroke='%234dd0e1' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3Cpath d='M5 13c4-7 8-7 12 0s8 7 12 0' stroke='%237c4dff' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
 <style>
-  :root { --bg:#0d1117; --panel:#161c27; --line:#263248; --text:#e6edf7;
-    --muted:#93a3bd; --accent:#4dd0e1; --accent2:#7c4dff; }
+  :root { --bg:#0d1117; --panel:#141b2a; --line:#263248; --text:#e6edf7;
+    --muted:#93a3bd; --accent:#4dd0e1; --accent2:#7c4dff; --accent3:#22d3a0;
+    --glow:rgba(77,208,225,.14); --glow2:rgba(124,77,255,.16); }
   * { box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
   body { margin:0; background:var(--bg); color:var(--text);
-    font:16px/1.65 system-ui,"Segoe UI",Roboto,sans-serif; }
+    font:16px/1.65 system-ui,"Segoe UI",Roboto,sans-serif;
+    min-height:100vh;
+    background-image:
+      radial-gradient(1100px 520px at 12% -8%, var(--glow), transparent 60%),
+      radial-gradient(900px 460px at 88% -12%, var(--glow2), transparent 60%),
+      repeating-linear-gradient(0deg, rgba(38,50,72,.06) 0 1px, transparent 1px 46px),
+      repeating-linear-gradient(90deg, rgba(38,50,72,.06) 0 1px, transparent 1px 46px);
+    background-attachment:fixed; }
   [dir="rtl"] body { font-family:"Segoe UI","Tahoma","Noto Naskh Arabic",system-ui,sans-serif; }
-  header, footer { padding:20px 28px; border-bottom:1px solid var(--line);
+  ::selection { background:rgba(77,208,225,.3); }
+  :focus-visible { outline:2px solid var(--accent); outline-offset:2px; border-radius:6px; }
+  header { position:sticky; top:0; z-index:10; padding:16px 28px;
+    border-bottom:1px solid var(--line); background:rgba(13,17,23,.85);
+    backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
     display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; }
   .logo { font-size:20px; font-weight:700; letter-spacing:.5px; }
-  .logo b { color:var(--accent); }
-  nav a { color:var(--muted); text-decoration:none; margin-inline-start:18px; font-size:14px; }
+  .logo b { color:var(--accent); text-shadow:0 0 18px var(--glow); }
+  nav { display:flex; align-items:center; flex-wrap:wrap; }
+  nav a { color:var(--muted); text-decoration:none; margin-inline-start:18px; font-size:14px;
+    transition:color .15s ease; }
   nav a:hover { color:var(--text); }
   #lang { background:var(--panel); color:var(--text); border:1px solid var(--line);
-    border-radius:8px; padding:6px 10px; font-size:13px; cursor:pointer; }
-  main { max-width:960px; margin:0 auto; padding:56px 24px 80px; }
-  .hero h1 { font-size:40px; line-height:1.15; margin:0 0 16px; }
-  .hero p { font-size:18px; color:var(--muted); max-width:640px; }
-  .cta { margin-top:28px; display:flex; gap:14px; flex-wrap:wrap; }
-  .btn { background:var(--accent); color:#06222b; border:none; border-radius:10px;
-    padding:13px 22px; font-size:16px; font-weight:600; text-decoration:none; }
-  .btn.ghost { background:transparent; border:1px solid var(--line); color:var(--text); }
-  .btn:hover { filter:brightness(1.08); }
+    border-radius:8px; padding:6px 10px; font-size:13px; cursor:pointer; margin-inline-start:18px; }
+  main { max-width:960px; margin:0 auto; padding:64px 24px 80px; }
+  .hero h1 { font-size:44px; line-height:1.15; margin:0 0 16px; letter-spacing:-.5px; }
+  .hero p { font-size:18px; color:var(--muted); max-width:660px; }
+  .cta { margin-top:30px; display:flex; gap:14px; flex-wrap:wrap; }
+  .btn { background:linear-gradient(135deg, var(--accent), #2fb9cc); color:#06222b; border:none;
+    border-radius:10px; padding:13px 22px; font-size:16px; font-weight:600; text-decoration:none;
+    box-shadow:0 4px 22px var(--glow); transition:transform .15s ease, box-shadow .15s ease; }
+  .btn.ghost { background:transparent; border:1px solid var(--line); color:var(--text); box-shadow:none; }
+  .btn:hover { transform:translateY(-1px); box-shadow:0 6px 28px var(--glow); }
+  .btn.ghost:hover { border-color:var(--accent); color:var(--accent); }
   .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-    gap:16px; margin-top:56px; }
-  .card { background:var(--panel); border:1px solid var(--line); border-radius:14px;
-    padding:22px; }
+    gap:18px; margin-top:56px; }
+  .card { background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:24px;
+    transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease; }
+  .card:hover { transform:translateY(-3px); border-color:rgba(77,208,225,.55);
+    box-shadow:0 10px 32px rgba(0,0,0,.35); }
   .card h2 { margin:0 0 8px; font-size:17px; }
   .card p { color:var(--muted); font-size:14.5px; margin:0; }
-  .tag { display:inline-block; font-size:11px; letter-spacing:1px;
-    text-transform:uppercase; color:var(--accent); border:1px solid var(--line);
-    border-radius:999px; padding:3px 10px; margin-bottom:12px; }
+  .tag { display:inline-block; font-size:11px; letter-spacing:1px; text-transform:uppercase;
+    color:var(--accent); border:1px solid rgba(77,208,225,.35); border-radius:999px;
+    padding:3px 10px; margin-bottom:14px; background:rgba(77,208,225,.07); }
   .legal { background:var(--panel); border:1px solid var(--line); border-radius:14px;
     padding:18px 22px; margin-top:56px; font-size:13.5px; color:var(--muted); }
-  footer { border-top:1px solid var(--line); border-bottom:none; font-size:13px;
-    color:var(--muted); }
+  footer { border-top:1px solid var(--line); font-size:13px; color:var(--muted);
+    padding:20px 28px; display:flex; justify-content:space-between; align-items:center;
+    flex-wrap:wrap; gap:12px; }
+  footer a { color:var(--muted); text-decoration:none; }
+  footer a:hover { color:var(--accent); }
+  ::-webkit-scrollbar { width:10px; }
+  ::-webkit-scrollbar-thumb { background:var(--line); border-radius:6px; }
+  ::-webkit-scrollbar-thumb:hover { background:#31415f; }
+  @media (max-width:640px) { .hero h1 { font-size:34px; } }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior:auto; }
+    .card, .btn, nav a { transition:none; }
+  }
 </style>
 </head>
 <body>
@@ -80,8 +111,9 @@
   <section class="hero">
     <h1 data-i18n="hero.title">Community-owned small cells.<br>Spectrum-safe by design.</h1>
     <p data-i18n="hero.sub">Fairwave is an open-source small-cell network you can run on a desk:
-       Open5GS EPC, srsRAN radio, a Go control plane, lab eSIM provisioning,
-       and a lab-first workflow where RF stays off unless every legal gate has passed.</p>
+       Open5GS EPC for 4G and a free5GC 5G core, srsRAN radio, a Go control plane,
+       lab eSIM provisioning, fair-use data caps measured from the core, and a lab-first
+       workflow where RF stays off unless every legal gate has passed.</p>
     <div class="cta">
       <a class="btn" href="/v1/status" data-i18n="hero.api">Live API status</a>
       <a class="btn ghost" href="https://github.com/HyperonX-Team/Fairwave-Sim" rel="noopener" data-i18n="hero.start">Get started in the lab</a>
@@ -94,10 +126,10 @@
       <p data-i18n="card1.body">ZMQ virtual radio by default. Transmit is off until country, license
          acknowledgment and band allow-list all pass - enforced in code, not
          by policy.</p></div>
-    <div class="card"><span class="tag" data-i18n="card2.tag">Real 4G core</span>
-      <h2 data-i18n="card2.title">Open5GS EPC</h2>
-      <p data-i18n="card2.body">MME, SGW, PGW, HSS, PCRF with a Mongo subscriber store. Lab PLMN
-         999-99, APNs internet + ims, ready for your test SIMs.</p></div>
+    <div class="card"><span class="tag" data-i18n="card2.tag">4G + 5G cores</span>
+      <h2 data-i18n="card2.title">Open5GS EPC + free5GC 5G</h2>
+      <p data-i18n="card2.body">MME, SGW, PGW, HSS, PCRF for LTE plus an optional free5GC 5G SA core
+         with UDR subscriber write-back. Lab PLMN 999-99, APNs internet + ims, ready for your test SIMs.</p></div>
     <div class="card"><span class="tag" data-i18n="card3.tag">Lab eSIM</span>
       <h2 data-i18n="card3.title">eSIM via your own SM-DP+</h2>
       <p data-i18n="card3.body">A Go SM-DP+ and software eUICC run the full SGP.22-shaped
@@ -110,7 +142,8 @@
     <div class="card"><span class="tag" data-i18n="card5.tag">Operator tools</span>
       <h2 data-i18n="card5.title">One dashboard, one CLI</h2>
       <p data-i18n="card5.body">REST API v1, single-file operator UI, offline-first SIM provisioner
-         with HSM-gated production profiles, Prometheus metrics.</p></div>
+         with HSM-gated production profiles, per-UE fair-use quotas with auto-suspend,
+         Prometheus metrics.</p></div>
     <div class="card"><span class="tag" data-i18n="card6.tag">Hardware</span>
       <h2 data-i18n="card6.title">Community builds</h2>
       <p data-i18n="card6.body">260 mm pizza-box enclosure, BOM tiers from ~$350 community builds to
@@ -143,13 +176,13 @@ const I18N = {
 en: {
   "nav.features":"Features","nav.law":"Spectrum & law","nav.status":"Status","nav.github":"GitHub",
   "hero.title":"Community-owned small cells.<br>Spectrum-safe by design.",
-  "hero.sub":"Fairwave is an open-source small-cell network you can run on a desk: Open5GS EPC, srsRAN radio, a Go control plane, lab eSIM provisioning, and a lab-first workflow where RF stays off unless every legal gate has passed.",
+  "hero.sub":"Fairwave is an open-source small-cell network you can run on a desk: Open5GS EPC for 4G and a free5GC 5G core, srsRAN radio, a Go control plane, lab eSIM provisioning, fair-use data caps measured from the core, and a lab-first workflow where RF stays off unless every legal gate has passed.",
   "hero.api":"Live API status","hero.start":"Get started in the lab",
   "card1.tag":"Lab first","card1.title":"No RF until you say so","card1.body":"ZMQ virtual radio by default. Transmit is off until country, license acknowledgment and band allow-list all pass - enforced in code, not by policy.",
-  "card2.tag":"Real 4G core","card2.title":"Open5GS EPC","card2.body":"MME, SGW, PGW, HSS, PCRF with a Mongo subscriber store. Lab PLMN 999-99, APNs internet + ims, ready for your test SIMs.",
+  "card2.tag":"4G + 5G cores","card2.title":"Open5GS EPC + free5GC 5G","card2.body":"MME, SGW, PGW, HSS, PCRF for LTE plus an optional free5GC 5G SA core with UDR subscriber write-back. Lab PLMN 999-99, APNs internet + ims, ready for your test SIMs.",
   "card3.tag":"Lab eSIM","card3.title":"eSIM via your own SM-DP+","card3.body":"A Go SM-DP+ and software eUICC run the full SGP.22-shaped profile download: encrypted bound profile packages, QR activation codes, CI-verified end to end.",
   "card4.tag":"Mesh","card4.title":"Peer and share","card4.body":"WireGuard mesh with control-plane-managed keys. Local breakout by default; optional cloud rendezvous hub for distributed sites.",
-  "card5.tag":"Operator tools","card5.title":"One dashboard, one CLI","card5.body":"REST API v1, single-file operator UI, offline-first SIM provisioner with HSM-gated production profiles, Prometheus metrics.",
+  "card5.tag":"Operator tools","card5.title":"One dashboard, one CLI","card5.body":"REST API v1, single-file operator UI, offline-first SIM provisioner with HSM-gated production profiles, per-UE fair-use quotas with auto-suspend, Prometheus metrics.",
   "card6.tag":"Hardware","card6.title":"Community builds","card6.body":"260 mm pizza-box enclosure, BOM tiers from ~$350 community builds to CBRS-ready radios, SDR notes for USRP, LimeSDR and BladeRF.",
   "card7.tag":"Transparency","card7.title":"Open governance","card7.body":"ADRs for every architectural decision, threat model, privacy design, and a spectrum compliance checklist in the repo.",
   "law.title":"Legal banner.","law.body":"Fairwave is not carrier equipment and is not certified for unlicensed operation. Transmitting on licensed spectrum without authorization is unlawful in most jurisdictions. The project ships with RF disabled by default; hardware transmit requires explicit country, license acknowledgment and band allow-list gates. Use only in compliance with local law. 3GPP, Open5GS, srsRAN and other marks belong to their owners; Fairwave is independent.",
@@ -158,13 +191,13 @@ en: {
 ar: {
   "nav.features":"الميزات","nav.law":"الطيف والقانون","nav.status":"الحالة","nav.github":"غيت‌هاب",
   "hero.title":"شبكات صغيرة مملوكة للمجتمع.<br>آمنة طيفيًا بالتصميم.",
-  "hero.sub":"فيرويف شبكة صغيرة مفتوحة المصدر يمكنك تشغيلها على مكتبك: نواة Open5GS، راديو srsRAN، طائرة تحكم بلغة Go، وتوفير eSIM مخبري، وسير عمل يبدأ من المختبر حيث يبقى البث الراديوي متوقفًا حتى تمر جميع البوابات القانونية.",
+  "hero.sub":"فيرويف شبكة صغيرة مفتوحة المصدر يمكنك تشغيلها على مكتبك: نواة Open5GS للجيل الرابع ونواة free5GC للجيل الخامس، راديو srsRAN، طائرة تحكم بلغة Go، توفير eSIM مخبري، وحدود استخدام عادلة للبيانات تُقاس من النواة، وسير عمل يبدأ من المختبر حيث يبقى البث الراديوي متوقفًا حتى تمر جميع البوابات القانونية.",
   "hero.api":"حالة واجهة API المباشرة","hero.start":"ابدأ في المختبر",
   "card1.tag":"المختبر أولًا","card1.title":"لا بث راديوي حتى تقرر","card1.body":"راديو افتراضي ZMQ افتراضيًا. البث يبقى متوقفًا حتى تمر الدولة والترخيص وقائمة النطاقات المسموحة - مفروض في الكود، ليس بسياسة.",
-  "card2.tag":"نواة 4G حقيقية","card2.title":"Open5GS EPC","card2.body":"MME وSGW وPGW وHSS وPCRF مع مخزن مشتركين Mongo. PLMN مخبري 999-99، ونقاط وصول internet وims، جاهز لبطاقات الاختبار الخاصة بك.",
+  "card2.tag":"نوى 4G و5G","card2.title":"Open5GS EPC + free5GC 5G","card2.body":"MME وSGW وPGW وHSS وPCRF للجيل الرابع بالإضافة إلى نواة free5GC 5G SA اختيارية مع كتابة المشتركين إلى UDR. PLMN مخبري 999-99، ونقاط وصول internet وims، جاهز لبطاقات الاختبار الخاصة بك.",
   "card3.tag":"eSIM مخبري","card3.title":"eSIM عبر خادم SM-DP+ الخاص بك","card3.body":"خادم SM-DP+ بلغة Go ومحاكي eUICC يشغّلان دورة تنزيل الملف الشخصي كاملة بشكل SGP.22: حزم ملفات مشفّرة، رموز تفعيل QR، ومتحقق منها في CI من البداية للنهاية.",
   "card4.tag":"شبكة نظير","card4.title":"شارك مع الجيران","card4.body":"شبكة WireGuard مع مفاتيح يديرها طائرة التحكم. تفريغ محلي افتراضيًا؛ ومحور التقاء سحابي اختياري للمواقع الموزعة.",
-  "card5.tag":"أدوات المشغّل","card5.title":"لوحة واحدة، واجهة أوامر واحدة","card5.body":"REST API v1، وواجهة مشغّل من ملف واحد، ومزوّد بطاقات SIM يعمل دون اتصال مع ملفات إنتاج محمية بـ HSM، ومقاييس Prometheus.",
+  "card5.tag":"أدوات المشغّل","card5.title":"لوحة واحدة، واجهة أوامر واحدة",  "card5.body":"REST API v1، وواجهة مشغّل من ملف واحد، ومزوّد بطاقات SIM يعمل دون اتصال مع ملفات إنتاج محمية بـ HSM، وحصص استخدام عادل لكل UE مع إيقاف تلقائي، ومقاييس Prometheus.",
   "card6.tag":"عتاد","card6.title":"بنى مجتمعية","card6.body":"صندوق بيتزا 260 مم، وفئات مكونات من ~350 دولار للبنى المجتمعية حتى راديوات جاهزة لـ CBRS، وملاحظات SDR لـ USRP وLimeSDR وBladeRF.",
   "card7.tag":"شفافية","card7.title":"حوكمة مفتوحة","card7.body":"سجلات ADR لكل قرار معماري، ونموذج تهديد، وتصميم خصوصية، وقائمة تحقق لامتثال الطيف في المستودع.",
   "law.title":"بيان قانوني.","law.body":"فيرويف ليست معدات مشغّل شبكات وليست معتمدة للتشغيل بدون ترخيص. البث على طيف مرخّص دون إذن غير قانوني في معظم الدول. المشروع يُشحن مع إيقاف البث افتراضيًا؛ البث عبر العتاد يتطلب البلد والاعتراف بالترخيص وقائمة النطاقات المسموحة. استخدم فقط بما يتوافق مع القانون المحلي. العلامات 3GPP وOpen5GS وsrsRAN وغيرها مملوكة لأصحابها؛ فيرويف مستقل.",
@@ -173,13 +206,13 @@ ar: {
 zh: {
   "nav.features":"功能","nav.law":"频谱与法律","nav.status":"状态","nav.github":"GitHub",
   "hero.title":"社区拥有的小基站。<br>设计上就是频谱安全的。",
-  "hero.sub":"Fairwave 是一个开源的桌面级小基站网络：Open5GS 核心网、srsRAN 无线、Go 控制面、实验室 eSIM 配置，以及默认实验室优先的工作流——除非所有法律关卡通过，射频保持关闭。",
+  "hero.sub":"Fairwave 是一个开源的桌面级小基站网络：用于 4G 的 Open5GS EPC 和 free5GC 5G 核心、srsRAN 无线、Go 控制面、实验室 eSIM 配置、从核心网测量的公平使用数据上限，以及默认实验室优先的工作流——除非所有法律关卡通过，射频保持关闭。",
   "hero.api":"实时 API 状态","hero.start":"在实验室开始",
   "card1.tag":"实验室优先","card1.title":"你说开才开射频","card1.body":"默认使用 ZMQ 虚拟无线电。只有国家、许可确认和频段白名单全部通过后才会发射——由代码强制，而非政策。",
-  "card2.tag":"真正的 4G 核心","card2.title":"Open5GS EPC","card2.body":"MME、SGW、PGW、HSS、PCRF，搭配 Mongo 用户存储。实验室 PLMN 999-99，APN internet + ims，可随时接入你的测试 SIM 卡。",
+  "card2.tag":"4G + 5G 双核心","card2.title":"Open5GS EPC + free5GC 5G","card2.body":"面向 LTE 的 MME、SGW、PGW、HSS、PCRF，外加可选的 free5GC 5G SA 核心与 UDR 用户回写。实验室 PLMN 999-99，APN internet + ims，可随时接入你的测试 SIM 卡。",
   "card3.tag":"实验室 eSIM","card3.title":"用自己的 SM-DP+ 提供 eSIM","card3.body":"Go 编写的 SM-DP+ 与软件 eUICC 完整执行 SGP.22 形态的配置下载流程：加密的绑定配置包、QR 激活码，端到端 CI 验证。",
   "card4.tag":"组网","card4.title":"对等互联、共享","card4.body":"WireGuard 网状网络，密钥由控制面管理。默认本地分流；分布式站点可选云端汇聚中心。",
-  "card5.tag":"运维工具","card5.title":"一个仪表盘，一个 CLI","card5.body":"REST API v1、单文件运维界面、离线优先的 SIM 配置器（生产档案由 HSM 保护）、Prometheus 指标。",
+  "card5.tag":"运维工具","card5.title":"一个仪表盘，一个 CLI",  "card5.body":"REST API v1、单文件运维界面、离线优先的 SIM 配置器（生产档案由 HSM 保护）、每 UE 的公平使用配额与自动暂停、Prometheus 指标。",
   "card6.tag":"硬件","card6.title":"社区套件","card6.body":"260 毫米披萨盒机箱，从约 350 美元的社区套件到 CBRS 就绪无线电的分层 BOM，以及 USRP、LimeSDR、BladeRF 的 SDR 笔记。",
   "card7.tag":"透明","card7.title":"开放治理","card7.body":"每个架构决策都有 ADR、威胁模型、隐私设计，以及仓库内的频谱合规检查清单。",
   "law.title":"法律声明。","law.body":"Fairwave 不是运营商设备，未获准在未授权频段运行。在大多数司法辖区，未经授权在授权频谱上发射是违法的。项目默认关闭射频；硬件发射需要明确的国家、许可确认和频段白名单关卡。请仅遵守当地法律使用。3GPP、Open5GS、srsRAN 等商标归其所有者所有；Fairwave 独立运营。",
@@ -188,13 +221,13 @@ zh: {
 es: {
   "nav.features":"Funciones","nav.law":"Espectro y ley","nav.status":"Estado","nav.github":"GitHub",
   "hero.title":"Small cells propiedad de la comunidad.<br>Seguros por diseño en el espectro.",
-  "hero.sub":"Fairwave es una red de small cells de código abierto que puedes ejecutar en un escritorio: EPC Open5GS, radio srsRAN, plano de control en Go, aprovisionamiento eSIM de laboratorio y un flujo de trabajo lab-first donde la RF permanece apagada hasta que se superan todas las compuertas legales.",
+  "hero.sub":"Fairwave es una red de small cells de código abierto que puedes ejecutar en un escritorio: EPC Open5GS para 4G y un núcleo 5G free5GC, radio srsRAN, plano de control en Go, aprovisionamiento eSIM de laboratorio, límites de datos de uso justo medidos desde el núcleo y un flujo de trabajo lab-first donde la RF permanece apagada hasta que se superan todas las compuertas legales.",
   "hero.api":"Estado de la API en vivo","hero.start":"Empieza en el laboratorio",
   "card1.tag":"Lab primero","card1.title":"Sin RF hasta que tú lo decidas","card1.body":"Radio virtual ZMQ por defecto. La transmisión está apagada hasta que el país, el reconocimiento de licencia y la lista de bandas permitidas pasen, aplicado en código, no por política.",
-  "card2.tag":"Núcleo 4G real","card2.title":"Open5GS EPC","card2.body":"MME, SGW, PGW, HSS y PCRF con almacén de suscriptores Mongo. PLMN de laboratorio 999-99, APNs internet + ims, listo para tus SIM de prueba.",
+  "card2.tag":"Núcleos 4G + 5G","card2.title":"Open5GS EPC + free5GC 5G","card2.body":"MME, SGW, PGW, HSS y PCRF para LTE, más un núcleo 5G SA free5GC opcional con escritura de suscriptores en UDR. PLMN de laboratorio 999-99, APNs internet + ims, listo para tus SIM de prueba.",
   "card3.tag":"eSIM de laboratorio","card3.title":"eSIM con tu propio SM-DP+","card3.body":"Un SM-DP+ en Go y una eUICC de software ejecutan el ciclo completo de descarga de perfiles con forma SGP.22: paquetes de perfil cifrados, códigos de activación QR, verificado de extremo a extremo en CI.",
   "card4.tag":"Malla","card4.title":"Conéctate y comparte","card4.body":"Malla WireGuard con claves gestionadas por el plano de control. Desvío local por defecto; hub de reunión en la nube opcional para sitios distribuidos.",
-  "card5.tag":"Herramientas del operador","card5.title":"Un panel, una CLI","card5.body":"REST API v1, panel de operador de archivo único, aprovisionador SIM offline-first con perfiles de producción protegidos por HSM y métricas Prometheus.",
+  "card5.tag":"Herramientas del operador","card5.title":"Un panel, una CLI",  "card5.body":"REST API v1, panel de operador de archivo único, aprovisionador SIM offline-first con perfiles de producción protegidos por HSM, cuotas de uso justo por UE con suspensión automática y métricas Prometheus.",
   "card6.tag":"Hardware","card6.title":"Construcciones comunitarias","card6.body":"Gabinete de pizza box de 260 mm, niveles de BOM desde ~350 USD hasta radios listos para CBRS, notas SDR para USRP, LimeSDR y BladeRF.",
   "card7.tag":"Transparencia","card7.title":"Gobernanza abierta","card7.body":"ADR para cada decisión arquitectónica, modelo de amenazas, diseño de privacidad y una lista de verificación de cumplimiento espectral en el repositorio.",
   "law.title":"Aviso legal.","law.body":"Fairwave no es equipo de operador y no está certificado para operación sin licencia. Transmitir en espectro licenciado sin autorización es ilegal en la mayoría de jurisdicciones. El proyecto se distribuye con RF desactivada por defecto; la transmisión por hardware exige país, reconocimiento de licencia y listas de bandas permitidas. Úsalo solo conforme a la ley local. 3GPP, Open5GS, srsRAN y otras marcas pertenecen a sus dueños; Fairwave es independiente.",
@@ -203,13 +236,13 @@ es: {
 fr: {
   "nav.features":"Fonctionnalités","nav.law":"Spectre et loi","nav.status":"État","nav.github":"GitHub",
   "hero.title":"Des small cells appartenant à la communauté.<br>Sûres par conception pour le spectre.",
-  "hero.sub":"Fairwave est un réseau de small cells open source que vous pouvez faire tourner sur un bureau : EPC Open5GS, radio srsRAN, plan de contrôle Go, approvisionnement eSIM de laboratoire, et un flux lab-first où la RF reste coupée tant que toutes les portes légales ne sont pas franchies.",
+  "hero.sub":"Fairwave est un réseau de small cells open source que vous pouvez faire tourner sur un bureau : EPC Open5GS pour la 4G et un cœur 5G free5GC, radio srsRAN, plan de contrôle Go, approvisionnement eSIM de laboratoire, plafonds de données à usage équitable mesurés depuis le cœur, et un flux lab-first où la RF reste coupée tant que toutes les portes légales ne sont pas franchies.",
   "hero.api":"État de l'API en direct","hero.start":"Commencer en laboratoire",
   "card1.tag":"Lab d'abord","card1.title":"Pas de RF avant d'avoir donné votre accord","card1.body":"Radio virtuelle ZMQ par défaut. La transmission reste coupée tant que le pays, la reconnaissance de licence et la liste des bandes autorisées ne passent pas - appliqué dans le code, pas par politique.",
-  "card2.tag":"Cœur 4G réel","card2.title":"Open5GS EPC","card2.body":"MME, SGW, PGW, HSS, PCRF avec un stockage d'abonnés Mongo. PLMN de labo 999-99, APN internet + ims, prêt pour vos SIM de test.",
+  "card2.tag":"Cœurs 4G + 5G","card2.title":"Open5GS EPC + free5GC 5G","card2.body":"MME, SGW, PGW, HSS, PCRF pour la LTE, plus un cœur 5G SA free5GC optionnel avec écriture des abonnés dans l'UDR. PLMN de labo 999-99, APN internet + ims, prêt pour vos SIM de test.",
   "card3.tag":"eSIM de laboratoire","card3.title":"eSIM via votre propre SM-DP+","card3.body":"Un SM-DP+ en Go et une eUICC logicielle exécutent tout le cycle de téléchargement de profils façon SGP.22 : profils liés chiffrés, codes d'activation QR, vérifié de bout en bout en CI.",
   "card4.tag":"Maille","card4.title":"S'appairer et partager","card4.body":"Maille WireGuard avec clés gérées par le plan de contrôle. Rupture locale par défaut ; hub de rendez-vous cloud optionnel pour les sites distribués.",
-  "card5.tag":"Outils opérateur","card5.title":"Un tableau de bord, une CLI","card5.body":"REST API v1, interface opérateur en un fichier, provisionneur SIM offline-first avec profils de production protégés HSM, métriques Prometheus.",
+  "card5.tag":"Outils opérateur","card5.title":"Un tableau de bord, une CLI",  "card5.body":"REST API v1, interface opérateur en un fichier, provisionneur SIM offline-first avec profils de production protégés HSM, quotas fair-use par UE avec suspension automatique, métriques Prometheus.",
   "card6.tag":"Matériel","card6.title":"Constructions communautaires","card6.body":"Boîtier pizza box 260 mm, niveaux de BOM d'environ 350 USD jusqu'aux radios prêtes pour le CBRS, notes SDR pour USRP, LimeSDR et BladeRF.",
   "card7.tag":"Transparence","card7.title":"Gouvernance ouverte","card7.body":"ADR pour chaque décision d'architecture, modèle de menaces, conception de la confidentialité et liste de contrôle de conformité spectrale dans le dépôt.",
   "law.title":"Mention légale.","law.body":"Fairwave n'est pas un équipement d'opérateur et n'est pas certifié pour une exploitation sans licence. Émettre sur un spectre sous licence sans autorisation est illégal dans la plupart des juridictions. Le projet est livré avec la RF désactivée par défaut ; la transmission matérielle exige pays, reconnaissance de licence et listes de bandes autorisées. À utiliser uniquement en conformité avec la loi locale. 3GPP, Open5GS, srsRAN et autres marques appartiennent à leurs propriétaires ; Fairwave est indépendant.",
@@ -218,13 +251,13 @@ fr: {
 de: {
   "nav.features":"Funktionen","nav.law":"Spektrum und Recht","nav.status":"Status","nav.github":"GitHub",
   "hero.title":"Community-eigene Small Cells.<br>Von Natur aus spektrumsicher.",
-  "hero.sub":"Fairwave ist ein Open-Source-Small-Cell-Netz, das Sie auf einem Schreibtisch betreiben können: Open5GS-EPC, srsRAN-Funk, Go-Control-Plane, Lab-eSIM-Provisionierung und ein Lab-First-Workflow, bei dem HF aus bleibt, bis alle rechtlichen Gateways passiert sind.",
+  "hero.sub":"Fairwave ist ein Open-Source-Small-Cell-Netz, das Sie auf einem Schreibtisch betreiben können: Open5GS-EPC für 4G und ein free5GC-5G-Kern, srsRAN-Funk, Go-Control-Plane, Lab-eSIM-Provisionierung, aus dem Kern gemessene Fair-Use-Datengrenzen und ein Lab-First-Workflow, bei dem HF aus bleibt, bis alle rechtlichen Gateways passiert sind.",
   "hero.api":"Live-API-Status","hero.start":"Im Labor starten",
   "card1.tag":"Lab zuerst","card1.title":"Kein HF bis Sie es sagen","card1.body":"Standardmäßig virtuelles ZMQ-Radio. Senden bleibt aus, bis Land, Lizenzbestätigung und Band-Whitelist bestehen - im Code erzwungen, nicht per Richtlinie.",
-  "card2.tag":"Echtes 4G-Kernnetz","card2.title":"Open5GS EPC","card2.body":"MME, SGW, PGW, HSS, PCRF mit Mongo-Teilnehmerdatenbank. Labor-PLMN 999-99, APNs internet + ims, bereit für Ihre Test-SIMs.",
+  "card2.tag":"4G- + 5G-Kernnetz","card2.title":"Open5GS EPC + free5GC 5G","card2.body":"MME, SGW, PGW, HSS, PCRF für LTE plus ein optionaler free5GC-5G-SA-Kern mit UDR-Teilnehmerschreibzugriff. Labor-PLMN 999-99, APNs internet + ims, bereit für Ihre Test-SIMs.",
   "card3.tag":"Lab-eSIM","card3.title":"eSIM über Ihren eigenen SM-DP+","card3.body":"Ein SM-DP+ in Go und eine Software-eUICC führen den vollständigen SGP.22-förmigen Profil-Download durch: verschlüsselte Bound-Profile-Pakete, QR-Aktivierungscodes, durchgängig CI-verifiziert.",
   "card4.tag":"Mesh","card4.title":"Peeren und teilen","card4.body":"WireGuard-Mesh mit Schlüsseln, die von der Control-Plane verwaltet werden. Lokale Ausleitung standardmäßig; optionaler Cloud-Rendezvous-Hub für verteilte Standorte.",
-  "card5.tag":"Operator-Werkzeuge","card5.title":"Ein Dashboard, eine CLI","card5.body":"REST-API v1, Operator-UI in einer Datei, Offline-First-SIM-Provisionierer mit HSM-geschützten Produktionsprofilen, Prometheus-Metriken.",
+  "card5.tag":"Operator-Werkzeuge","card5.title":"Ein Dashboard, eine CLI",  "card5.body":"REST-API v1, Operator-UI in einer Datei, Offline-First-SIM-Provisionierer mit HSM-geschützten Produktionsprofilen, Fair-Use-Kontingente pro UE mit automatischer Sperrung, Prometheus-Metriken.",
   "card6.tag":"Hardware","card6.title":"Community-Bauten","card6.body":"260-mm-Pizza-Box-Gehäuse, BOM-Stufen von ca. 350 USD bis CBRS-fähigen Funkgeräten, SDR-Notizen für USRP, LimeSDR und BladeRF.",
   "card7.tag":"Transparenz","card7.title":"Offene Governance","card7.body":"ADRs für jede Architekturentscheidung, Bedrohungsmodell, Datenschutzdesign und eine Spektrum-Compliance-Checkliste im Repo.",
   "law.title":"Rechtlicher Hinweis.","law.body":"Fairwave ist keine Betreiberausrüstung und nicht für den Betrieb ohne Lizenz zertifiziert. Das Senden auf lizenziertem Spektrum ohne Genehmigung ist in den meisten Ländern rechtswidrig. Das Projekt wird mit standardmäßig deaktivierter HF ausgeliefert; Hardware-Senden erfordert Land, Lizenzbestätigung und Band-Whitelists. Nur in Übereinstimmung mit lokalem Recht verwenden. 3GPP, Open5GS, srsRAN und andere Marken gehören ihren Eigentümern; Fairwave ist unabhängig.",
@@ -233,13 +266,13 @@ de: {
 hi: {
   "nav.features":"विशेषताएं","nav.law":"स्पेक्ट्रम और कानून","nav.status":"स्थिति","nav.github":"GitHub",
   "hero.title":"समुदाय के स्वामित्व वाले छोटे सेल।<br>डिज़ाइन से ही स्पेक्ट्रम-सुरक्षित।",
-  "hero.sub":"Fairwave एक ओपन-सोर्स छोटा-सेल नेटवर्क है जिसे आप डेस्क पर चला सकते हैं: Open5GS EPC, srsRAN रेडियो, Go कंट्रोल प्लेन, लैब eSIM प्रोविज़निंग, और लैब-फर्स्ट वर्कफ़्लो जहाँ सभी कानूनी गेट पास होने तक RF बंद रहता है।",
+  "hero.sub":"Fairwave एक ओपन-सोर्स छोटा-सेल नेटवर्क है जिसे आप डेस्क पर चला सकते हैं: 4G के लिए Open5GS EPC और free5GC 5G कोर, srsRAN रेडियो, Go कंट्रोल प्लेन, लैब eSIM प्रोविज़निंग, कोर से मापी गई फेयर-यूज़ डेटा सीमाएँ, और लैब-फर्स्ट वर्कफ़्लो जहाँ सभी कानूनी गेट पास होने तक RF बंद रहता है।",
   "hero.api":"लाइव API स्थिति","hero.start":"लैब में शुरू करें",
   "card1.tag":"पहले लैब","card1.title":"आपके कहने तक कोई RF नहीं","card1.body":"डिफ़ॉल्ट रूप से ZMQ वर्चुअल रेडियो। देश, लाइसेंस स्वीकृति और बैंड-अनुमति सूची सभी पास होने तक ट्रांसमिट बंद रहता है - नीति से नहीं, कोड से लागू।",
-  "card2.tag":"असली 4G कोर","card2.title":"Open5GS EPC","card2.body":"Mongo सब्सक्राइबर स्टोर के साथ MME, SGW, PGW, HSS, PCRF। लैब PLMN 999-99, APN internet + ims, आपके टेस्ट SIM के लिए तैयार।",
+  "card2.tag":"4G + 5G कोर","card2.title":"Open5GS EPC + free5GC 5G","card2.body":"LTE के लिए MME, SGW, PGW, HSS, PCRF के साथ वैकल्पिक free5GC 5G SA कोर और UDR सब्सक्राइबर राइट-बैक। लैब PLMN 999-99, APN internet + ims, आपके टेस्ट SIM के लिए तैयार।",
   "card3.tag":"लैब eSIM","card3.title":"अपने खुद के SM-DP+ से eSIM","card3.body":"Go में SM-DP+ और सॉफ़्टवेयर eUICC पूरी SGP.22-आकार की प्रोफ़ाइल डाउनलोड प्रक्रिया चलाते हैं: एन्क्रिप्टेड बाउंड प्रोफ़ाइल पैकेज, QR एक्टिवेशन कोड, CI में एंड-टू-एंड सत्यापित।",
   "card4.tag":"मेश","card4.title":"जुड़ें और साझा करें","card4.body":"WireGuard मेश जिसकी कुंजियाँ कंट्रोल प्लेन प्रबंधित करता है। डिफ़ॉल्ट रूप से लोकल ब्रेकआउट; वितरित साइटों के लिए वैकल्पिक क्लाउड रेंडेवज़ हब।",
-  "card5.tag":"ऑपरेटर टूल्स","card5.title":"एक डैशबोर्ड, एक CLI","card5.body":"REST API v1, सिंगल-फ़ाइल ऑपरेटर UI, HSM-सुरक्षित प्रोडक्शन प्रोफ़ाइल वाला ऑफ़लाइन-फर्स्ट SIM प्रोविज़नर, Prometheus मेट्रिक्स।",
+  "card5.tag":"ऑपरेटर टूल्स","card5.title":"एक डैशबोर्ड, एक CLI",  "card5.body":"REST API v1, सिंगल-फ़ाइल ऑपरेटर UI, HSM-सुरक्षित प्रोडक्शन प्रोफ़ाइल वाला ऑफ़लाइन-फर्स्ट SIM प्रोविज़नर, प्रति-UE फेयर-यूज़ कोटा ऑटो-सस्पेंड के साथ, Prometheus मेट्रिक्स।",
   "card6.tag":"हार्डवेयर","card6.title":"सामुदायिक निर्माण","card6.body":"260 मिमी पिज़्ज़ा-बॉक्स एनक्लोज़र, ~$350 सामुदायिक बिल्ड से CBRS-रेडी रेडियो तक BOM स्तर, USRP, LimeSDR और BladeRF के लिए SDR नोट्स।",
   "card7.tag":"पारदर्शिता","card7.title":"खुला शासन","card7.body":"हर आर्किटेक्चर निर्णय के लिए ADR, थ्रेट मॉडल, प्राइवेसी डिज़ाइन, और रिपो में स्पेक्ट्रम अनुपालन चेकलिस्ट।",
   "law.title":"कानूनी बैनर।","law.body":"Fairwave कैरियर उपकरण नहीं है और बिना लाइसेंस संचालन के लिए प्रमाणित नहीं है। अधिकांश क्षेत्राधिकारों में बिना प्राधिकरण के लाइसेंस प्राप्त स्पेक्ट्रम पर ट्रांसमिट करना अवैध है। परियोजना डिफ़ॉल्ट रूप से RF बंद करके आती है; हार्डवेयर ट्रांसमिट के लिए देश, लाइसेंस स्वीकृति और बैंड अनुमति गेट आवश्यक हैं। केवल स्थानीय कानून के अनुपालन में उपयोग करें। 3GPP, Open5GS, srsRAN और अन्य ट्रेडमार्क उनके स्वामियों के हैं; Fairwave स्वतंत्र है।",
@@ -251,15 +284,15 @@ hi: {
   "nav.status":"Stato",
   "nav.github":"GitHub",
   "hero.title":"Small cell di proprietà della comunità.<br>Sicure per progetto nello spettro.",
-  "hero.sub":"Fairwave è una rete di small cell open source che puoi gestire su una scrivania: EPC Open5GS, radio srsRAN, piano di controllo Go, provisioning eSIM di laboratorio e un flusso di lavoro lab-first dove la RF resta spenta finché non superano tutti i cancelli legali.",
+  "hero.sub":"Fairwave è una rete di small cell open source che puoi gestire su una scrivania: EPC Open5GS per il 4G e un core 5G free5GC, radio srsRAN, piano di controllo Go, provisioning eSIM di laboratorio, tetti dati fair-use misurati dal core e un flusso lab-first dove la RF resta spenta finché non superano tutti i cancelli legali.",
   "hero.api":"Stato API in tempo reale",
   "hero.start":"Inizia in laboratorio",
   "card1.tag":"Lab prima",
   "card1.title":"Nessuna RF finché non lo dici tu",
   "card1.body":"Radio virtuale ZMQ per impostazione predefinita. La trasmissione resta spenta finché paese, riconoscimento licenza e lista bianca delle bande non passano - imposto nel codice, non per policy.",
-  "card2.tag":"Nucleo 4G reale",
-  "card2.title":"Open5GS EPC",
-  "card2.body":"MME, SGW, PGW, HSS, PCRF con archivio abbonati Mongo. PLMN di laboratorio 999-99, APN internet + ims, pronto per le tue SIM di test.",
+  "card2.tag":"Nuclei 4G + 5G",
+  "card2.title":"Open5GS EPC + free5GC 5G",
+  "card2.body":"MME, SGW, PGW, HSS, PCRF per LTE più un core 5G SA free5GC opzionale con write-back degli abbonati in UDR. PLMN di laboratorio 999-99, APN internet + ims, pronto per le tue SIM di test.",
   "card3.tag":"eSIM di laboratorio",
   "card3.title":"eSIM tramite il tuo SM-DP+",
   "card3.body":"Un SM-DP+ in Go e una eUICC software eseguono l'intero ciclo di download dei profili in stile SGP.22: pacchetti di profilo cifrati, codici di attivazione QR, verificato end-to-end in CI.",
@@ -268,7 +301,7 @@ hi: {
   "card4.body":"Mesh WireGuard con chiavi gestite dal piano di controllo. Breakout locale per impostazione predefinita; hub cloud opzionale per siti distribuiti.",
   "card5.tag":"Strumenti operatore",
   "card5.title":"Un pannello, una CLI",
-  "card5.body":"REST API v1, interfaccia operatore a file singolo, provisioner SIM offline-first con profili di produzione protetti da HSM, metriche Prometheus.",
+  "card5.body":"REST API v1, interfaccia operatore a file singolo, provisioner SIM offline-first con profili di produzione protetti da HSM, quote fair-use per UE con sospensione automatica, metriche Prometheus.",
   "card6.tag":"Hardware",
   "card6.title":"Costruzioni comunitarie",
   "card6.body":"Involucro pizza box da 260 mm, livelli BOM da ~350 $ fino a radio pronte per CBRS, note SDR per USRP, LimeSDR e BladeRF.",
@@ -286,15 +319,15 @@ hi: {
   "nav.status":"Status",
   "nav.github":"GitHub",
   "hero.title":"Small cells da comunidade.<br>Seguros por design no espectro.",
-  "hero.sub":"Fairwave é uma rede de small cells de código aberto que você roda em uma mesa: EPC Open5GS, rádio srsRAN, plano de controle em Go, provisionamento eSIM de laboratório e um fluxo lab-first onde a RF permanece desligada até que todas as portas legais passem.",
+  "hero.sub":"Fairwave é uma rede de small cells de código aberto que você roda em uma mesa: EPC Open5GS para 4G e um núcleo 5G free5GC, rádio srsRAN, plano de controle em Go, provisionamento eSIM de laboratório, limites de dados de uso justo medidos pelo núcleo e um fluxo lab-first onde a RF permanece desligada até que todas as portas legais passem.",
   "hero.api":"Status da API ao vivo",
   "hero.start":"Comece no laboratório",
   "card1.tag":"Lab primeiro",
   "card1.title":"Sem RF até você autorizar",
   "card1.body":"Rádio virtual ZMQ por padrão. A transmissão fica desligada até que país, reconhecimento de licença e whitelist de bandas passem - imposto no código, não por política.",
-  "card2.tag":"Núcleo 4G real",
-  "card2.title":"Open5GS EPC",
-  "card2.body":"MME, SGW, PGW, HSS, PCRF com armazenamento de assinantes Mongo. PLMN de laboratório 999-99, APNs internet + ims, pronto para seus SIMs de teste.",
+  "card2.tag":"Núcleos 4G + 5G",
+  "card2.title":"Open5GS EPC + free5GC 5G",
+  "card2.body":"MME, SGW, PGW, HSS, PCRF para LTE, além de um núcleo 5G SA free5GC opcional com write-back de assinantes no UDR. PLMN de laboratório 999-99, APNs internet + ims, pronto para seus SIMs de teste.",
   "card3.tag":"eSIM de laboratório",
   "card3.title":"eSIM via seu próprio SM-DP+",
   "card3.body":"Um SM-DP+ em Go e uma eUICC de software executam todo o ciclo de download de perfis no formato SGP.22: pacotes de perfil vinculado criptografados, códigos de ativação QR, verificado de ponta a ponta no CI.",
@@ -303,7 +336,7 @@ hi: {
   "card4.body":"Malha WireGuard com chaves gerenciadas pelo plano de controle. Breakout local por padrão; hub de encontro em nuvem opcional para sites distribuídos.",
   "card5.tag":"Ferramentas do operador",
   "card5.title":"Um painel, uma CLI",
-  "card5.body":"REST API v1, interface de operador em arquivo único, provisionador SIM offline-first com perfis de produção protegidos por HSM, métricas Prometheus.",
+  "card5.body":"REST API v1, interface de operador em arquivo único, provisionador SIM offline-first com perfis de produção protegidos por HSM, cotas fair-use por UE com suspensão automática, métricas Prometheus.",
   "card6.tag":"Hardware",
   "card6.title":"Construções comunitárias",
   "card6.body":"Gabinete pizza box de 260 mm, níveis de BOM de ~US$ 350 a rádios prontos para CBRS, notas de SDR para USRP, LimeSDR e BladeRF.",
@@ -321,15 +354,15 @@ hi: {
   "nav.status":"Статус",
   "nav.github":"GitHub",
   "hero.title":"Малые соты в собственности сообщества.<br>Безопасно по спектру по замыслу.",
-  "hero.sub":"Fairwave - это сеть малых сот с открытым исходным кодом, которую можно запустить на столе: EPC Open5GS, радио srsRAN, панель управления на Go, лабораторная eSIM и рабочий процесс lab-first, где RF остается выключенной, пока не пройдут все правовые барьеры.",
+  "hero.sub":"Fairwave - это сеть малых сот с открытым исходным кодом, которую можно запустить на столе: EPC Open5GS для 4G и ядро 5G на free5GC, радио srsRAN, панель управления на Go, лабораторная eSIM, справедливые лимиты трафика, измеряемые ядром, и рабочий процесс lab-first, где RF выключена, пока не пройдут все правовые барьеры.",
   "hero.api":"Статус API в реальном времени",
   "hero.start":"Начать в лаборатории",
   "card1.tag":"Сначала лаборатория",
   "card1.title":"Без RF, пока вы не разрешите",
   "card1.body":"Виртуальное радио ZMQ по умолчанию. Передача выключена, пока страна, подтверждение лицензии и белый список диапазонов не пройдут - закреплено в коде, а не политикой.",
-  "card2.tag":"Настоящее ядро 4G",
-  "card2.title":"Open5GS EPC",
-  "card2.body":"MME, SGW, PGW, HSS, PCRF с хранилищем абонентов Mongo. Лабораторный PLMN 999-99, APN internet + ims, готово для ваших тестовых SIM.",
+  "card2.tag":"Ядра 4G + 5G",
+  "card2.title":"Open5GS EPC + free5GC 5G",
+  "card2.body":"MME, SGW, PGW, HSS, PCRF для LTE плюс опциональное ядро 5G SA на free5GC с записью абонентов в UDR. Лабораторный PLMN 999-99, APN internet + ims, готово для ваших тестовых SIM.",
   "card3.tag":"Лабораторная eSIM",
   "card3.title":"eSIM через собственный SM-DP+",
   "card3.body":"SM-DP+ на Go и программная eUICC выполняют полный цикл загрузки профилей в стиле SGP.22: зашифрованные пакеты привязанных профилей, QR-коды активации, проверено в CI от начала до конца.",
@@ -338,7 +371,7 @@ hi: {
   "card4.body":"Сетка WireGuard с ключами, управляемыми панелью управления. Локальный выход по умолчанию; опциональный облачный узел для распределенных площадок.",
   "card5.tag":"Инструменты оператора",
   "card5.title":"Одна панель, один CLI",
-  "card5.body":"REST API v1, интерфейс оператора в одном файле, офлайн-провизор SIM с профилями производства, защищенными HSM, метрики Prometheus.",
+  "card5.body":"REST API v1, интерфейс оператора в одном файле, офлайн-провизор SIM с профилями производства, защищенными HSM, справедливые квоты трафика на каждое UE с автоприостановкой, метрики Prometheus.",
   "card6.tag":"Железо",
   "card6.title":"Сообщественные сборки",
   "card6.body":"Корпус 260 мм, уровни BOM от ~350 долларов до радио, готовых к CBRS, заметки по SDR для USRP, LimeSDR и BladeRF.",
@@ -356,15 +389,15 @@ hi: {
   "nav.status":"ステータス",
   "nav.github":"GitHub",
   "hero.title":"コミュニティ所有のスモールセル。<br>設計上スペクトラム安全。",
-  "hero.sub":"Fairwaveはデスクで動かせるオープンソースのスモールセルネットワークです：Open5GS EPC、srsRAN無線、Goコントロールプレーン、ラボeSIM、すべての法的ゲートを通過するまでRFがオフのままのラボファーストなワークフロー。",
+  "hero.sub":"Fairwaveはデスクで動かせるオープンソースのスモールセルネットワークです：4G用Open5GS EPCとfree5GC 5Gコア、srsRAN無線、Goコントロールプレーン、ラボeSIM、コアで計測するフェアユースのデータ上限、そしてすべての法的ゲートを通過するまでRFがオフのままのラボファーストなワークフロー。",
   "hero.api":"ライブAPIステータス",
   "hero.start":"ラボで始める",
   "card1.tag":"ラボ優先",
   "card1.title":"あなたが言うまでRFなし",
   "card1.body":"デフォルトはZMQ仮想無線。国、ライセンス確認、バンド許可リストがすべて通過するまで送信はオフ - ポリシーではなくコードで強制。",
-  "card2.tag":"本物の4Gコア",
-  "card2.title":"Open5GS EPC",
-  "card2.body":"Mongo加入者ストアを備えたMME、SGW、PGW、HSS、PCRF。ラボPLMN 999-99、APN internet + ims、テストSIM対応。",
+  "card2.tag":"4G + 5G コア",
+  "card2.title":"Open5GS EPC + free5GC 5G",
+  "card2.body":"LTE向けのMME、SGW、PGW、HSS、PCRFに加え、UDRへの加入者書き込みを備えたオプションのfree5GC 5G SAコア。ラボPLMN 999-99、APN internet + ims、テストSIM対応。",
   "card3.tag":"ラボeSIM",
   "card3.title":"自分だけのSM-DP+でeSIM",
   "card3.body":"Go製SM-DP+とソフトウェアeUICCがSGP.22型のプロファイルダウンロード全体を実行：暗号化されたバウンドプロファイルパッケージ、QRアクティベーションコード、CIでエンドツーエンド検証。",
@@ -373,7 +406,7 @@ hi: {
   "card4.body":"コントロールプレーン管理の鍵によるWireGuardメッシュ。デフォルトでローカルブレークアウト。分散サイト向けのオプションのクラウドハブ。",
   "card5.tag":"オペレーターツール",
   "card5.title":"1つのダッシュボード、1つのCLI",
-  "card5.body":"REST API v1、単一ファイルのオペレーターUI、HSM保護の本番プロファイルを持つオフラインファーストSIMプロビジョナー、Prometheusメトリクス。",
+  "card5.body":"REST API v1、単一ファイルのオペレーターUI、HSM保護の本番プロファイルを持つオフラインファーストSIMプロビジョナー、UEごとのフェアユース上限と自動停止、Prometheusメトリクス。",
   "card6.tag":"ハードウェア",
   "card6.title":"コミュニティビルド",
   "card6.body":"260mmピザボックス筐体、約350ドルのコミュニティビルドからCBRS対応ラジオまでのBOMティア、USRP・LimeSDR・BladeRFのSDRノート。",
@@ -391,15 +424,15 @@ hi: {
   "nav.status":"상태",
   "nav.github":"GitHub",
   "hero.title":"커뮤니티 소유의 스몰셀.<br>설계상 스펙트럼 안전.",
-  "hero.sub":"Fairwave는 책상 위에서 돌릴 수 있는 오픈소스 스몰셀 네트워크입니다: Open5GS EPC, srsRAN 무선, Go 컨트롤 플레인, 랩 eSIM 프로비저닝, 그리고 모든 법적 게이트를 통과할 때까지 RF가 꺼져 있는 랩 퍼스트 워크플로우.",
+  "hero.sub":"Fairwave는 책상 위에서 돌릴 수 있는 오픈소스 스몰셀 네트워크입니다: 4G용 Open5GS EPC와 free5GC 5G 코어, srsRAN 무선, Go 컨트롤 플레인, 랩 eSIM 프로비저닝, 코어에서 측정하는 페어유즈 데이터 상한, 그리고 모든 법적 게이트를 통과할 때까지 RF가 꺼져 있는 랩 퍼스트 워크플로우.",
   "hero.api":"라이브 API 상태",
   "hero.start":"랩에서 시작하기",
   "card1.tag":"랩 우선",
   "card1.title":"당신이 허락할 때까지 RF 없음",
   "card1.body":"기본은 ZMQ 가상 라디오. 국가, 라이선스 확인, 밴드 허용 목록이 모두 통과할 때까지 송신은 꺼져 있습니다 - 정책이 아니라 코드로 강제됩니다.",
-  "card2.tag":"진짜 4G 코어",
-  "card2.title":"Open5GS EPC",
-  "card2.body":"Mongo 가입자 스토어가 있는 MME, SGW, PGW, HSS, PCRF. 랩 PLMN 999-99, APN internet + ims, 테스트 SIM 준비 완료.",
+  "card2.tag":"4G + 5G 코어",
+  "card2.title":"Open5GS EPC + free5GC 5G",
+  "card2.body":"LTE용 MME, SGW, PGW, HSS, PCRF와 UDR 가입자 쓰기백을 갖춘 옵션 free5GC 5G SA 코어. 랩 PLMN 999-99, APN internet + ims, 테스트 SIM 준비 완료.",
   "card3.tag":"랩 eSIM",
   "card3.title":"자체 SM-DP+로 eSIM",
   "card3.body":"Go로 만든 SM-DP+와 소프트웨어 eUICC가 SGP.22 형태의 전체 프로파일 다운로드 사이클을 실행합니다: 암호화된 바운드 프로파일 패키지, QR 활성화 코드, CI에서 엔드투엔드 검증.",
@@ -408,7 +441,7 @@ hi: {
   "card4.body":"컨트롤 플레인이 관리하는 키를 사용하는 WireGuard 메시. 기본은 로컬 브레이크아웃. 분산 사이트용 선택적 클라우드 허브.",
   "card5.tag":"운영자 도구",
   "card5.title":"하나의 대시보드, 하나의 CLI",
-  "card5.body":"REST API v1, 단일 파일 운영자 UI, HSM 보호 프로덕션 프로파일을 갖춘 오프라인 퍼스트 SIM 프로비저너, Prometheus 메트릭.",
+  "card5.body":"REST API v1, 단일 파일 운영자 UI, HSM 보호 프로덕션 프로파일을 갖춘 오프라인 퍼스트 SIM 프로비저너, UE별 페어유즈 할당량 자동 일시중지, Prometheus 메트릭.",
   "card6.tag":"하드웨어",
   "card6.title":"커뮤니티 빌드",
   "card6.body":"260mm 피자박스 인클로저, 약 $350 커뮤니티 빌드부터 CBRS 대비 라디오까지 BOM 티어, USRP·LimeSDR·BladeRF용 SDR 노트.",
@@ -426,15 +459,15 @@ hi: {
   "nav.status":"Durum",
   "nav.github":"GitHub",
   "hero.title":"Topluluk sahipliğinde küçük hücreler.<br>Tasarım gereği spektrum güvenli.",
-  "hero.sub":"Fairwave, masanızda çalıştırabileceğiniz açık kaynak bir küçük hücre ağıdır: Open5GS EPC, srsRAN radyosu, Go kontrol düzlemi, laboratuvar eSIM sağlama ve tüm yasal kapılar geçilene kadar RF'nin kapalı kaldığı lab-first bir iş akışı.",
+  "hero.sub":"Fairwave, masanızda çalıştırabileceğiniz açık kaynak bir küçük hücre ağıdır: 4G için Open5GS EPC ve free5GC 5G çekirdeği, srsRAN radyosu, Go kontrol düzlemi, laboratuvar eSIM sağlama, çekirdekten ölçülen adil kullanım veri limitleri ve tüm yasal kapılar geçilene kadar RF'nin kapalı kaldığı lab-first bir iş akışı.",
   "hero.api":"Canlı API durumu",
   "hero.start":"Laboratuvarda başlayın",
   "card1.tag":"Önce lab",
   "card1.title":"Siz söyleyene kadar RF yok",
   "card1.body":"Varsayılan olarak ZMQ sanal radyo. Ülke, lisans onayı ve bant beyaz listesi geçene kadar iletim kapalıdır - politika ile değil kod ile uygulanır.",
-  "card2.tag":"Gerçek 4G çekirdeği",
-  "card2.title":"Open5GS EPC",
-  "card2.body":"Mongo abone deposu ile MME, SGW, PGW, HSS, PCRF. Laboratuvar PLMN 999-99, APN internet + ims, test SIM'leriniz için hazır.",
+  "card2.tag":"4G + 5G çekirdekleri",
+  "card2.title":"Open5GS EPC + free5GC 5G",
+  "card2.body":"LTE için MME, SGW, PGW, HSS, PCRF ve UDR abone geri yazımlı isteğe bağlı free5GC 5G SA çekirdeği. Laboratuvar PLMN 999-99, APN internet + ims, test SIM'leriniz için hazır.",
   "card3.tag":"Lab eSIM",
   "card3.title":"Kendi SM-DP+'nizla eSIM",
   "card3.body":"Go ile yazılmış bir SM-DP+ ve yazılım eUICC, SGP.22 biçimli profil indirme döngüsünün tamamını çalıştırır: şifrelenmiş bağlı profil paketleri, QR aktivasyon kodları, CI'da uçtan uca doğrulanır.",
@@ -443,7 +476,7 @@ hi: {
   "card4.body":"Kontrol düzlemi tarafından yönetilen anahtarlarla WireGuard mesh. Varsayılan olarak yerel çıkış; dağıtık siteler için isteğe bağlı bulut buluşma merkezi.",
   "card5.tag":"Operatör araçları",
   "card5.title":"Tek panel, tek CLI",
-  "card5.body":"REST API v1, tek dosyalık operatör arayüzü, HSM korumalı üretim profilleriyle çevrimdışı öncelikli SIM sağlayıcı, Prometheus metrikleri.",
+  "card5.body":"REST API v1, tek dosyalık operatör arayüzü, HSM korumalı üretim profilleriyle çevrimdışı öncelikli SIM sağlayıcı, otomatik askıya almalı UE başına adil kullanım kotaları, Prometheus metrikleri.",
   "card6.tag":"Donanım",
   "card6.title":"Topluluk yapıları",
   "card6.body":"260 mm pizza kutusu kasa, ~350 dolarlık topluluk yapılarından CBRS hazır radyolara kadar BOM katmanları, USRP, LimeSDR ve BladeRF için SDR notları.",
@@ -461,15 +494,15 @@ hi: {
   "nav.status":"Status",
   "nav.github":"GitHub",
   "hero.title":"Małe stacje komórkowe własności społeczności.<br>Bezpieczne widmowo z założenia.",
-  "hero.sub":"Fairwave to otwartoźródłowa sieć małych stacji, którą uruchomisz na biurku: EPC Open5GS, radio srsRAN, płaszczyzna kontrolna w Go, laboratoryjne eSIM i przepływ pracy lab-first, w którym RF pozostaje wyłączona, dopóki nie przejdą wszystkie bramy prawne.",
+  "hero.sub":"Fairwave to otwartoźródłowa sieć małych stacji, którą uruchomisz na biurku: EPC Open5GS dla 4G i rdzeń 5G free5GC, radio srsRAN, płaszczyzna kontrolna w Go, laboratoryjne eSIM, limity danych fair-use mierzone w rdzeniu oraz przepływ pracy lab-first, w którym RF pozostaje wyłączona, dopóki nie przejdą wszystkie bramy prawne.",
   "hero.api":"Status API na żywo",
   "hero.start":"Zacznij w laboratorium",
   "card1.tag":"Najpierw lab",
   "card1.title":"Żadnej RF, dopóki nie powiesz",
   "card1.body":"Domyślnie wirtualne radio ZMQ. Nadawanie jest wyłączone, dopóki kraj, potwierdzenie licencji i lista dozwolonych pasm nie przejdą - egzekwowane w kodzie, nie polityką.",
-  "card2.tag":"Prawdziwe jądro 4G",
-  "card2.title":"Open5GS EPC",
-  "card2.body":"MME, SGW, PGW, HSS, PCRF z magazynem abonentów Mongo. Laboratoryjny PLMN 999-99, APN internet + ims, gotowe na Twoje testowe karty SIM.",
+  "card2.tag":"Jądra 4G + 5G",
+  "card2.title":"Open5GS EPC + free5GC 5G",
+  "card2.body":"MME, SGW, PGW, HSS, PCRF dla LTE oraz opcjonalny rdzeń 5G SA free5GC z zapisem abonentów do UDR. Laboratoryjny PLMN 999-99, APN internet + ims, gotowe na Twoje testowe karty SIM.",
   "card3.tag":"Laboratoryjna eSIM",
   "card3.title":"eSIM przez własny SM-DP+",
   "card3.body":"SM-DP+ w Go i programowa eUICC wykonują cały cykl pobierania profili w kształcie SGP.22: szyfrowane pakiety powiązanych profili, kody aktywacyjne QR, weryfikowane end-to-end w CI.",
@@ -478,7 +511,7 @@ hi: {
   "card4.body":"Siatka WireGuard z kluczami zarządzanymi przez płaszczyznę kontrolną. Lokalny breakout domyślnie; opcjonalny chmurowy hub spotkań dla rozproszonych lokalizacji.",
   "card5.tag":"Narzędzia operatora",
   "card5.title":"Jeden pulpit, jedna CLI",
-  "card5.body":"REST API v1, jedno-plikowy interfejs operatora, offline-first provisioner SIM z profilami produkcyjnymi chronionymi HSM, metryki Prometheus.",
+  "card5.body":"REST API v1, jedno-plikowy interfejs operatora, offline-first provisioner SIM z profilami produkcyjnymi chronionymi HSM, sprawiedliwe limity danych na UE z automatycznym zawieszeniem, metryki Prometheus.",
   "card6.tag":"Sprzęt",
   "card6.title":"Budowy społecznościowe",
   "card6.body":"Obudowa 260 mm, poziomy BOM od ~350 USD do radia gotowego na CBRS, notatki SDR dla USRP, LimeSDR i BladeRF.",
@@ -496,15 +529,15 @@ hi: {
   "nav.status":"Status",
   "nav.github":"GitHub",
   "hero.title":"Kleine cellen in gemeenschapseigendom.<br>Spectrumveilig door ontwerp.",
-  "hero.sub":"Fairwave is een open-source small-cell netwerk dat je op een bureau draait: Open5GS EPC, srsRAN-radio, een Go-controlelaag, lab-eSIM-voorziening en een lab-first workflow waarbij RF uit blijft totdat alle juridische poorten zijn gepasseerd.",
+  "hero.sub":"Fairwave is een open-source small-cell netwerk dat je op een bureau draait: Open5GS EPC voor 4G en een free5GC 5G-kern, srsRAN-radio, een Go-controlelaag, lab-eSIM-voorziening, eerlijke datalimieten gemeten vanuit de kern en een lab-first workflow waarbij RF uit blijft totdat alle juridische poorten zijn gepasseerd.",
   "hero.api":"Live API-status",
   "hero.start":"Start in het lab",
   "card1.tag":"Eerst lab",
   "card1.title":"Geen RF tot jij het zegt",
   "card1.body":"Standaard virtuele ZMQ-radio. Zenden blijft uit totdat land, licentiebevestiging en band-whitelist allemaal slagen - afgedwongen in code, niet door beleid.",
-  "card2.tag":"Echte 4G-kern",
-  "card2.title":"Open5GS EPC",
-  "card2.body":"MME, SGW, PGW, HSS, PCRF met een Mongo-abonneeopslag. Lab-PLMN 999-99, APN internet + ims, klaar voor je test-SIM's.",
+  "card2.tag":"4G- + 5G-kern",
+  "card2.title":"Open5GS EPC + free5GC 5G",
+  "card2.body":"MME, SGW, PGW, HSS, PCRF voor LTE plus een optionele free5GC 5G SA-core met UDR-abonnee-writeback. Lab-PLMN 999-99, APN internet + ims, klaar voor je test-SIM's.",
   "card3.tag":"Lab-eSIM",
   "card3.title":"eSIM via je eigen SM-DP+",
   "card3.body":"Een SM-DP+ in Go en een software-eUICC voeren de volledige SGP.22-vormige profieldownloadcyclus uit: versleutelde gebonden profielpakketten, QR-activeringscodes, end-to-end geverifieerd in CI.",
@@ -513,7 +546,7 @@ hi: {
   "card4.body":"WireGuard-mesh met sleutels die door de controlelaag worden beheerd. Standaard lokale breakout; optionele cloud-hub voor gedistribueerde locaties.",
   "card5.tag":"Operator-tools",
   "card5.title":"Eén dashboard, één CLI",
-  "card5.body":"REST API v1, operator-interface in één bestand, offline-first SIM-voorziening met HSM-beschermde productieprofielen, Prometheus-metrieken.",
+  "card5.body":"REST API v1, operator-interface in één bestand, offline-first SIM-voorziening met HSM-beschermde productieprofielen, fair-use-quota per UE met automatische opschorting, Prometheus-metrieken.",
   "card6.tag":"Hardware",
   "card6.title":"Community-builds",
   "card6.body":"260 mm pizza-box-behuizing, BOM-niveaus van ~350 USD tot CBRS-ready radio's, SDR-notities voor USRP, LimeSDR en BladeRF.",
@@ -531,15 +564,15 @@ hi: {
   "nav.status":"Статус",
   "nav.github":"GitHub",
   "hero.title":"Малі соти у власності громади.<br>Безпечно за спектром за задумом.",
-  "hero.sub":"Fairwave - це мережа малих сот з відкритим кодом, яку можна запустити на столі: EPC Open5GS, радіо srsRAN, панель керування на Go, лабораторна eSIM і робочий процес lab-first, де RF залишається вимкненою, доки не пройдуть усі правові бар'єри.",
+  "hero.sub":"Fairwave - це мережа малих сот з відкритим кодом, яку можна запустити на столі: EPC Open5GS для 4G і ядро 5G на free5GC, радіо srsRAN, панель керування на Go, лабораторна eSIM, справедливі ліміти трафіку, які вимірює ядро, і робочий процес lab-first, де RF вимкнена, поки не пройдуть усі правові бар'єри.",
   "hero.api":"Статус API у реальному часі",
   "hero.start":"Почати в лабораторії",
   "card1.tag":"Спершу лабораторія",
   "card1.title":"Без RF, доки ви не дозволите",
   "card1.body":"Віртуальне радіо ZMQ за замовчуванням. Передача вимкнена, доки країна, підтвердження ліцензії та білий список діапазонів не пройдуть - закріплено в коді, а не політикою.",
-  "card2.tag":"Справжнє ядро 4G",
-  "card2.title":"Open5GS EPC",
-  "card2.body":"MME, SGW, PGW, HSS, PCRF зі сховищем абонентів Mongo. Лабораторний PLMN 999-99, APN internet + ims, готово для ваших тестових SIM.",
+  "card2.tag":"Ядра 4G + 5G",
+  "card2.title":"Open5GS EPC + free5GC 5G",
+  "card2.body":"MME, SGW, PGW, HSS, PCRF для LTE плюс опційне ядро 5G SA на free5GC із записом абонентів у UDR. Лабораторний PLMN 999-99, APN internet + ims, готово для ваших тестових SIM.",
   "card3.tag":"Лабораторна eSIM",
   "card3.title":"eSIM через власний SM-DP+",
   "card3.body":"SM-DP+ на Go і програмна eUICC виконують повний цикл завантаження профілів у стилі SGP.22: зашифровані пакети прив'язаних профілів, QR-коди активації, перевірено в CI від початку до кінця.",
@@ -548,7 +581,7 @@ hi: {
   "card4.body":"Сітка WireGuard з ключами, керованими панеллю керування. Локальний вихід за замовчуванням; опційний хмарний вузол для розподілених майданчиків.",
   "card5.tag":"Інструменти оператора",
   "card5.title":"Одна панель, один CLI",
-  "card5.body":"REST API v1, інтерфейс оператора в одному файлі, офлайн-провізор SIM з профілями виробництва, захищеними HSM, метрики Prometheus.",
+  "card5.body":"REST API v1, інтерфейс оператора в одному файлі, офлайн-провізор SIM із захищеними HSM виробничими профілями, справедливі квоти трафіку на кожне UE з автопризупиненням, метрики Prometheus.",
   "card6.tag":"Залізо",
   "card6.title":"Спільнотні збірки",
   "card6.body":"Корпус 260 мм, рівні BOM від ~350 доларів до радіо, готових до CBRS, нотатки SDR для USRP, LimeSDR і BladeRF.",
@@ -566,15 +599,15 @@ hi: {
   "nav.status":"Status",
   "nav.github":"GitHub",
   "hero.title":"Småceller i samhällets ägo.<br>Spektrumsäkra av design.",
-  "hero.sub":"Fairwave är ett open source-småcellnätverk du kör på ett skrivbord: Open5GS EPC, srsRAN-radio, Go-kontrollplan, labb-eSIM-försörjning och ett lab-first-arbetsflöde där RF förblir avstängd tills alla juridiska grindar är passerade.",
+  "hero.sub":"Fairwave är ett open source-småcellnätverk du kör på ett skrivbord: Open5GS EPC för 4G och en free5GC 5G-kärna, srsRAN-radio, Go-kontrollplan, labb-eSIM, rimliga datatak mätta från kärnan och ett labb-först-arbetsflöde där RF förblir avstängd tills alla juridiska grindar passerats.",
   "hero.api":"Live API-status",
   "hero.start":"Börja i labbet",
   "card1.tag":"Lab först",
   "card1.title":"Ingen RF förrän du säger till",
   "card1.body":"Virtuell ZMQ-radio som standard. Sändning är avstängd tills land, licensbekräftelse och bandvitlista alla passerar - tvingat i kod, inte genom policy.",
-  "card2.tag":"Äkta 4G-kärna",
-  "card2.title":"Open5GS EPC",
-  "card2.body":"MME, SGW, PGW, HSS, PCRF med en Mongo-abonnentlagring. Labb-PLMN 999-99, APN internet + ims, redo för dina test-SIM.",
+  "card2.tag":"4G- + 5G-kärnor",
+  "card2.title":"Open5GS EPC + free5GC 5G",
+  "card2.body":"MME, SGW, PGW, HSS, PCRF för LTE plus en valfri free5GC 5G SA-kärna med UDR-abonnent-writeback. Labb-PLMN 999-99, APN internet + ims, redo för dina test-SIM.",
   "card3.tag":"Lab-eSIM",
   "card3.title":"eSIM via din egen SM-DP+",
   "card3.body":"En SM-DP+ i Go och en mjukvaru-eUICC kör hela den SGP.22-formade profils nedladdningscykeln: krypterade bundna profils paket, QR-aktiveringskoder, verifierat end-to-end i CI.",
@@ -583,7 +616,7 @@ hi: {
   "card4.body":"WireGuard-mesh med nycklar som hanteras av kontrollplanet. Lokal breakout som standard; valfri molnhubb för distribuerade platser.",
   "card5.tag":"Operatörsverktyg",
   "card5.title":"En panel, en CLI",
-  "card5.body":"REST API v1, operatörsgränssnitt i en fil, offline-first-SIM-försörjare med HSM-skyddade produktionsprofiler, Prometheus-metriker.",
+  "card5.body":"REST API v1, operatörsgränssnitt i en fil, offline-first-SIM-försörjare med HSM-skyddade produktionsprofiler, fair-use-kvoter per UE med automatisk paus, Prometheus-metriker.",
   "card6.tag":"Hårdvara",
   "card6.title":"Gemenskapsbygge",
   "card6.body":"260 mm pizzakartong-chassi, BOM-nivåer från ~350 USD till CBRS-klara radioapparater, SDR-anteckningar för USRP, LimeSDR och BladeRF.",
@@ -601,15 +634,15 @@ hi: {
   "nav.status":"Status",
   "nav.github":"GitHub",
   "hero.title":"Sel kecil milik komunitas.<br>Aman spektrum sejak desain.",
-  "hero.sub":"Fairwave adalah jaringan sel kecil sumber terbuka yang bisa Anda jalankan di meja: EPC Open5GS, radio srsRAN, bidang kendali Go, penyediaan eSIM lab, dan alur kerja lab-first di mana RF tetap mati sampai semua gerbang hukum dilewati.",
+  "hero.sub":"Fairwave adalah jaringan small cell sumber terbuka yang bisa Anda jalankan di meja: EPC Open5GS untuk 4G dan inti 5G free5GC, radio srsRAN, bidang kendali Go, provisi eSIM lab, batas data penggunaan wajar yang diukur dari inti, dan alur kerja lab-first yang menjaga RF tetap mati sampai semua gerbang hukum terlewati.",
   "hero.api":"Status API langsung",
   "hero.start":"Mulai di lab",
   "card1.tag":"Lab dulu",
   "card1.title":"Tidak ada RF sampai Anda setuju",
   "card1.body":"Radio virtual ZMQ secara default. Transmisi tetap mati sampai negara, pengakuan lisensi, dan daftar putih pita semuanya lolos - diterapkan dalam kode, bukan kebijakan.",
-  "card2.tag":"Inti 4G nyata",
-  "card2.title":"Open5GS EPC",
-  "card2.body":"MME, SGW, PGW, HSS, PCRF dengan penyimpanan pelanggan Mongo. PLMN lab 999-99, APN internet + ims, siap untuk SIM uji Anda.",
+  "card2.tag":"Inti 4G + 5G",
+  "card2.title":"Open5GS EPC + free5GC 5G",
+  "card2.body":"MME, SGW, PGW, HSS, PCRF untuk LTE plus inti 5G SA free5GC opsional dengan write-back pelanggan UDR. PLMN lab 999-99, APN internet + ims, siap untuk SIM uji Anda.",
   "card3.tag":"eSIM lab",
   "card3.title":"eSIM melalui SM-DP+ Anda sendiri",
   "card3.body":"SM-DP+ dalam Go dan eUICC perangkat lunak menjalankan seluruh siklus unduh profil berbentuk SGP.22: paket profil terikat terenkripsi, kode aktivasi QR, terverifikasi end-to-end di CI.",
@@ -618,7 +651,7 @@ hi: {
   "card4.body":"Mesh WireGuard dengan kunci yang dikelola bidang kendali. Breakout lokal secara default; hub cloud opsional untuk situs terdistribusi.",
   "card5.tag":"Alat operator",
   "card5.title":"Satu dasbor, satu CLI",
-  "card5.body":"REST API v1, UI operator satu file, penyedia SIM offline-first dengan profil produksi terproteksi HSM, metrik Prometheus.",
+  "card5.body":"REST API v1, UI operator satu file, penyedia SIM offline-first dengan profil produksi yang dilindungi HSM, kuota penggunaan wajar per UE dengan penangguhan otomatis, metrik Prometheus.",
   "card6.tag":"Perangkat keras",
   "card6.title":"Bangunan komunitas",
   "card6.body":"Enklosur kotak pizza 260 mm, tingkat BOM dari ~$350 untuk bangunan komunitas hingga radio siap CBRS, catatan SDR untuk USRP, LimeSDR, dan BladeRF.",
@@ -636,15 +669,15 @@ hi: {
   "nav.status":"Trạng thái",
   "nav.github":"GitHub",
   "hero.title":"Small cell thuộc sở hữu cộng đồng.<br>An toàn phổ tần ngay từ thiết kế.",
-  "hero.sub":"Fairwave là mạng small cell mã nguồn mở bạn có thể chạy trên bàn làm việc: EPC Open5GS, radio srsRAN, mặt phẳng điều khiển Go, cấp eSIM thí nghiệm và quy trình lab-first nơi RF vẫn tắt cho đến khi mọi cổng pháp lý được vượt qua.",
+  "hero.sub":"Fairwave là mạng small cell mã nguồn mở bạn có thể chạy trên bàn làm việc: EPC Open5GS cho 4G và lõi 5G free5GC, radio srsRAN, mặt phẳng điều khiển Go, cấp phát eSIM lab, hạn mức dữ liệu sử dụng hợp lý đo từ lõi, và quy trình lab-first giữ RF tắt cho đến khi mọi cổng pháp lý được vượt qua.",
   "hero.api":"Trạng thái API trực tiếp",
   "hero.start":"Bắt đầu trong phòng thí nghiệm",
   "card1.tag":"Lab trước",
   "card1.title":"Không RF cho đến khi bạn đồng ý",
   "card1.body":"Radio ảo ZMQ mặc định. Truyền vẫn tắt cho đến khi quốc gia, xác nhận giấy phép và danh sách trắng băng tần đều đạt - được thực thi trong mã, không phải chính sách.",
-  "card2.tag":"Lõi 4G thực",
-  "card2.title":"Open5GS EPC",
-  "card2.body":"MME, SGW, PGW, HSS, PCRF với kho lưu trữ thuê bao Mongo. PLMN phòng thí nghiệm 999-99, APN internet + ims, sẵn sàng cho SIM thử nghiệm của bạn.",
+  "card2.tag":"Lõi 4G + 5G",
+  "card2.title":"Open5GS EPC + free5GC 5G",
+  "card2.body":"MME, SGW, PGW, HSS, PCRF cho LTE cùng lõi 5G SA free5GC tùy chọn với ghi ngược thuê bao UDR. PLMN lab 999-99, APN internet + ims, sẵn sàng cho SIM thử nghiệm của bạn.",
   "card3.tag":"eSIM phòng thí nghiệm",
   "card3.title":"eSIM qua SM-DP+ của riêng bạn",
   "card3.body":"SM-DP+ viết bằng Go và eUICC phần mềm chạy toàn bộ chu trình tải hồ sơ dạng SGP.22: gói hồ sơ ràng buộc được mã hóa, mã kích hoạt QR, được CI xác minh từ đầu đến cuối.",
@@ -653,7 +686,7 @@ hi: {
   "card4.body":"Lưới WireGuard với khóa do mặt phẳng điều khiển quản lý. Breakout cục bộ mặc định; trung tâm đám mây tùy chọn cho các địa điểm phân tán.",
   "card5.tag":"Công cụ vận hành",
   "card5.title":"Một bảng điều khiển, một CLI",
-  "card5.body":"REST API v1, giao diện vận hành một tệp, bộ cấp SIM offline-first với hồ sơ sản xuất được HSM bảo vệ, số liệu Prometheus.",
+  "card5.body":"REST API v1, giao diện điều hành một tệp, bộ cấp phát SIM offline-first với hồ sơ sản xuất được bảo vệ bằng HSM, hạn mức sử dụng hợp lý cho từng UE với tự động tạm ngưng, số liệu Prometheus.",
   "card6.tag":"Phần cứng",
   "card6.title":"Bản dựng cộng đồng",
   "card6.body":"Vỏ hộp pizza 260 mm, các cấp BOM từ ~350 USD cho bản dựng cộng đồng đến radio sẵn sàng CBRS, ghi chú SDR cho USRP, LimeSDR và BladeRF.",

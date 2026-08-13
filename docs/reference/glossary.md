@@ -16,7 +16,7 @@ Terms used across the Fairwave docs. Line-oriented; 3GPP-heavy where noted.
 - **HSS** - Home Subscriber Server: holds subscriber credentials (Ki/OPc, IMSI, profiles) and authenticates SIMs.
 - **PCRF** - Policy and Charging Rules Function: policy/QoS decisions in the 4G core; Open5GS supports a basic profile.
 - **UDM** - Unified Data Management: the 5G analogue of the HSS; the roadmap target for subscriber stores.
-- **AMF** - Access and Mobility Management Function: 5G analogue of the MME. Future work only.
+- **AMF** - Access and Mobility Management Function: 5G analogue of the MME. Shipped as part of the free5GC 5G core (`core: free5gc`).
 - **GTP-U** - GPRS Tunnelling Protocol, User plane: tunnels user packets between eNB/SGW/PGW.
 - **APN** - Access Point Name: the named "gateway" a UE connects through; Fairwave defaults are `internet` and `ims`.
 - **EARFCN** - E-UTRA Absolute Radio Frequency Channel Number: numeric channel identifier for LTE carriers.

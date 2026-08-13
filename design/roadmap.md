@@ -16,6 +16,15 @@
 | M5 | Wi-Fi calling / ePDG path | v0.6.0 | Handoff to national EPC via ipsec, where lawful |
 | M6 | Neutral-host multi-PLMN | v0.7.0 | Broadcast multiple PLMN ids; roaming prep |
 
+## Shipped ahead of the table (5G core + fair use)
+
+The free5GC 5G SA core landed ahead of the milestone numbering: `core: free5gc`
+switches the control plane to free5GC (AMF/SMF/UPF/NRF/PCF/NSSF/AUSF/UDM/UDR) with
+UDR write-back, AMF OAM session polling, and **fair-use metering from the core**
+(free5GC CHF CDR files; GTP-U tap on 4G) feeding per-SIM quotas with auto-suspend.
+Deployment: `deploy/docker-compose.5g.yml`, configs in `core/free5gc/`, RAN profiles
+`core/ran/gnb.zmq.yml` + `ue5g.zmq.yml`. 4G/Open5GS remains the default path.
+
 ## Detailed gates
 
 ### M0 - v0.1.0 (lab)

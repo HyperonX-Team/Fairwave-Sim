@@ -48,15 +48,29 @@ const DefaultDBURI = "mongodb://localhost:27017/open5gs"
 
 // New builds the writer for a driver name. Unknown or empty drivers return
 // the safe no-op (None).
+//
+// The free5gc driver defaults to the lab PLMN (999/99); production
+// deployments should construct NewFree5GC with the real MCC+MNC instead.
 func New(driver, container string) Writer {
 	switch driver {
 	case DriverMongosh:
 		return &Mongosh{Container: container, DBURI: DefaultDBURI, run: execRunner}
 	case DriverDBCTL:
 		return &DBCTL{Container: container, run: execRunner}
+	case DriverFree5GC:
+		return NewFree5GC(container, "")
 	default:
 		return None{}
 	}
+}
+
+// ambrValue normalizes a Mbps cap to the HSS AMBR value (0 -> 1 Mbps
+// lab default, matching hss-init.sh's value 1 / unit 8).
+func ambrValue(mbps int) int {
+	if mbps <= 0 {
+		return 1
+	}
+	return mbps
 }
 
 // None is a safe no-op writer (default when no driver is configured).
@@ -76,7 +90,9 @@ type Mongosh struct {
 	run       runner
 }
 
-// Add implements Writer: db.subscribers.updateOne(... upsert).
+// Add implements Writer: db.subscribers.updateOne(... upsert). The AMBR
+// caps come from the subscriber's QoS fields (Mbps, unit 8 per the repo's
+// HSS convention in core/open5gs/hss-init.sh); 0 means the 1 Mbps default.
 func (m *Mongosh) Add(ctx context.Context, sub simprov.Subscriber) error {
 	doc := map[string]any{
 		"imsi":                     sub.IMSI,
@@ -90,8 +106,8 @@ func (m *Mongosh) Add(ctx context.Context, sub simprov.Subscriber) error {
 			"apn": sub.APN,
 			"qos": map[string]any{"class_id": 9, "priority_level": 8, "preemption_vulnerability": 1, "preemption_capability": 1},
 			"ambr": map[string]any{
-				"uplink":   map[string]any{"value": 1, "unit": 8},
-				"downlink": map[string]any{"value": 1, "unit": 8},
+				"uplink":   map[string]any{"value": ambrValue(sub.QoSULMbps), "unit": 8},
+				"downlink": map[string]any{"value": ambrValue(sub.QoSDLMbps), "unit": 8},
 			},
 			"type": 0,
 		}},

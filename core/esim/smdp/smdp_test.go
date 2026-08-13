@@ -283,6 +283,34 @@ func TestSessionLifecycleAndKeyAgreement(t *testing.T) {
 	}
 }
 
+func TestOnDeliveredHookFiresOnce(t *testing.T) {
+	store := NewMemStore()
+	srv := NewServer("smdp.fairwave.test", store, func(ac string) (*profile.Profile, error) {
+		if ac != testActivationCode {
+			return nil, ErrUnknownActivationCode
+		}
+		return labProfile(t, "999991234567001"), nil
+	})
+	delivered := 0
+	srv.OnDelivered = func(ac string) error {
+		if ac != testActivationCode {
+			t.Errorf("hook got activation code %q", ac)
+		}
+		delivered++
+		return nil
+	}
+	hs := httptest.NewServer(srv.Handler())
+	defer hs.Close()
+
+	e, _ := euicc.New()
+	if _, err := e.Download(context.Background(), hs.URL, "LPA:1$smdp.fairwave.test$"+testActivationCode, hs.Client()); err != nil {
+		t.Fatal(err)
+	}
+	if delivered != 1 {
+		t.Fatalf("OnDelivered fired %d times, want 1", delivered)
+	}
+}
+
 func TestInitiateRejectsBadInput(t *testing.T) {
 	srv := NewServer("smdp.fairwave.test", NewMemStore(), func(ac string) (*profile.Profile, error) {
 		if ac != testActivationCode {

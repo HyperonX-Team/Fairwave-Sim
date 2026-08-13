@@ -1,0 +1,402 @@
+# Fairwave 5G SA lab stack - NO RF. The srsRAN 5G RAN (srsGNB + srsUE)
+# runs over ZMQ virtual radio (N2/N3 over the docker network); nothing
+# touches an antenna.
+#
+# Why free5GC? Per-UE charging is native: the UPF reports per-session
+# volume via PFCP Usage Report (URR) to the SMF -> CHF, so fair-use caps
+# are measured from the core itself (no GTP-U tap, no CAP_NET_RAW). The
+# CHF writes per-UE CDR files (TS 32.297 + BER ChargingRecord) into its
+# /tmp; the control plane mounts that directory (chf-cdr volume) and feeds
+# the per-UE totals into the fair-use quota pipeline.
+#
+# Bring up:    docker compose -f docker-compose.5g.yml up -d
+#              (run core/free5gc/fetch-upstream.sh once first - it pulls
+#               the canonical NF configs we do not hand-write)
+# Teardown:    docker compose -f docker-compose.5g.yml down -v
+#
+# HARD REQUIREMENTS (see core/free5gc/README.md):
+#   - gtp5g kernel module v0.9.5 on the HOST:
+#       git clone --branch v0.9.5 --depth 1 https://github.com/free5gc/gtp5g.git
+#       cd gtp5g && make && sudo make install
+#   - the UPF container is privileged (it creates the gtp5g tunnel).
+#   - mongo:4.4 is pinned on purpose: mongo >= 5 needs AVX on the host CPU.
+#
+# REQUIRED env overrides (all optional, defaults in line):
+#   FW_F5GC_IMAGE_TAG   v4.2.3            (free5gc NF image tag)
+#   FW_UE1_IMSI         999991234567001   (must be a lab test vector;
+#                                          Ki/OPc allow-listed in srs-entry.sh)
+#   FW_CONTROL_PORT     8080
+#   FW_NET_SUBNET       10.100.200.0/24   (upstream free5gc-compose subnet;
+#                                          AMF is pinned to .16)
+
+name: fairwave-lab-5g
+
+networks:
+  fwnet5g:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: ${FW_NET_SUBNET:-10.100.200.0/24}
+
+volumes:
+  dbdata:
+  fairwave-data:
+  chf-cdr: # CHF CDR files; shared with the control-plane usage meter
+
+services:
+  # ---------------------------------------------------------------------------
+  # Subscriber database (free5GC UDR). mongo:4.4 to dodge the AVX requirement
+  # of mongo >= 5 (matches the upstream free5gc-compose).
+  # ---------------------------------------------------------------------------
+  db:
+    image: mongo:4.4
+    container_name: mongodb
+    restart: unless-stopped
+    command: mongod --port 27017
+    networks:
+      fwnet5g:
+        aliases: [db]
+    volumes:
+      - dbdata:/data/db
+    healthcheck:
+      test: ["CMD", "mongo", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+
+  # ---------------------------------------------------------------------------
+  # free5GC network functions (v4.2.3 images, canonical free5gc-compose
+  # topology). NFs that touch the UDR get DB_URI; the AMF is pinned to .16
+  # because the N2 config in core/ran/gnb.zmq.yml references it literally.
+  # Every NF mounts its config + the shared TLS cert dir from core/free5gc/.
+  # ---------------------------------------------------------------------------
+  free5gc-nrf:
+    image: free5gc/nrf:${FW_F5GC_IMAGE_TAG:-v4.2.3}
+    restart: unless-stopped
+    environment:
+      DB_URI: mongodb://db/free5gc
+      GIN_MODE: release
+    networks:
+      fwnet5g:
+        aliases: [nrf.free5gc.org]
+    volumes:
+      - ../core/free5gc/nrfcfg.yaml:/free5gc/config/nrfcfg.yaml:ro
+      - ../core/free5gc/cert:/free5gc/cert:ro
+    depends_on:
+      db:
+        condition: service_healthy
+
+  free5gc-udr:
+    image: free5gc/udr:${FW_F5GC_IMAGE_TAG:-v4.2.3}
+    restart: unless-stopped
+    environment:
+      DB_URI: mongodb://db/free5gc
+      GIN_MODE: release
+    networks:
+      fwnet5g:
+        aliases: [udr.free5gc.org]
+    volumes:
+      - ../core/free5gc/udrcfg.yaml:/free5gc/config/udrcfg.yaml:ro
+      - ../core/free5gc/cert:/free5gc/cert:ro
+    depends_on:
+      db:
+        condition: service_healthy
+      free5gc-nrf:
+        condition: service_started
+
+  free5gc-udm:
+    image: free5gc/udm:${FW_F5GC_IMAGE_TAG:-v4.2.3}
+    restart: unless-stopped
+    environment:
+      GIN_MODE: release
+    networks:
+      fwnet5g:
+        aliases: [udm.free5gc.org]
+    volumes:
+      - ../core/free5gc/udmcfg.yaml:/free5gc/config/udmcfg.yaml:ro
+      - ../core/free5gc/cert:/free5gc/cert:ro
+    depends_on:
+      free5gc-nrf:
+        condition: service_started
+      free5gc-udr:
+        condition: service_started
+
+  free5gc-ausf:
+    image: free5gc/ausf:${FW_F5GC_IMAGE_TAG:-v4.2.3}
+    restart: unless-stopped
+    environment:
+      GIN_MODE: release
+    networks:
+      fwnet5g:
+        aliases: [ausf.free5gc.org]
+    volumes:
+      - ../core/free5gc/ausfcfg.yaml:/free5gc/config/ausfcfg.yaml:ro
+      - ../core/free5gc/cert:/free5gc/cert:ro
+    depends_on:
+      free5gc-nrf:
+        condition: service_started
+
+  free5gc-nssf:
+    image: free5gc/nssf:${FW_F5GC_IMAGE_TAG:-v4.2.3}
+    restart: unless-stopped
+    environment:
+      GIN_MODE: release
+    networks:
+      fwnet5g:
+        aliases: [nssf.free5gc.org]
+    volumes:
+      - ../core/free5gc/nssfcfg.yaml:/free5gc/config/nssfcfg.yaml:ro
+      - ../core/free5gc/cert:/free5gc/cert:ro
+    depends_on:
+      free5gc-nrf:
+        condition: service_started
+
+  free5gc-pcf:
+    image: free5gc/pcf:${FW_F5GC_IMAGE_TAG:-v4.2.3}
+    restart: unless-stopped
+    environment:
+      GIN_MODE: release
+    networks:
+      fwnet5g:
+        aliases: [pcf.free5gc.org]
+    volumes:
+      - ../core/free5gc/pcfcfg.yaml:/free5gc/config/pcfcfg.yaml:ro
+      - ../core/free5gc/cert:/free5gc/cert:ro
+    depends_on:
+      free5gc-nrf:
+        condition: service_started
+
+  free5gc-amf:
+    image: free5gc/amf:${FW_F5GC_IMAGE_TAG:-v4.2.3}
+    container_name: amf
+    restart: unless-stopped
+    environment:
+      GIN_MODE: release
+    networks:
+      fwnet5g:
+        ipv4_address: 10.100.200.16 # pinned: referenced by core/ran/gnb.zmq.yml
+        aliases: [amf.free5gc.org]
+    volumes:
+      - ../core/free5gc/amfcfg.yaml:/free5gc/config/amfcfg.yaml:ro
+      - ../core/free5gc/cert:/free5gc/cert:ro
+    depends_on:
+      free5gc-nrf:
+        condition: service_started
+
+  free5gc-smf:
+    image: free5gc/smf:${FW_F5GC_IMAGE_TAG:-v4.2.3}
+    container_name: smf
+    restart: unless-stopped
+    environment:
+      GIN_MODE: release
+    networks:
+      fwnet5g:
+        aliases: [smf.free5gc.org]
+    volumes:
+      - ../core/free5gc/smfcfg.yaml:/free5gc/config/smfcfg.yaml:ro
+      - ../core/free5gc/cert:/free5gc/cert:ro
+    depends_on:
+      free5gc-nrf:
+        condition: service_started
+      free5gc-upf:
+        condition: service_started
+
+  free5gc-chf:
+    image: free5gc/chf:${FW_F5GC_IMAGE_TAG:-v4.2.3}
+    restart: unless-stopped
+    environment:
+      DB_URI: mongodb://db/free5gc
+      GIN_MODE: release
+    networks:
+      fwnet5g:
+        aliases: [chf.free5gc.org]
+    volumes:
+      - ../core/free5gc/chfcfg.yaml:/free5gc/config/chfcfg.yaml:ro
+      - ../core/free5gc/cert:/free5gc/cert:ro
+      # CDR files are written to /tmp by free5GC (hardcoded in chf's
+      # dumpCdrFile); the control plane reads them from this shared volume.
+      - chf-cdr:/tmp
+    depends_on:
+      db:
+        condition: service_healthy
+      free5gc-nrf:
+        condition: service_started
+
+  # ---------------------------------------------------------------------------
+  # UPF: creates the gtp5g tunnel, hence privileged + NET_ADMIN, plus the
+  # iptables NAT script so UE traffic reaches the internet (upstream shape).
+  # ---------------------------------------------------------------------------
+  free5gc-upf:
+    image: free5gc/upf:${FW_F5GC_IMAGE_TAG:-v4.2.3}
+    container_name: upf
+    restart: unless-stopped
+    command: bash -c "./upf-iptables.sh && ./upf -c ./config/upfcfg.yaml"
+    privileged: true # gtp5g tunnel creation (the upstream README calls for this)
+    cap_add:
+      - NET_ADMIN
+    networks:
+      fwnet5g:
+        aliases: [upf.free5gc.org]
+    volumes:
+      - ../core/free5gc/upfcfg.yaml:/free5gc/config/upfcfg.yaml:ro
+      - ../core/free5gc/upf-iptables.sh:/free5gc/upf-iptables.sh:ro
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # ---------------------------------------------------------------------------
+  # WebUI (subscriber browser + REST API on :5000). The control plane does
+  # NOT depend on it - the mongosh write-back provisions subscribers
+  # directly - but it is the fastest way to eyeball a subscriber document.
+  # ---------------------------------------------------------------------------
+  free5gc-webui:
+    image: free5gc/webui:${FW_F5GC_IMAGE_TAG:-v4.2.3}
+    container_name: webui
+    restart: unless-stopped
+    command: ./webui -c ./config/webuicfg.yaml
+    environment:
+      - GIN_MODE=release
+    ports:
+      - "5000:5000"
+      - "2122:2122"
+      - "2121:2121"
+    networks:
+      fwnet5g:
+        aliases: [webui]
+    depends_on:
+      db:
+        condition: service_healthy
+      free5gc-nrf:
+        condition: service_started
+
+  # ---------------------------------------------------------------------------
+  # srsRAN 5G SA RAN over ZMQ virtual radio (no antenna). The gNB is
+  # srsRAN_Project (built into the fairwave/srsran image); the 5G SA UE is
+  # srsUE from srsRAN_4G sharing the gNB's network namespace so the ZMQ
+  # radio runs over localhost (same topology as the 4G lab). Configs in
+  # core/ran/ (gnb.zmq.yml + ue5g.zmq.yml); everything - PLMN 999-99,
+  # TAC 1, slice 010203, DNN internet - agrees with core/free5gc/*.yaml.
+  # ---------------------------------------------------------------------------
+  gnb:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.srsran
+    image: ${FW_SRS_IMAGE:-fairwave/srsran:lab}
+    restart: unless-stopped
+    networks:
+      fwnet5g:
+        ipv4_address: 10.100.200.100 # pinned: N2/N3 bind_addr in gnb.zmq.yml
+    devices:
+      - "/dev/net/tun" # the UE (shared namespace) creates tun_srsue here
+    cap_add:
+      - NET_ADMIN
+    environment:
+      PROFILE: gnb-zmq
+      RAN_CFG_DIR: /etc/fairwave/ran
+    depends_on:
+      free5gc-amf:
+        condition: service_started
+      free5gc-upf:
+        condition: service_started
+    volumes:
+      - ../core/ran:/etc/fairwave/ran:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep -x gnb >/dev/null"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  ue5g:
+    image: ${FW_SRS_IMAGE:-fairwave/srsran:lab}
+    restart: unless-stopped
+    network_mode: "service:gnb" # shares the gNB namespace: ZMQ over localhost
+    environment:
+      PROFILE: ue-5g-zmq
+      RAN_CFG_DIR: /etc/fairwave/ran
+      UE_IMSI: ${FW_UE1_IMSI:-999991234567001} # lab vector; Ki/OPc allow-listed in srs-entry.sh
+    depends_on:
+      gnb:
+        condition: service_healthy
+    volumes:
+      - ../core/ran:/etc/fairwave/ran:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep -x srsue >/dev/null"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  # Alternative RAN: UERANSIM gNB/UE (the canonical free5gc-compose
+  # reference). Opt-in via `--profile ran-ueransim`; its configs live in
+  # core/free5gc/ran/ (uecfg.yaml carries the same lab vector).
+  ueransim:
+    image: free5gc/ueransim:latest
+    container_name: ueransim
+    restart: unless-stopped
+    profiles: ["ran-ueransim"]
+    command: ./nr-gnb -c ./config/gnbcfg.yaml
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - "/dev/net/tun"
+    networks:
+      fwnet5g:
+        ipv4_address: 10.100.200.101
+        aliases: [gnb.free5gc.org]
+    volumes:
+      - ../core/free5gc/ran/gnbcfg.yaml:/ueransim/config/gnbcfg.yaml:ro
+      - ../core/free5gc/ran/uecfg.yaml:/ueransim/config/uecfg.yaml:ro
+    depends_on:
+      free5gc-amf:
+        condition: service_started
+      free5gc-upf:
+        condition: service_started
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep -x nr-gnb >/dev/null"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  # ---------------------------------------------------------------------------
+  # Fairwave control plane (REST API on :8080). Same image as the 4G stack;
+  # the FAIRWAVE_* env overrides switch it to the free5GC core: mongosh
+  # write-back against the free5GC document set and the AMF OAM collector.
+  # ---------------------------------------------------------------------------
+  control-plane:
+    build:
+      context: ..
+      dockerfile: deploy/docker/Dockerfile.control
+    image: ${FW_CONTROL_IMAGE:-fairwave/control:0.1.0}
+    restart: unless-stopped
+    networks: [fwnet5g]
+    ports:
+      - "${FW_CONTROL_PORT:-8080}:8080"
+    environment:
+      FAIRWAVE_CONFIG: /etc/fairwave/fairwave-control.yaml
+      FAIRWAVE_SERVER_DATADIR: /var/lib/fairwave
+      FAIRWAVE_CORE: free5gc
+      FAIRWAVE_COLLECTOR_ENABLED: "true"
+      FAIRWAVE_COLLECTOR_INTERVAL: 15s
+      FAIRWAVE_FREE5GC_AMF_OAM_URL: http://amf.free5gc.org:8000
+      FAIRWAVE_FREE5GC_CDR_DIR: /var/fairwave/chf-cdr # core-metered usage (fair-use caps)
+      FAIRWAVE_HSS_DRIVER: free5gc
+      FAIRWAVE_HSS_CONTAINER: mongodb
+      FAIRWAVE_ADMIN_TOKEN: ${FW_ADMIN_TOKEN:-}
+    depends_on:
+      free5gc-amf:
+        condition: service_started
+      gnb:
+        condition: service_started
+    volumes:
+      - fairwave-data:/var/lib/fairwave
+      - chf-cdr:/var/fairwave/chf-cdr
+      - ./config/fairwave-control.yaml:/etc/fairwave/fairwave-control.yaml:ro
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:8080/v1/healthz || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 30s

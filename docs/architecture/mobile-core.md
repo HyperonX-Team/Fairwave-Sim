@@ -1,10 +1,10 @@
 ---
-title: Mobile Core (Open5GS)
+title: Mobile Core (Open5GS + free5GC)
 ---
 
-# Mobile Core (Open5GS)
+# Mobile Core (Open5GS + free5GC)
 
-Fairwave uses Open5GS as its LTE EPC (`docs/adr/0001-open5gs-vs-magma.md`). The core runs entirely on the box; there is no cloud dependency in v0.1.
+Fairwave uses Open5GS as its LTE EPC (`docs/adr/0001-open5gs-vs-magma.md`) and a free5GC 5G SA core as the 5G option (`core: free5gc`). The core runs entirely on the box; there is no cloud dependency in v0.1.
 
 ## Services
 
@@ -48,9 +48,16 @@ flowchart LR
 
 No RF hardware is required: the `zmq` transport carries LTE-Uu over loopback. This is the default Compose stack in release `v0.1.0`.
 
-## 5G SA/NSA
+## 5G SA (free5GC)
 
-5G is **not implemented** in v0.1. Open5GS contains 5G core services (AMF/SMF/UPF/NRF/PCF), but Fairwave ships them disabled and untested. The M0–M6 roadmap (`design/roadmap.md`) scopes SA as a later milestone; NSA (dual connectivity with the eNB) is not planned. Docs do not imply 5G support.
+Fairwave ships a **5G SA core** alongside the 4G EPC, switchable with `core: free5gc` in the control-plane config (`deploy/docker-compose.5g.yml`, configs under `core/free5gc/`). It runs free5GC's AMF, SMF, UPF, NRF, PCF, NSSF, AUSF, UDM, and UDR (Mongo), with the same lab PLMN `999-99` and `internet` APN.
+
+- **Subscriber provisioning:** the HSS write-back driver (`hss.driver: free5gc`) upserts the UDR's seven document collections (authenticationSubscription, amData, smData, smfSelectionSubscriptionData, policyData.ues, identityData) exactly as free5GC's webconsole does.
+- **Session visibility:** the collector polls the AMF's `namf-oam` API (`GET /namf-oam/v1/registered-ue-context`) and reports live 5G sessions to `/v1/sessions`.
+- **Usage metering:** with `free5gc.cdr_dir` set, the collector reads the CHF's per-UE CDR files (TS 32.297 containers with BER `ChargingRecord` bodies) and feeds per-SIM byte totals into the same quota/auto-suspend pipeline as the 4G GTP-U tap - usage measured from the core, no packet capture required. See `core/free5gc/README.md`.
+- **Radio:** srsRAN_Project gNB + srsUE 5G SA over ZMQ virtual radio (`core/ran/gnb.zmq.yml`, `core/ran/ue5g.zmq.yml`); UERANSIM is kept as an opt-in profile.
+
+4G remains the default and best-tested path; NSA (LTE-anchored dual connectivity) is not planned.
 
 ## Related
 

@@ -26,7 +26,7 @@ What we do *not* propose: Fairwave boxes masquerading as your network, or backha
 
 ## Q: What would it take to interconnect Fairwave boxes lawfully?
 
-See [roaming-future](../peering/roaming-future.md) for the honest list. In brief: contracts and settlement (commercial), SEPP or GRX-certified interconnects (infrastructure), HSS/UDM federation (engineering), LI and data-protection compliance (legal), and real interop testing (process). Fairwave documents the integration surface (Open5GS-standard S6a/API; CDR export schema in M4) so a partner operator can build against it - but we will not ship inter-operator signalling before a licensed partner exists.
+See [roaming-future](../peering/roaming-future.md) for the honest list. In brief: contracts and settlement (commercial), SEPP or GRX-certified interconnects (infrastructure), HSS/UDM federation (engineering), LI and data-protection compliance (legal), and real interop testing (process). Fairwave documents the integration surface (Open5GS-standard S6a/API; in 5G mode the free5GC CHF already emits per-UE TS 32.297 CDRs, consumed for fair-use metering) so a partner operator can build against it - but we will not ship inter-operator signalling before a licensed partner exists.
 
 ## Q: Is the EPC production-grade?
 

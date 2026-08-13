@@ -1,0 +1,86 @@
+# free5GC SMF config, Fairwave lab adaptation.
+#
+# Derived from the canonical free5gc-compose smfcfg.yaml (PLMN switched to
+# 999/99, slice list trimmed to what the lab uses). The `urrPeriod` /
+# `urrThreshold` / `requestedUnit` knobs at the bottom drive PFCP Usage
+# Report generation - the Phase 3 hook for per-UE volume measured from the
+# core (SMF -> CHF offline/online charging).
+info:
+  version: 1.0.7
+  description: SMF initial local configuration
+configuration:
+  smfName: SMF
+  sbi:
+    scheme: http
+    registerIPv4: smf.free5gc.org
+    bindingIPv4: smf.free5gc.org
+    port: 8000
+    tls:
+      key: cert/smf.key
+      pem: cert/smf.pem
+    serviceNameList:
+      - nsmf-pdusession
+      - nsmf-event-exposure
+      - nsmf-oam
+      - nsmf-callback
+  snssaiInfos:
+    - sNssai:
+        sst: 1
+        sd: 010203
+      dnnInfos:
+        - dnn: internet
+          dns:
+            ipv4: 8.8.8.8
+            ipv6: 2001:4860:4860::8888
+  plmnList:
+    - mcc: 999
+      mnc: 99
+  locality: area1
+  pfcp:
+    nodeID: smf.free5gc.org
+    listenAddr: smf.free5gc.org
+    externalAddr: smf.free5gc.org
+  userplaneInformation:
+    upNodes:
+      gNB1:
+        type: AN
+      UPF:
+        type: UPF
+        nodeID: upf.free5gc.org
+        addr: upf.free5gc.org
+        sNssaiUpfInfos:
+          - sNssai:
+              sst: 1
+              sd: 010203
+            dnnUpfInfoList:
+              - dnn: internet
+                pools:
+                  - cidr: 10.60.0.0/16
+                staticPools:
+                  - cidr: 10.60.100.0/24
+    interfaces:
+      - interfaceType: N3
+        endpoints:
+          - upf.free5gc.org
+        networkInstances:
+          - internet
+    links:
+      - A: gNB1
+        B: UPF
+  t3591:
+    enable: true
+    expireTime: 16s
+    maxRetryTimes: 3
+  t3592:
+    enable: true
+    expireTime: 16s
+    maxRetryTimes: 3
+  nrfUri: http://nrf.free5gc.org:8000
+  nrfCertPem: cert/nrf.pem
+  urrPeriod: 10 # default usage report period in seconds (charging)
+  urrThreshold: 1000 # default usage report threshold in bytes (charging)
+  requestedUnit: 1000 # byte dose for online-charging quota reservation (charging)
+logger:
+  enable: true
+  level: info
+  reportCaller: false

@@ -1,0 +1,99 @@
+name: 5G attach
+
+# End-to-end 5G SA attach test: brings up the free5GC compose (5G core +
+# srsRAN 5G ZMQ RAN + control plane), provisions the lab vector into the
+# UDR through the hsswrite free5gc driver, and asserts the UE shows up in
+# /v1/sessions (the AMF OAM collector sees the attach).
+#
+# Heavy: builds the srsRAN image from source (srsRAN_Project gNB) and
+# installs the gtp5g kernel module, so it only runs on push to main, on
+# PRs that touch the 5G stack, or manually (workflow_dispatch).
+#
+# Known runner constraints:
+#   - the ZMQ gNB needs CPU headroom; ubuntu-latest (4 vCPU) is the floor
+#     (the reference lab reports 5 cores for the gNB). If attach flakes
+#     here, move this job to a larger runner.
+#   - gtp5g must match the runner's kernel; v0.9.14 builds on the
+#     ubuntu-latest (24.04, kernel 6.8) headers. Override with
+#     GTP5G_REF=<tag> if the base image drifts.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'core/free5gc/**'
+      - 'core/ran/**'
+      - 'deploy/docker-compose.5g.yml'
+      - 'deploy/docker/Dockerfile.srsran'
+      - 'deploy/docker/srs-entry.sh'
+      - 'deploy/scripts/attach-5g.sh'
+      - 'core/sim-ops/hsswrite/**'
+      - 'core/fairwave-control/internal/collector/**'
+      - '.github/workflows/5g-attach.yml'
+  pull_request:
+    paths:
+      - 'core/free5gc/**'
+      - 'core/ran/**'
+      - 'deploy/docker-compose.5g.yml'
+      - 'deploy/docker/Dockerfile.srsran'
+      - 'deploy/docker/srs-entry.sh'
+      - 'deploy/scripts/attach-5g.sh'
+      - 'core/sim-ops/hsswrite/**'
+      - 'core/fairwave-control/internal/collector/**'
+      - '.github/workflows/5g-attach.yml'
+  workflow_dispatch:
+
+env:
+  FW_ADMIN_TOKEN: ci-admin
+  GTP5G_REF: v0.9.14 # builds on the ubuntu-24.04 runner kernel (6.8)
+
+jobs:
+  attach:
+    name: free5GC + srsRAN 5G SA attach (ZMQ)
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install gtp5g kernel module
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y linux-headers-$(uname -r) make gcc
+          git clone --branch "${GTP5G_REF}" --depth 1 https://github.com/free5gc/gtp5g.git /tmp/gtp5g
+          cd /tmp/gtp5g && make && sudo make install
+          sudo modprobe gtp5g || sudo insmod /tmp/gtp5g/gtp5g.ko
+          lsmod | grep gtp5g
+
+      - name: Stage free5GC configs + certs
+        run: ./core/free5gc/fetch-upstream.sh
+
+      - name: Set up Go (CLI build)
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build srsRAN image (srsgnb + srsue, ZMQ)
+        uses: docker/build-push-action@v6
+        with:
+          context: deploy
+          file: deploy/docker/Dockerfile.srsran
+          tags: fairwave/srsran:lab
+          load: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build control-plane image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: deploy/docker/Dockerfile.control
+          tags: fairwave/control:0.1.0
+          load: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Run the attach test
+        run: ATTACH_BUILD=0 bash deploy/scripts/attach-5g.sh

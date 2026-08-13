@@ -114,6 +114,98 @@ func TestHSSDriverValidation(t *testing.T) {
 	}
 }
 
+func TestUPFCollectorValidation(t *testing.T) {
+	c := Default()
+	c.Collector.UPF.Enabled = true
+	c.Collector.UPF.Iface = ""
+	if err := c.Validate(); err == nil {
+		t.Fatal("upf enabled without iface must fail")
+	}
+	c.Collector.UPF.Iface = "fwnet"
+	if err := c.Validate(); err != nil {
+		t.Fatalf("upf with iface must validate: %v", err)
+	}
+}
+
+func TestEnvOverridesUPF(t *testing.T) {
+	cfg := Default()
+	t.Setenv("FAIRWAVE_COLLECTOR_UPF_ENABLED", "true")
+	t.Setenv("FAIRWAVE_COLLECTOR_UPF_IFACE", "eth1")
+	applyEnv(cfg)
+	if !cfg.Collector.UPF.Enabled || cfg.Collector.UPF.Iface != "eth1" {
+		t.Fatalf("upf env overrides not applied: %+v", cfg.Collector.UPF)
+	}
+}
+
+func TestFree5GCCoreValidation(t *testing.T) {
+	c := Default()
+	c.Core = "free5gc"
+	if err := c.Validate(); err != nil {
+		t.Fatalf("free5gc core with defaults must validate: %v", err)
+	}
+	// free5gc collector needs the AMF OAM URL.
+	c.Collector.Enabled = true
+	c.Free5GC.AMFOAMURL = ""
+	if err := c.Validate(); err == nil {
+		t.Fatal("free5gc collector without amf_oam_url must fail")
+	}
+	c.Free5GC.AMFOAMURL = "http://amf:8000"
+	if err := c.Validate(); err != nil {
+		t.Fatalf("free5gc collector with amf_oam_url must validate: %v", err)
+	}
+	// free5gc core does not require the open5gs MME URL.
+	c.Collector.MMEURL = ""
+	if err := c.Validate(); err != nil {
+		t.Fatalf("free5gc core must not require mme_url: %v", err)
+	}
+	// unknown core must fail.
+	c.Core = "nextepc"
+	if err := c.Validate(); err == nil {
+		t.Fatal("unknown core must fail")
+	}
+}
+
+func TestFree5GCHSSDriverValidation(t *testing.T) {
+	c := Default()
+	c.HSS.Driver = "free5gc"
+	c.HSS.Container = "mongo"
+	if err := c.Validate(); err != nil {
+		t.Fatalf("free5gc hss driver must validate: %v", err)
+	}
+}
+
+func TestEnvOverridesFree5GC(t *testing.T) {
+	cfg := Default()
+	t.Setenv("FAIRWAVE_CORE", "free5gc")
+	t.Setenv("FAIRWAVE_FREE5GC_AMF_OAM_URL", "http://amf:8000")
+	t.Setenv("FAIRWAVE_FREE5GC_CDR_DIR", "/var/fairwave/chf-cdr")
+	applyEnv(cfg)
+	if cfg.Core != "free5gc" || cfg.Free5GC.AMFOAMURL != "http://amf:8000" || cfg.Free5GC.CDRDir != "/var/fairwave/chf-cdr" {
+		t.Fatalf("free5gc env overrides not applied: core=%s amf=%s cdr=%s", cfg.Core, cfg.Free5GC.AMFOAMURL, cfg.Free5GC.CDRDir)
+	}
+}
+
+func TestFree5GCCDRValidation(t *testing.T) {
+	c := Default()
+	c.Core = "free5gc"
+	c.Collector.Enabled = true
+	c.Free5GC.CDRDir = "/var/fairwave/chf-cdr"
+	if err := c.Validate(); err != nil {
+		t.Fatalf("free5gc with cdr_dir must validate: %v", err)
+	}
+	// CDR meter runs in the collector: it must be enabled.
+	c.Collector.Enabled = false
+	if err := c.Validate(); err == nil {
+		t.Fatal("cdr_dir without collector.enabled must fail")
+	}
+	c.Collector.Enabled = true
+	// cdr_dir only makes sense with the free5GC core.
+	c.Core = "open5gs"
+	if err := c.Validate(); err == nil {
+		t.Fatal("cdr_dir on an open5gs core must fail")
+	}
+}
+
 func TestEnvOverridesHSS(t *testing.T) {
 	dir := t.TempDir()
 	t.Setenv("FAIRWAVE_HSS_DRIVER", "dbctl")

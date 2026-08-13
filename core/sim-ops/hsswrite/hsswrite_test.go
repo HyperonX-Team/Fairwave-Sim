@@ -59,6 +59,34 @@ func TestMongoshAddBuildsUpsert(t *testing.T) {
 	}
 }
 
+func TestMongoshAddWritesPolicyAMBR(t *testing.T) {
+	sub := labSub()
+	sub.QoSDLMbps = 50
+	sub.QoSULMbps = 25
+	fr := &fakeRunner{}
+	m := &Mongosh{Container: "mongo", DBURI: DefaultDBURI, run: fr.run}
+	if err := m.Add(context.Background(), sub); err != nil {
+		t.Fatal(err)
+	}
+	eval := fr.calls[0][len(fr.calls[0])-1]
+	if !strings.Contains(eval, `"downlink":{"unit":8,"value":50}`) ||
+		!strings.Contains(eval, `"uplink":{"unit":8,"value":25}`) {
+		t.Fatalf("AMBR caps missing from eval: %s", eval)
+	}
+}
+
+func TestMongoshAddDefaultsAMBR(t *testing.T) {
+	fr := &fakeRunner{}
+	m := &Mongosh{Container: "mongo", DBURI: DefaultDBURI, run: fr.run}
+	if err := m.Add(context.Background(), labSub()); err != nil { // QoS fields zero
+		t.Fatal(err)
+	}
+	eval := fr.calls[0][len(fr.calls[0])-1]
+	if !strings.Contains(eval, `"unit":8,"value":1`) {
+		t.Fatalf("default AMBR missing from eval: %s", eval)
+	}
+}
+
 func TestMongoshAddPropagatesError(t *testing.T) {
 	fr := &fakeRunner{err: errors.New("exec failed"), out: []byte("boom")}
 	m := &Mongosh{Container: "mongo", DBURI: DefaultDBURI, run: fr.run}

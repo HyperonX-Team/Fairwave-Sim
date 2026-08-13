@@ -26,6 +26,11 @@ type Subscriber struct {
 	SQN    string `json:"sqn"` // 6 bytes hex (12 chars)
 	APN    string `json:"apn"`
 	Class  string `json:"class"` // lab | prod
+
+	// QoSDLMbps/QoSULMbps are the per-subscriber AMBR caps in Mbps (0 = the
+	// write-back driver's default). Enforced in the HSS subscriber document.
+	QoSDLMbps int `json:"qos_dl_mbps,omitempty"`
+	QoSULMbps int `json:"qos_ul_mbps,omitempty"`
 }
 
 // BatchSpec describes the requested batch.

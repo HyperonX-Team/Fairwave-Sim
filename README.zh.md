@@ -1,7 +1,7 @@
 <h1 align="center">Fairwave - 一个装在披萨盒里的社区运营商</h1>
 
 <p align="center">
-  <strong>开源私有 LTE：插上以太网，发射 4G，欢迎你的邻居。</strong>
+  <strong>开源私有 LTE：插上以太网，发射 4G 或 5G，欢迎你的邻居。</strong>
 </p>
 
 <p align="center">
@@ -135,7 +135,7 @@ make lab-down                            # 停止一切
 ## 状态
 
 **实验室版本 `v0.1.0`**：EPC + zmq RAN + srsUE 接入端到端可用；控制面、CLI、
-SIM 签发器、实验室 eSIM（SM-DP+）与文档站均可运行。真实射频路径已在开发硬件上
+SIM 签发器、实验室 eSIM（SM-DP+）与文档站均可运行。另附基于 free5GC 的 5G SA 核心与基于 CHF 的用量计量（可选，`core: free5gc`），含 ZMQ gNB/UE 实验室配置与 CI 接入测试。真实射频路径已在开发硬件上
 验证，但**默认禁用**。参见[路线图](design/roadmap.md)。
 
 ## Fairwave 不是什么

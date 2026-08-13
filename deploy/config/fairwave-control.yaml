@@ -28,3 +28,46 @@ policy:
   apns: [internet, ims]
 telemetry:
   metrics: true
+
+# Per-UE byte counters measured from the core's GTP-U user plane.
+#
+# Open5GS exports no per-UE traffic bytes (its Prometheus metrics only
+# carry aggregate per-QoS volumes), so fair-use metering counts GTP-U
+# packets directly on an interface the UE traffic transits (S1-U or S5-U)
+# and learns the TEID -> IMSI map from GTP-C session signaling.
+#
+# The tap needs CAP_NET_RAW and must run where it can SEE the GTP-U leg:
+#   - host/bare-metal deployment: tap the docker bridge (e.g. br-<id>) or
+#     the interface carrying S1-U/S5-U;
+#   - the default compose puts the control plane in its own container,
+#     where its veth only carries its own traffic - move the control plane
+#     into the open5gs namespace (network_mode: service:open5gs) to tap lo
+#     and eth0, or run it on the host.
+#
+# collector:
+#   upf:
+#     enabled: true
+#     iface: br-fwnet   # interface carrying GTP-U
+
+# --- free5GC core (5G SA) ------------------------------------------------
+# Switch the whole control plane to free5GC by setting core: free5gc and
+# using the free5gc HSS driver + AMF OAM collector (deploy/docker-compose.5g.yml
+# sets these via FAIRWAVE_* env overrides; configs live in core/free5gc/):
+#
+# core: free5gc
+# hss:
+#   driver: free5gc          # UDR mongosh write-back (free5GC document set)
+#   container: mongodb
+# collector:
+#   enabled: true            # live sessions from the AMF OAM API, not infoAPI
+#   mme_url: ""
+#   smf_url: ""
+# free5gc:
+#   amf_oam_url: http://amf.free5gc.org:8000   # GET /namf-oam/v1/registered-ue-context
+#   # Fair-use caps measured from the core: the CHF writes per-UE CDR files
+#   # (TS 32.297 + BER ChargingRecord) into its /tmp; mount that directory
+#   # here (the 5G compose shares the chf-cdr volume) and the collector
+#   # reports per-UE bytes into the existing quota/auto-suspend pipeline -
+#   # no GTP-U tap, no CAP_NET_RAW. Requires charging configured in free5GC
+#   # (webconsole slice-level offline charging; see core/free5gc/README.md).
+#   cdr_dir: /var/fairwave/chf-cdr

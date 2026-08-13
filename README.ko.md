@@ -1,7 +1,7 @@
 <h1 align="center">Fairwave - 피자 박스 속 커뮤니티 캐리어</h1>
 
 <p align="center">
-  <strong>오픈소스 프라이빗 LTE: 이더넷에 꽂고, 4G를 내보내고, 이웃을 맞이하세요.</strong>
+  <strong>오픈소스 프라이빗 LTE: 이더넷에 꽂고, 4G/5G를 내보내고, 이웃을 맞이하세요.</strong>
 </p>
 
 <p align="center">
@@ -133,7 +133,7 @@ make lab-down                            # 모두 중지
 ## 상태
 
 **랩 릴리스 `v0.1.0`**: EPC + zmq RAN + srsUE 어태치가 엔드투엔드로 동작; 컨트롤 플레인, CLI,
-SIM 발급기, 랩 eSIM(SM-DP+), 문서 사이트가 기능합니다. 실제 RF 경로는 개발 하드웨어에서 검증
+SIM 발급기, 랩 eSIM(SM-DP+), 문서 사이트가 기능합니다. 또한 CHF 기반 사용량 측정을 갖춘 free5GC 5G SA 코어가 옵션으로 함께 제공됩니다(`core: free5gc`). ZMQ gNB/UE 랩 프로필과 CI 어태치 테스트 포함. 실제 RF 경로는 개발 하드웨어에서 검증
 되었지만 **기본적으로 비활성화**되어 있습니다. [로드맵](design/roadmap.md) 참조.
 
 ## Fairwave가 아닌 것

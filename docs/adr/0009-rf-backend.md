@@ -43,6 +43,11 @@ Negative:
 - **Custom minimal virtual radio instead of ZMQ:** rejected - ZMQ is maintained upstream, realistic (real IQ over TCP), and already how srsRAN tests itself.
 - **Third-party bundled binaries (e.g. Amarisoft):** rejected - licensing costs and closed core contradict the open-source project.
 
+## Status update (2026-08)
+
+- **Shipped (lab):** the same srsRAN stack now also drives the 5G SA path - srsRAN_Project's gNB (24.10, ZMQ) plus the srsRAN_4G srsUE in `[rat.nr]` mode (`core/ran/gnb.zmq.yml`, `core/ran/ue5g.zmq.yml`) against the free5GC core (ADR-0002 status update). ZMQ stays the lab default for both generations.
+- **Unchanged:** LTE remains the default and best-tested radio path; OAI remains a documented alternative, not packaged.
+
 ## Related
 
 - ADR-0001 · ADR-0002 · ADR-0008 · [Lab attach tutorial](../tutorials/lab-attach.md) · [Roadmap](/design/roadmap.md)

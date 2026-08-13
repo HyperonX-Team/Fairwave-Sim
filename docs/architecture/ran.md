@@ -4,7 +4,7 @@ title: Radio Access Network (RAN)
 
 # Radio Access Network (RAN)
 
-The RAN is srsRAN Project's eNB, driving a software-defined radio. The same software stack runs in two modes: **zmq virtual radio** (lab, no RF) and **real RF** (gated).
+The RAN is srsRAN Project's eNB (4G) and gNB (5G SA), driving a software-defined radio. The same software stack runs in two modes: **zmq virtual radio** (lab, no RF) and **real RF** (gated).
 
 ## srsRAN Project eNB
 
@@ -59,8 +59,13 @@ flowchart LR
     end
 ```
 
+## 5G SA (gNB) Lab Profile
+
+With `core: free5gc`, the same ZMQ approach works for NR: `core/ran/gnb.zmq.yml` (srsRAN_Project 24.10 gNB, PLMN 999-99, slice 010203) pairs with `core/ran/ue5g.zmq.yml` (srsUE 5G SA - the srsRAN_4G UE with `[rat.nr]` enabled). Both are verified against the pinned binaries; the full attach needs the gtp5g kernel module (see `core/free5gc/README.md` and the CI attach job). UERANSIM remains an opt-in alternative profile in the 5G compose.
+
 ## Related
 
 - Frontend comparison: `docs/hardware/sdr-notes.md`
 - Band/region law: `docs/spectrum-and-law/index.md`
 - TX gate and state machine: `docs/architecture/control-plane.md`
+- 5G core + RAN configs: `core/free5gc/README.md`

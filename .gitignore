@@ -27,6 +27,9 @@ sbom*.spdx.json
 # Go
 vendor/
 
+# Local toolchains (downloaded, never committed)
+.tools/
+
 # Node
 node_modules/
 

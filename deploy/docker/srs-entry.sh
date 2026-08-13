@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # Fairwave srsRAN entrypoint - dispatches on PROFILE.
-#   PROFILE=enb-zmq | ue-zmq | enb-rf   (required)
+#   PROFILE=enb-zmq | ue-zmq | enb-rf | gnb-zmq | ue-5g-zmq   (required)
 # Configs are read from RAN_CFG_DIR (default /etc/fairwave/ran).
 set -euo pipefail
 
-PROFILE="${PROFILE:?PROFILE must be set: enb-zmq | ue-zmq | enb-rf}"
+PROFILE="${PROFILE:?PROFILE must be set: enb-zmq | ue-zmq | enb-rf | gnb-zmq | ue-5g-zmq}"
 RAN_CFG_DIR="${RAN_CFG_DIR:-/etc/fairwave/ran}"
 
 # ZMQ virtual-radio plumbing (lab). The eNB and UEs share one network
@@ -82,8 +82,35 @@ case "$PROFILE" in
         exec srsenb "${RAN_CFG_DIR}/enb.rf.yml"
         ;;
 
+    gnb-zmq)
+        # 5G SA virtual cell against the free5GC AMF (see core/ran/gnb.zmq.yml).
+        # srsRAN_Project gNB: N2 to the AMF, N3 to the UPF, ZMQ radio. The UE
+        # shares this container's namespace, so the ZMQ ports are localhost.
+        # Note: the 24.10 gnb takes the config via -c (no positional arg).
+        exec gnb -c "${RAN_CFG_DIR}/gnb.zmq.yml"
+        ;;
+
+    ue-5g-zmq)
+        # 5G SA lab UE - same SIM guard as ue-zmq: only the dummy lab test
+        # vectors may ever ride this radio.
+        if [[ "${FAIRWAVE_RF_MODE:-}" == "hardware" ]]; then
+            echo "REFUSED: PROFILE=ue-5g-zmq is a ZMQ lab profile and must not run with FAIRWAVE_RF_MODE=hardware" >&2
+            exit 1
+        fi
+        UE_IMSI="${UE_IMSI:-999991234567001}"
+        lab_imsi_ok "$UE_IMSI" || {
+            echo "REFUSED: IMSI ${UE_IMSI} is not a lab test vector (sim/test-vectors/lab-vectors.yaml). No real SIMs in the lab stack." >&2
+            exit 1
+        }
+        read -r UE_K UE_OPC < <(lab_vector "$UE_IMSI")
+        exec srsue "${RAN_CFG_DIR}/ue5g.zmq.yml" \
+            --usim.imsi="${UE_IMSI}" \
+            --usim.k="${UE_K}" \
+            --usim.opc="${UE_OPC}"
+        ;;
+
     *)
-        echo "unknown PROFILE '${PROFILE}' (expected enb-zmq | ue-zmq | enb-rf)" >&2
+        echo "unknown PROFILE '${PROFILE}' (expected enb-zmq | ue-zmq | enb-rf | gnb-zmq | ue-5g-zmq)" >&2
         exit 1
         ;;
 esac

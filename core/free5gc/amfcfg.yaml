@@ -1,0 +1,121 @@
+# free5GC AMF config, Fairwave lab adaptation.
+#
+# Derived from the canonical free5gc-compose amfcfg.yaml (PLMN switched to
+# the Fairwave lab PLMN 999/99 so SIM test vectors + the hsswrite free5gc
+# driver agree with the core). `namf-oam` stays in serviceNameList: that is
+# the endpoint the Fairwave session collector polls
+# (GET /namf-oam/v1/registered-ue-context on the SBI port below).
+info:
+  version: 1.0.9
+  description: AMF initial local configuration
+configuration:
+  amfName: AMF
+  ngapIpList:
+    - amf.free5gc.org
+  ngapPort: 38412
+  sbi:
+    scheme: http
+    registerIPv4: amf.free5gc.org
+    bindingIPv4: amf.free5gc.org
+    port: 8000
+    tls:
+      pem: cert/amf.pem
+      key: cert/amf.key
+    serviceNameList:
+      - namf-comm
+      - namf-evts
+      - namf-mt
+      - namf-loc
+      - namf-oam # Fairwave session collector polls this
+      - namf-callback
+  servedGuamiList:
+    - plmnId:
+        mcc: 999
+        mnc: 99
+      amfId: cafe00
+  supportTaiList:
+    - plmnId:
+        mcc: 999
+        mnc: 99
+      tac: 000001
+  plmnSupportList:
+    - plmnId:
+        mcc: 999
+        mnc: 99
+      snssaiList:
+        - sst: 1
+          sd: 010203
+        - sst: 1
+          sd: 112233
+  supportDnnList:
+    - internet
+  nrfUri: http://nrf.free5gc.org:8000
+  nrfCertPem: cert/nrf.pem
+  security:
+    integrityOrder:
+      - NIA2
+    cipheringOrder:
+      - NEA0
+  networkName:
+    full: free5GC
+    short: free
+  ngapIE:
+    mobilityRestrictionList:
+      enable: true
+    maskedIMEISV:
+      enable: true
+    redirectionVoiceFallback:
+      enable: false
+  nasIE:
+    networkFeatureSupport5GS:
+      enable: true
+      length: 1
+      imsVoPS: 0
+      emc: 0
+      emf: 0
+      iwkN26: 0
+      mpsi: 0
+      emcN3: 0
+      mcsi: 0
+  t3502Value: 720
+  t3512Value: 3600
+  non3gppDeregTimerValue: 3240
+  t3513:
+    enable: true
+    expireTime: 6s
+    maxRetryTimes: 4
+  t3522:
+    enable: true
+    expireTime: 6s
+    maxRetryTimes: 4
+  t3550:
+    enable: true
+    expireTime: 6s
+    maxRetryTimes: 4
+  t3555:
+    enable: true
+    expireTime: 6s
+    maxRetryTimes: 4
+  t3560:
+    enable: true
+    expireTime: 6s
+    maxRetryTimes: 4
+  t3565:
+    enable: true
+    expireTime: 6s
+    maxRetryTimes: 4
+  t3570:
+    enable: true
+    expireTime: 6s
+    maxRetryTimes: 4
+  locality: area1
+  sctp:
+    numOstreams: 3
+    maxInstreams: 5
+    maxAttempts: 2
+    maxInitTimeout: 2
+  defaultUECtxReq: false
+logger:
+  enable: true
+  level: info
+  reportCaller: false

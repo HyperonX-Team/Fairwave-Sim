@@ -33,6 +33,15 @@ versions follow [SemVer](https://semver.org/spec/v2.0.0.html).
   issue/revoke) and `fairwave esim issue --hss-driver`; config
   `hss.driver`/`hss.container` + `FAIRWAVE_HSS_*` env; lab compose config
   enables it.
+- **free5GC core integration (5G SA lab):** `core: free5gc` switches the
+  control plane to a free5GC backend - UDR mongosh write-back with the
+  webconsole document set (`hsswrite` driver `free5gc`), live sessions from
+  the AMF OAM API (`collector` source `free5gc`), and **core-metered usage**
+  for fair-use caps from the CHF's CDR files (`collector` source `cdr`:
+  TS 32.297 container + BER ChargingRecord parsing, no GTP-U tap, no
+  CAP_NET_RAW); `deploy/docker-compose.5g.yml` (12 services, srsRAN 5G ZMQ
+  RAN in `core/ran/`, shared `chf-cdr` volume), CI attach workflow
+  (`.github/workflows/5g-attach.yml`), docs in `core/free5gc/README.md`.
 
 ## [0.1.0] - 2026-08-02
 

@@ -1,7 +1,7 @@
 <h1 align="center">Fairwave - ein Community-Carrier in einer Pizzabox</h1>
 
 <p align="center">
-  <strong>Open-Source-Privat-LTE: einstecken, 4G senden, Nachbarn willkommen heißen.</strong>
+  <strong>Open-Source-Privat-LTE: einstecken, 4G/5G senden, Nachbarn willkommen heißen.</strong>
 </p>
 
 <p align="center">
@@ -135,7 +135,7 @@ Komplette Website: **`make docs-serve` ausführen** - oder im Baum unter [`docs/
 ## Status
 
 **Lab-Version `v0.1.0`**: EPC + zmq-RAN + srsUE-Attach funktioniert Ende-zu-Ende; Control-Plane, CLI,
-SIM-Provisionierer, Lab-eSIM (SM-DP+) und die Docs-Website sind funktionsfähig. Echte RF-Pfade sind auf
+SIM-Provisionierer, Lab-eSIM (SM-DP+) und die Docs-Website sind funktionsfähig. Ein free5GC-5G-SA-Kern mit CHF-basiertem Verbrauchsmetering wird optional mitgeliefert (`core: free5gc`), mit ZMQ-gNB/UE-Lab-Profilen und einem CI-Attach-Test. Echte RF-Pfade sind auf
 Entwicklungshardware validiert, aber **standardmäßig deaktiviert**. Siehe [Roadmap](design/roadmap.md).
 
 ## Was Fairwave NICHT ist

@@ -1,8 +1,13 @@
-# Fairwave srsRAN image - srsENB / srsEPC / srsUE (one build, three binaries).
-# Branch pinned: srsRAN_4G release_23_10, Debian 12 base.
+# Fairwave srsRAN image - 4G (srsENB / srsEPC / srsUE) + 5G SA (srsGNB).
+#
+# 4G binaries: srsRAN_4G branch pinned release_23_10, Debian 12 base.
+# 5G binaries: srsRAN_Project (the 5G CU/DU, includes the ZMQ virtual
+#   radio); the 5G SA UE is srsUE from srsRAN_4G (srsRAN Project has no UE
+#   app), and the pinned srsRAN_4G commit below is the exact version proven
+#   against free5GC + srsRAN Project ZMQ in the s5uishida reference lab.
 #
 # PROFILE is a runtime env var consumed by docker/srs-entry.sh:
-#   enb-zmq | ue-zmq | enb-rf
+#   enb-zmq | ue-zmq | enb-rf | gnb-zmq | ue-5g-zmq
 #
 # Build (from deploy/): docker build -f docker/Dockerfile.srsran -t fairwave/srsran:lab .
 
@@ -12,7 +17,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         git ca-certificates cmake build-essential pkg-config \
         libfftw3-dev libmbedtls-dev libboost-program-options-dev libboost-system-dev \
         libconfig++-dev libsctp-dev libpcsclite-dev \
-        libzmq3-dev \
+        libzmq3-dev libyaml-cpp-dev libgtest-dev \
         # SDR backends - all optional at link time, all installed here so a
         # single image supports UHD (USRP), SoapySDR and BladeRF radios.
         libuhd-dev libsoapysdr-dev libbladerf-dev \
@@ -21,6 +26,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # srsRAN_4G is pinned to the master commit proven with the docker_open5gs
 # reference stack (release_23_11 has a ZMQ attach race: the eNB times out
 # the InitialContextSetup and drops the UE after RRC security completes).
+# The same commit carries the 5G SA UE used by the free5GC lab.
 ARG SRS_TAG=master
 ARG SRS_COMMIT=ec29b0c1ff79cebcbe66caa6d6b90778261c42b8
 RUN git clone https://github.com/srsRAN/srsRAN_4G.git /src \
@@ -34,6 +40,23 @@ RUN mkdir build \
     && make install \
     && install -m 0755 srsenb/src/srsenb srsue/src/srsue srsepc/src/srsepc /usr/local/bin/
 
+# srsRAN_Project (5G gNB) pinned to the 24.10 commit proven with the
+# free5GC + ZMQ reference lab (build_srsran_5g_zmq). ZMQ must be enabled
+# explicitly (default off); tests are skipped to keep the build lean.
+ARG SRS5G_TAG=v24.10
+ARG SRS5G_COMMIT=9d5dd742a70e82c0813c34f57982f9507f1b6d5d
+RUN git clone https://github.com/srsran/srsRAN_Project.git /srs5g \
+    && cd /srs5g && git checkout ${SRS5G_COMMIT}
+
+WORKDIR /srs5g
+RUN mkdir build \
+    && cd build \
+    && cmake .. -DCMAKE_BUILD_TYPE=Release \
+        -DENABLE_EXPORT=ON -DENABLE_ZEROMQ=ON -DBUILD_TESTS=OFF \
+    && make -j"$(nproc)" gnb \
+    && make install \
+    && install -m 0755 apps/gnb/gnb /usr/local/bin/gnb
+
 # ---------------------------------------------------------------------------
 # Runtime: Debian 12 slim. procps provides pgrep (used by healthchecks).
 # Version-matched runtime libs - run `apt-cache policy <lib>` if the base
@@ -45,15 +68,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         procps ca-certificates \
         libfftw3-single3 libmbedtls14 libboost-program-options1.74.0 \
         libconfig++9v5 libsctp1 libpcsclite1 \
-        libzmq5 \
+        libzmq5 libyaml-cpp0.7 \
         libuhd4.3.0 libsoapysdr0.8 libbladerf2 \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=build /usr/local/bin/srsenb /usr/local/bin/srsenb
 COPY --from=build /usr/local/bin/srsue /usr/local/bin/srsue
 COPY --from=build /usr/local/bin/srsepc /usr/local/bin/srsepc
+COPY --from=build /usr/local/bin/gnb /usr/local/bin/gnb
 COPY --from=build /usr/local/lib /usr/local/lib
 COPY docker/srs-entry.sh /usr/local/bin/srs-entry.sh
-RUN ldconfig
+RUN chmod +x /usr/local/bin/srs-entry.sh && ldconfig
 
 ENTRYPOINT ["/usr/local/bin/srs-entry.sh"]

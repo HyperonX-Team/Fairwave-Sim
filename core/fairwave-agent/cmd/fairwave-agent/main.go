@@ -17,12 +17,14 @@ func main() {
 	var (
 		controlURL string
 		nodeID     string
+		token      string
 		interval   time.Duration
 		dataDir    string
 		enableRF   bool
 	)
 	flag.StringVar(&controlURL, "control", "http://localhost:8080", "control plane URL")
 	flag.StringVar(&nodeID, "node-id", "", "node id (default: hostname)")
+	flag.StringVar(&token, "token", os.Getenv("FAIRWAVE_ADMIN_TOKEN"), "bearer token for /v1/telemetry")
 	flag.DurationVar(&interval, "interval", 10*time.Second, "heartbeat interval")
 	flag.StringVar(&dataDir, "data-dir", "./data", "data dir for watchdog state")
 	flag.BoolVar(&enableRF, "enable-rf", false, "MUST NOT be enabled without tx-arm approval (stays false)")
@@ -41,6 +43,7 @@ func main() {
 	a := agent.New(agent.Config{
 		ControlURL: controlURL,
 		NodeID:     nodeID,
+		Token:      token,
 		Interval:   interval,
 		DataDir:    dataDir,
 		EnableRF:   enableRF,

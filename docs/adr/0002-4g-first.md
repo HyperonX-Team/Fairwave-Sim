@@ -41,6 +41,9 @@ Negative:
 - **Dual-stack from day one:** rejected - doubles test matrix and integration cost for zero v0.1 user value; flags allow later without re-architecture.
 - **NSA-only (LTE anchor + NR data):** deferred - requires 5G core elements (AMF/UDM paths) that milestone M0–M6 does not schedule; revisit only with a licensed partner.
 
-## Related
+## Status update (2026-08)
+
+- **Shipped (lab):** the 5G SA path landed as an optional core - free5GC AMF/SMF/UPF/NRF/PCF + UDR write-back, AMF OAM session polling, CHF CDR usage metering, and a ZMQ gNB/UE lab profile - selected per-node with `core: free5gc` (`deploy/docker-compose.5g.yml`, `core/free5gc/`). The default build and the supported real-RF path remain 4G/Open5GS.
+- **Unchanged:** NSA (LTE-anchored dual connectivity) is still not planned; 5G remains a lab/optional profile, not the default radio access.
 
 - ADR-0001 · ADR-0009 · [Roadmap](/design/roadmap.md) · [Glossary](../reference/glossary.md)

@@ -15,5 +15,10 @@ Milestones:
 | M5 | Wi-Fi calling / ePDG path | v0.6.0 |
 | M6 | Neutral-host multi-PLMN | v0.7.0 |
 
+> **Shipped ahead of the table:** the free5GC 5G SA core (`core: free5gc`) with UDR
+> write-back, AMF OAM session polling, and fair-use metering from the core (free5GC
+> CHF CDR files; GTP-U tap on 4G) feeding per-SIM quotas with auto-suspend. See
+> `deploy/docker-compose.5g.yml` and `core/free5gc/README.md`. 4G/Open5GS remains the default.
+
 Permanent non-goals: free nationwide MNO coverage, IMSI-catcher tooling,
 spectrum misuse. See the full roadmap for milestone gates.

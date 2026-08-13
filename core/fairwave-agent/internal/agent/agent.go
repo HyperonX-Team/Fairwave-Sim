@@ -3,12 +3,16 @@
 package agent
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"sync"
 	"time"
 )
@@ -17,6 +21,7 @@ import (
 type Config struct {
 	ControlURL  string
 	NodeID      string
+	Token       string // bearer token for /v1/telemetry (FAIRWAVE_ADMIN_TOKEN)
 	Interval    time.Duration
 	DataDir     string
 	EnableRF    bool   // default false; only set after tx-arm
@@ -118,8 +123,30 @@ func (a *Agent) collect() Health {
 }
 
 func (a *Agent) send(h Health) error {
-	// fire-and-forget; the control plane's /v1/status aggregates nodes.
-	// (v0.1: agent telemetry endpoint is a stub; the CLI reads node state.)
+	if a.cfg.ControlURL == "" {
+		return nil
+	}
+	body, err := json.Marshal(h)
+	if err != nil {
+		return fmt.Errorf("marshal health: %w", err)
+	}
+	req, err := http.NewRequest(http.MethodPost, strings.TrimRight(a.cfg.ControlURL, "/")+"/v1/telemetry", bytes.NewReader(body))
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	if a.cfg.Token != "" {
+		req.Header.Set("Authorization", "Bearer "+a.cfg.Token)
+	}
+	resp, err := a.client.Do(req)
+	if err != nil {
+		return fmt.Errorf("telemetry: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode >= 300 {
+		_, _ = io.Copy(io.Discard, resp.Body)
+		return fmt.Errorf("telemetry: %s", resp.Status)
+	}
 	return nil
 }
 

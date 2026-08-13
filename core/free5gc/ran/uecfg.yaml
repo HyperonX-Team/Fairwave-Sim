@@ -1,0 +1,23 @@
+# UERANSIM UE config for the Fairwave 5G lab.
+# supi/key/op are the lab test vector from core/sim-ops/simprov
+# (IMSI 999991234567001): the hsswrite free5gc driver pushes the same
+# Ki/OPc into the UDR, so authentication succeeds. opType: OPC means `op`
+# holds the OPc directly.
+supi: 'imsi-999991234567001'
+mcc: '999'
+mnc: '99'
+key: '465B5CE8B199B49FAA5F0A2EE238A6BC'
+op: '4D9B7A2C5E8F1A3B6C0D2E4F7A9B5C1D'
+opType: OPC
+amfConfigs:
+  - address: 10.100.200.16
+    port: 38412
+sessions:
+  - type: 'IPv4'
+    apn: 'internet'
+    slice:
+      sst: 1
+      sd: 0x010203
+log:
+  filename: /tmp/ue.log
+  level: info

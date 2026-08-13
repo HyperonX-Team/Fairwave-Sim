@@ -1,7 +1,7 @@
 <h1 align="center">Fairwave - en gemenskapsoperatör i en pizzakartong</h1>
 
 <p align="center">
-  <strong>Öppen källkod privat LTE: koppla in i ethernet, sänd 4G, välkomna dina grannar.</strong>
+  <strong>Öppen källkod privat LTE: koppla in i ethernet, sänd 4G/5G, välkomna dina grannar.</strong>
 </p>
 
 <p align="center">
@@ -134,7 +134,7 @@ Fullständig webbplats: **kör `make docs-serve`** - eller läs i trädet under 
 ## Status
 
 **Labbrelease `v0.1.0`**: EPC + zmq-RAN + srsUE-anslutning fungerar end-to-end; kontrollplans, CLI,
-SIM-försörjare, labb-eSIM (SM-DP+) och dokumentationssajten är funktionella. Riktiga RF-vägar är validerade
+SIM-försörjare, labb-eSIM (SM-DP+) och dokumentationssajten är funktionella. Dessutom levereras en free5GC 5G SA-kärna med CHF-baserad förbrukningsmätning (valfritt, `core: free5gc`), med ZMQ gNB/UE-labbprofiler och ett CI-attach-test. Riktiga RF-vägar är validerade
 på utvecklingshårdvara men **avstängda som standard**. Se [färdplanen](design/roadmap.md).
 
 ## Vad Fairwave INTE är

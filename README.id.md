@@ -1,7 +1,7 @@
 <h1 align="center">Fairwave - operator komunitas dalam kotak pizza</h1>
 
 <p align="center">
-  <strong>LTE privat sumber terbuka: colokkan ke Ethernet, pancarkan 4G, sambut tetangga Anda.</strong>
+  <strong>LTE privat sumber terbuka: colokkan ke Ethernet, pancarkan 4G atau 5G, sambut tetangga Anda.</strong>
 </p>
 
 <p align="center">
@@ -136,7 +136,7 @@ Situs lengkap: **jalankan `make docs-serve`** - atau baca di pohon di bawah [`do
 ## Status
 
 **Rilis lab `v0.1.0`**: lampiran EPC + zmq RAN + srsUE berfungsi end-to-end; bidang kendali, CLI,
-penyedia SIM, eSIM lab (SM-DP+) dan situs dokumentasi berfungsi. Jalur RF nyata tervalidasi pada perangkat
+penyedia SIM, eSIM lab (SM-DP+) dan situs dokumentasi berfungsi. Selain itu, inti 5G SA free5GC dengan pengukuran pemakaian berbasis CHF disertakan secara opsional (`core: free5gc`), lengkap dengan profil lab gNB/UE ZMQ dan tes attach CI. Jalur RF nyata tervalidasi pada perangkat
 keras pengembangan tetapi **dinonaktifkan secara default**. Lihat [peta jalan](design/roadmap.md).
 
 ## Apa yang Fairwave BUKAN

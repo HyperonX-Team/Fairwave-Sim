@@ -17,7 +17,7 @@ This page is deliberately unambitious. Fairwave v0.1.0 does **not** do inter-ope
 1. **Contractual basis.** Roaming is a commercial and legal arrangement: settlement agreements, fraud handling, LI obligations, data protection (GDPR/DPA scope). Software cannot supply this.
 2. **SEPP or MAP/GRX interconnects.** For LTE: S6a/S8 over a trusted GRX/IPX exchange with certificate chains (STKS, network certificates). For 5G: SEPP with security parameter negotiation (PRINS). Fairwave has neither implemented nor certified.
 3. **HSS/UDM federation.** S6a/S13d reachability, roaming IMSI ranges (MCC/MNC of visited networks), VLR/MME addressing, and AVP-level compatibility with host network elements.
-4. **Charging and settlement.** Offline charging (CGa/CDR export) and inter-operator TAP/NA records - none shipped.
+4. **Charging and settlement.** Inter-operator TAP/NA records - none shipped. Note: per-UE offline charging **is** produced today by the free5GC CHF (TS 32.297 CDR files, consumed by `fairwave-control` for fair-use metering) - that is a metering source, not a roaming settlement format.
 5. **LI and lawful access.** Host-country requirements for retained data and interception of roaming subscribers must be met by *both* operators; see the [regulator FAQ](../reference/faq-regulators.md).
 6. **Testing.** Actual interop testing with a real MNO's core or a certified test lab - not simulated.
 
@@ -26,6 +26,7 @@ This page is deliberately unambitious. Fairwave v0.1.0 does **not** do inter-ope
 | Milestone | Scope |
 | --- | --- |
 | v0.1 (lab) | No roaming. Mesh peering within one admin domain only. |
+| v0.1 (5G mode) | Per-UE offline CDRs from the free5GC CHF, used for fair-use metering (not inter-operator settlement). |
 | M4 | Interchange formats documented (CDR export schema) for community settlement experiments. |
 | M5 | SEPP interface contract documented as an integration point (ADR-0011 style contract), no implementation committed. |
 | M6+ | Only with a licensed partner: pilot of one-to-one roaming via a certified IPX provider. |
@@ -35,7 +36,7 @@ Nothing in M0–M6 implies roaming is shipped. If a page or talk says otherwise,
 ## What Fairwave-compatible boxes can do lawfully today
 
 - **Offload / neutral host experiments**: one operator's node serving subscribers of another *only* through lawful MVNO-style arrangements (subscribers hosted in the local HSS under contract). This is the realistic path: local breakout with hosted identities, not inter-operator signalling.
-- **Community settlement prototypes**: CDR-style accounting via the sessions API for voluntary clearing between community operators - data-plane settlements, no core-to-core interconnect.
+- **Community settlement prototypes**: CDR-style accounting via the sessions API (and the CHF CDR files in 5G mode) for voluntary clearing between community operators - data-plane settlements, no core-to-core interconnect.
 
 ## If you are an MNO reading this
 

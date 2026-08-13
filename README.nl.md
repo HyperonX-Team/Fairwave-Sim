@@ -1,7 +1,7 @@
 <h1 align="center">Fairwave - een community carrier in een pizzadoos</h1>
 
 <p align="center">
-  <strong>Open-source privaat LTE: steek het in de ethernet, zend 4G uit, verwelkom je buren.</strong>
+  <strong>Open-source privaat LTE: steek het in de ethernet, zend 4G/5G uit, verwelkom je buren.</strong>
 </p>
 
 <p align="center">
@@ -135,7 +135,7 @@ Volledige site: **voer `make docs-serve` uit** - of lees in de boom onder [`docs
 ## Status
 
 **Labrelease `v0.1.0`**: EPC + zmq-RAN + srsUE-attach werkt end-to-end; controlelaag, CLI,
-simkaartvoorziening, lab-eSIM (SM-DP+) en de documentatiesite zijn functioneel. Echte RF-paden zijn
+simkaartvoorziening, lab-eSIM (SM-DP+) en de documentatiesite zijn functioneel. Daarnaast wordt een free5GC 5G SA-core met op CHF gebaseerde verbruiksmeting optioneel meegeleverd (`core: free5gc`), met ZMQ gNB/UE-labprofielen en een CI-attachtest. Echte RF-paden zijn
 gevalideerd op ontwikkelhardware maar **standaard uitgeschakeld**. Zie de [roadmap](design/roadmap.md).
 
 ## Wat Fairwave NIET is

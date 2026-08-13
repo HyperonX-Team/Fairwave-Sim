@@ -32,10 +32,11 @@ flowchart LR
 
 | Component | Role | Runs as |
 |---|---|---|
-| srsRAN eNB | LTE radio: LTE-Uu toward UEs, S1 toward EPC | container |
-| srsRAN srsUE | Synthetic UE for lab tests (zmq loopback) | container |
-| Open5GS EPC | MME, SGW, PGW, HSS, PCRF | containers (one per service) |
-| fairwave-control | Identity, enrollment, reconcile loop, REST API v1 | container / systemd |
+| srsRAN eNB/gNB | LTE/NR radio: LTE-Uu or NR-Uu toward UEs, S1/N2 toward the core | container |
+| srsRAN srsUE | Synthetic UE for lab tests (zmq loopback, 4G and 5G SA) | container |
+| Open5GS EPC | MME, SGW, PGW, HSS, PCRF (4G, default) | containers (one per service) |
+| free5GC core | AMF, SMF, UPF, NRF, PCF, NSSF, AUSF, UDM, UDR (5G SA, `core: free5gc`) | containers (one per service) |
+| fairwave-control | Identity, enrollment, reconcile loop, REST API v1, usage metering | container / systemd |
 | fairwave-agent | On-box health probes, heartbeat, watchdog | systemd |
 | fairwave-cli | Operator commands against the REST API | binary |
 | Operator UI | Local-first dashboard | container |
@@ -43,7 +44,7 @@ flowchart LR
 
 ## Data Plane vs Control Plane
 
-- **Data plane:** UE ↔ eNB (LTE-Uu) ↔ S1-U ↔ SGW/PGW ↔ local breakout NAT ↔ Internet. User traffic never hairpins through a cloud.
+- **Data plane (4G):** UE ↔ eNB (LTE-Uu) ↔ S1-U ↔ SGW/PGW ↔ local breakout NAT ↔ Internet. **Data plane (5G SA):** UE ↔ gNB (NR-Uu) ↔ N3 ↔ UPF ↔ local breakout NAT ↔ Internet. User traffic never hairpins through a cloud.
 - **Control plane:** NAS/S1AP signaling stays inside the box; `fairwave-control` reconciles configuration into Open5GS and srsRAN; policy (APN, breakout, band allow-list) lives in the control plane.
 - **Management plane:** `fairwave-agent` → `fairwave-control` → CLI/UI, all on-box; peer boxes connect over an mTLS mesh with a WireGuard data plane.
 
@@ -65,6 +66,8 @@ stateDiagram-v2
 
 - PLMN `999-99` (lab), TAC `7`, APNs `internet` and `ims`.
 - Local breakout (edge NAT) by default; WireGuard tunnel optional (`docs/adr/0005-local-breakout-default.md`).
+- Core: Open5GS (4G) by default; free5GC 5G SA is an opt-in per-node switch (`core: free5gc`, `deploy/docker-compose.5g.yml`).
+- Usage metering: GTP-U tap (4G) or free5GC CHF CDR files (5G) feed fair-use quotas with auto-suspend.
 - Release `v0.1.0` targets lab mode; milestones M0–M6 in `design/roadmap.md`.
 
 ## Related

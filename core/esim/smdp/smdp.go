@@ -27,6 +27,7 @@ import (
 	"github.com/HyperonX-Team/Fairwave-Sim/core/esim/activation"
 	"github.com/HyperonX-Team/Fairwave-Sim/core/esim/crypto"
 	"github.com/HyperonX-Team/Fairwave-Sim/core/esim/profile"
+	"github.com/HyperonX-Team/Fairwave-Sim/core/esim/registry"
 )
 
 // SessionStatus is the download-session state machine step.
@@ -134,6 +135,10 @@ type Server struct {
 	Store  Store
 	Source ProfileSource
 	Now    func() time.Time
+	// OnDelivered, when set, is called with the activation code after a
+	// bound profile package has been produced. Registry policy layers
+	// (single-use codes, download accounting) hook in here.
+	OnDelivered func(activationCode string) error
 }
 
 // NewServer builds a server with the given identifier, store and profile
@@ -328,6 +333,12 @@ func (s *Server) GetBoundProfilePackage(transactionID string) (*BPPResponse, err
 	if err := s.Store.UpdateSession(sess); err != nil {
 		return nil, err
 	}
+	// The package is delivered; give the registry policy layer its hook
+	// (single-use marking, download accounting). Hook failures must not
+	// fail an already-served download, so they are swallowed.
+	if s.OnDelivered != nil {
+		_ = s.OnDelivered(sess.ActivationCode)
+	}
 	return &BPPResponse{
 		SeqCounter: sess.SeqCounter,
 		BPP:        base64.StdEncoding.EncodeToString(der),
@@ -458,6 +469,8 @@ func httpStatusFor(err error) int {
 		return http.StatusUnauthorized
 	case errors.Is(err, ErrUnknownActivationCode):
 		return http.StatusNotFound
+	case errors.Is(err, registry.ErrActivationCodeUsed), errors.Is(err, registry.ErrActivationCodeExpired):
+		return http.StatusGone
 	default:
 		return http.StatusInternalServerError
 	}

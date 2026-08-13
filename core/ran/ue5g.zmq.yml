@@ -1,0 +1,56 @@
+# Fairwave srsUE config - 5G SA over ZMQ VIRTUAL RADIO (lab UE).
+#
+# The 5G SA UE ships inside srsRAN_4G (srsRAN Project has no UE app); the
+# repo's pinned srsRAN_4G build (commit ec29b0c1f) is exactly the version
+# proven against free5GC in the s5uishida ZMQ reference. The 5G carrier is
+# enabled via [rat.nr] while [rat.eutra] is disabled.
+#
+# SIM below is the DUMMY lab test vector - see sim/test-vectors/lab-vectors.yaml.
+# NEVER put a real SIM here. CLI overrides in srs-entry.sh win over this file.
+#
+# Slice must agree with the core + gNB: SST 1, SD 010203 (DECIMAL: 66051).
+[usim]
+mode = soft
+algo = milenage
+imsi = 999991234567001
+k = 465B5CE8B199B49FAA5F0A2EE238A6BC
+opc = 4D9B7A2C5E8F1A3B6C0D2E4F7A9B5C1D
+imei = 353490069873319
+
+[rf]
+freq_offset = 0
+tx_gain = 80
+rx_gain = 40
+srate = 23.04e6
+nof_antennas = 1
+device_name = zmq
+device_args = rx_port=tcp://127.0.0.1:2000,tx_port=tcp://*:2001,base_srate=23.04e6
+time_adv_nsamples = 0
+
+[rat.eutra]
+dl_earfcn = 2850
+nof_carriers = 0
+
+[rat.nr]
+bands = 3
+nof_carriers = 1
+max_nof_prb = 106
+nof_prb = 106
+
+[rrc]
+release = 15
+ue_category = 4
+
+[nas]
+apn = internet
+apn_protocol = ipv4
+
+[slicing]
+enable = true
+nssai-sst = 1
+nssai-sd = 66051 # 0x010203
+
+[log]
+filename = /tmp/ue.log
+all_level = info
+all_hex_limit = 0
