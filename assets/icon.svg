@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2d3178"/>
+      <stop offset="0.55" stop-color="#1a1d52"/>
+      <stop offset="1" stop-color="#0e1230"/>
+    </linearGradient>
+    <linearGradient id="crust" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f2a44e"/>
+      <stop offset="1" stop-color="#cf7a26"/>
+    </linearGradient>
+    <radialGradient id="cheese" cx="0.5" cy="0.28" r="1.05">
+      <stop offset="0" stop-color="#f8dd78"/>
+      <stop offset="0.7" stop-color="#f0c250"/>
+      <stop offset="1" stop-color="#e2a93b"/>
+    </radialGradient>
+    <linearGradient id="wave" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#36b7ea"/>
+      <stop offset="1" stop-color="#7ff0e0"/>
+    </linearGradient>
+    <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="12"/>
+    </filter>
+    <filter id="soft" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+    <clipPath id="icon">
+      <rect width="512" height="512" rx="116"/>
+    </clipPath>
+  </defs>
+
+  <g clip-path="url(#icon)">
+    <rect width="512" height="512" rx="116" fill="url(#bg)"/>
+
+    <circle cx="80" cy="140" r="5" fill="#8b93e6" opacity="0.35"/>
+    <circle cx="438" cy="150" r="5" fill="#8b93e6" opacity="0.32"/>
+    <circle cx="56" cy="300" r="4" fill="#8b93e6" opacity="0.3"/>
+    <circle cx="452" cy="330" r="4" fill="#8b93e6" opacity="0.3"/>
+    <circle cx="120" cy="430" r="5" fill="#8b93e6" opacity="0.28"/>
+    <circle cx="400" cy="440" r="5" fill="#8b93e6" opacity="0.28"/>
+    <circle cx="152" cy="70" r="4" fill="#8b93e6" opacity="0.25"/>
+    <circle cx="368" cy="66" r="4" fill="#8b93e6" opacity="0.25"/>
+
+    <g stroke="#35d8c8" stroke-width="30" stroke-linecap="round" fill="none" opacity="0.35" filter="url(#glow)">
+      <path d="M 204.4 176.3 A 90 90 0 0 1 307.6 176.3"/>
+      <path d="M 181.5 143.5 A 130 130 0 0 1 330.5 143.5"/>
+      <path d="M 158.5 110.8 A 170 170 0 0 1 353.5 110.8"/>
+    </g>
+    <g stroke="url(#wave)" stroke-width="20" stroke-linecap="round" fill="none">
+      <path d="M 204.4 176.3 A 90 90 0 0 1 307.6 176.3" opacity="0.95"/>
+      <path d="M 181.5 143.5 A 130 130 0 0 1 330.5 143.5" opacity="0.62"/>
+      <path d="M 158.5 110.8 A 170 170 0 0 1 353.5 110.8" opacity="0.38"/>
+    </g>
+
+    <ellipse cx="256" cy="478" rx="132" ry="17" fill="#05061c" opacity="0.45" filter="url(#soft)"/>
+
+    <g stroke-linejoin="round">
+      <path d="M 132 250 A 152.125 152.125 0 0 1 380 250 L 360 258 A 155.2 155.2 0 0 0 152 258 Z"
+            fill="url(#crust)" stroke="#d98a2f" stroke-width="7"/>
+      <path d="M 152 258 A 155.2 155.2 0 0 1 360 258 L 256 468 Z"
+            fill="url(#cheese)" stroke="#efc154" stroke-width="7"/>
+    </g>
+
+    <path d="M 152 258 A 155.2 155.2 0 0 1 360 258" fill="none" stroke="#a03828" stroke-width="9" stroke-linecap="round"/>
+
+    <g fill="#b06a20" opacity="0.5">
+      <circle cx="170" cy="240" r="3.5"/>
+      <circle cx="205" cy="222" r="3.5"/>
+      <circle cx="256" cy="208" r="3.5"/>
+      <circle cx="307" cy="222" r="3.5"/>
+      <circle cx="342" cy="240" r="3.5"/>
+    </g>
+
+    <g transform="translate(238,322) rotate(-25)">
+      <ellipse rx="19" ry="9" fill="#3f9e5f"/>
+      <path d="M -19 0 Q 0 -3.5 19 0" stroke="#2f7a49" stroke-width="2.2" fill="none"/>
+    </g>
+    <g transform="translate(274,378) rotate(32)">
+      <ellipse rx="18" ry="8.5" fill="#47ab6b"/>
+      <path d="M -18 0 Q 0 -3.5 18 0" stroke="#358a53" stroke-width="2.2" fill="none"/>
+    </g>
+
+    <g fill="#d05444" stroke="#a8382c" stroke-width="3">
+      <circle cx="218" cy="292" r="17"/>
+      <circle cx="296" cy="292" r="17"/>
+      <circle cx="256" cy="350" r="18"/>
+      <circle cx="256" cy="406" r="14"/>
+    </g>
+    <g fill="#e0796a" opacity="0.55">
+      <circle cx="213" cy="287" r="5"/>
+      <circle cx="291" cy="287" r="5"/>
+      <circle cx="251" cy="345" r="5.5"/>
+      <circle cx="252" cy="402" r="4"/>
+    </g>
+  </g>
+</svg>

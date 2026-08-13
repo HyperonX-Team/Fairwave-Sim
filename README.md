@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/icon.png" alt="Fairwave icon - a pizza slice broadcasting" width="160">
+</p>
+
 <h1 align="center">Fairwave - a community carrier in a pizza box</h1>
 
 <p align="center">

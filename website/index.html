@@ -6,7 +6,9 @@
 <meta name="color-scheme" content="dark">
 <meta name="description" content="Fairwave - a community-owned 4G/5G small-cell network. Open5GS EPC + free5GC 5G core, srsRAN radio, lab eSIM, fair-use metering, lab-first, spectrum-safe.">
 <title>Fairwave - community small cells</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230d1117'/%3E%3Cpath d='M5 20c4-7 8-7 12 0s8 7 12 0' stroke='%234dd0e1' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3Cpath d='M5 13c4-7 8-7 12 0s8 7 12 0' stroke='%237c4dff' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" href="icon.png">
+<link rel="apple-touch-icon" href="icon.png">
 <style>
   :root { --bg:#0d1117; --panel:#141b2a; --line:#263248; --text:#e6edf7;
     --muted:#93a3bd; --accent:#4dd0e1; --accent2:#7c4dff; --accent3:#22d3a0;
@@ -29,7 +31,11 @@
     border-bottom:1px solid var(--line); background:rgba(13,17,23,.85);
     backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
     display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; }
-  .logo { font-size:20px; font-weight:700; letter-spacing:.5px; }
+  .logo { font-size:20px; font-weight:700; letter-spacing:.5px;
+    display:flex; align-items:center; gap:10px; }
+  .logo img { width:34px; height:34px; border-radius:8px; }
+  .hero-icon { width:128px; height:auto; border-radius:28px; margin-bottom:20px;
+    box-shadow:0 12px 40px rgba(0,0,0,.4); }
   .logo b { color:var(--accent); text-shadow:0 0 18px var(--glow); }
   nav { display:flex; align-items:center; flex-wrap:wrap; }
   nav a { color:var(--muted); text-decoration:none; margin-inline-start:18px; font-size:14px;
@@ -77,7 +83,7 @@
 </head>
 <body>
 <header>
-  <div class="logo">fair<b>wave</b></div>
+  <div class="logo"><img src="icon.png" alt="">fair<b>wave</b></div>
   <nav>
     <a href="#features" data-i18n="nav.features">Features</a>
     <a href="#law" data-i18n="nav.law">Spectrum &amp; law</a>
@@ -109,6 +115,7 @@
 
 <main>
   <section class="hero">
+    <img class="hero-icon" src="icon.png" alt="Fairwave - community carrier in a pizza box">
     <h1 data-i18n="hero.title">Community-owned small cells.<br>Spectrum-safe by design.</h1>
     <p data-i18n="hero.sub">Fairwave is an open-source small-cell network you can run on a desk:
        Open5GS EPC for 4G and a free5GC 5G core, srsRAN radio, a Go control plane,

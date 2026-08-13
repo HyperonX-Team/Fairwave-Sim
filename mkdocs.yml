@@ -6,6 +6,8 @@ edit_uri: edit/main/docs/
 
 theme:
   name: material
+  logo: assets/icon.png
+  favicon: assets/favicon.ico
   features:
     - navigation.instant
     - navigation.tracking

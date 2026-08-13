@@ -2,6 +2,10 @@
 title: Fairwave Documentation
 ---
 
+<p align="center">
+  <img src="assets/icon.png" alt="Fairwave - community carrier in a pizza box" width="160">
+</p>
+
 # Fairwave Documentation
 
 > Fairwave defaults to lab/no-RF mode. Transmitting on cellular bands without proper authorization is illegal in most jurisdictions. You are solely responsible for licenses, SAS grants, indoor restrictions, and type approval. HyperonX and contributors provide software as-is for lawful private networks, research, and shared-spectrum regimes only.
