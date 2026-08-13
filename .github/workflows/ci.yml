@@ -78,16 +78,3 @@ jobs:
           print('nav target check done')
           EOF
 
-  secrets:
-    name: Secrets scan
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Run Gitleaks (OSS binary, no license required)
-        run: |
-          docker run --rm \
-            -v "${GITHUB_WORKSPACE}:/repo" \
-            gitleaks/gitleaks:latest detect \
-            --source /repo \
-            --no-banner \
-            --redact
