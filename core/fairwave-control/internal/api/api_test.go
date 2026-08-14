@@ -12,6 +12,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"testing"
 	"time"
@@ -244,9 +245,16 @@ func TestSIMIssueWritesBackToHSS(t *testing.T) {
 	if len(sims) != 2 {
 		t.Fatalf("issued sims = %d, want 2", len(sims))
 	}
-	for i, sim := range sims {
-		if sim.IMSI != hss.added[i] {
-			t.Fatalf("hss write-back IMSI %s != issued %s", hss.added[i], sim.IMSI)
+	// The API does not promise response ordering, so compare as a set.
+	got := make([]string, 0, len(sims))
+	for _, sim := range sims {
+		got = append(got, sim.IMSI)
+	}
+	sort.Strings(got)
+	sort.Strings(hss.added)
+	for i, imsi := range got {
+		if imsi != hss.added[i] {
+			t.Fatalf("hss write-back IMSI %s != issued %s", hss.added[i], imsi)
 		}
 	}
 

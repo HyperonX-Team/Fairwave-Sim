@@ -10,7 +10,6 @@ import (
 
 // ---- config ----
 
-// configCmd is the group node for configuration subcommands.
 func configCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "config",
@@ -51,13 +50,7 @@ func configValidateCmd() *cobra.Command {
 	}
 }
 
-// printConfigValidate emits a single-line JSON result to the command's stdout.
 func printConfigValidate(cmd *cobra.Command, r validateResult) {
-	b, err := json.Marshal(r)
-	if err != nil {
-		// validateResult is a static shape; marshal cannot fail.
-		fmt.Fprintln(cmd.OutOrStdout(), `{"valid":false}`)
-		return
-	}
+	b, _ := json.Marshal(r)
 	fmt.Fprintln(cmd.OutOrStdout(), string(b))
 }

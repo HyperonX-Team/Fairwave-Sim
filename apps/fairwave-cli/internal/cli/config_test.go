@@ -43,7 +43,6 @@ telemetry:
   metrics: true
 `
 
-// writeConfig writes contents to a fresh file inside a temp dir and returns its path.
 func writeConfig(t *testing.T, contents string) string {
 	t.Helper()
 	path := filepath.Join(t.TempDir(), "fairwave-control.yaml")
@@ -53,8 +52,6 @@ func writeConfig(t *testing.T, contents string) string {
 	return path
 }
 
-// runConfigValidate executes `fairwave config validate <args...>` with output
-// captured in a buffer. It returns the buffer and the error from ExecuteC.
 func runConfigValidate(t *testing.T, args ...string) (*bytes.Buffer, error) {
 	t.Helper()
 	root := newTestRoot(t)
@@ -66,7 +63,6 @@ func runConfigValidate(t *testing.T, args ...string) (*bytes.Buffer, error) {
 	return &out, err
 }
 
-// decodeValidResult asserts the captured stdout is a single-line JSON object.
 func decodeValidResult(t *testing.T, out *bytes.Buffer) map[string]any {
 	t.Helper()
 	var got map[string]any

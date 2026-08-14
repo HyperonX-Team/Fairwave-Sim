@@ -37,12 +37,14 @@ func newTestRoot(t *testing.T) *cobra.Command {
 }
 
 // walkCommands visits cmd and every descendant, returning the full path of
-// each command (e.g. "fairwave sim import").
-func walkCommands(t *testing.T, cmd *cobra.Command, path string) []string {
+// each command (e.g. "fairwave sim import") and indexing each path to its
+// command in byPath.
+func walkCommands(t *testing.T, cmd *cobra.Command, path string, byPath map[string]*cobra.Command) []string {
 	t.Helper()
+	byPath[path] = cmd
 	names := []string{path}
 	for _, sub := range cmd.Commands() {
-		names = append(names, walkCommands(t, sub, path+" "+sub.Name())...)
+		names = append(names, walkCommands(t, sub, path+" "+sub.Name(), byPath)...)
 	}
 	return names
 }
@@ -75,20 +77,11 @@ func TestCommandTreeShape(t *testing.T) {
 
 func TestCommandTreeEveryCommandWellFormed(t *testing.T) {
 	root := newTestRoot(t)
-	paths := walkCommands(t, root, "fairwave")
+	byPath := make(map[string]*cobra.Command)
+	paths := walkCommands(t, root, "fairwave", byPath)
 	if len(paths) < 10 {
 		t.Fatalf("tree unexpectedly small: %d commands", len(paths))
 	}
-
-	byPath := map[string]*cobra.Command{"fairwave": root}
-	var index func(cmd *cobra.Command, path string)
-	index = func(cmd *cobra.Command, path string) {
-		byPath[path] = cmd
-		for _, sub := range cmd.Commands() {
-			index(sub, path+" "+sub.Name())
-		}
-	}
-	index(root, "fairwave")
 
 	for _, path := range paths {
 		cmd := byPath[path]
