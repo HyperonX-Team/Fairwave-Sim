@@ -57,7 +57,7 @@ func NewCDR(cfg CDRConfig) *Free5GCCDR {
 // cumulative bytes. Unparseable files (mid-write, or a foreign file
 // matching the glob) are skipped; a missing directory is an error so the
 // caller keeps the previous snapshot.
-func (c *Free5GCCDR) Poll(ctx context.Context) ([]api.Session, error) {
+func (c *Free5GCCDR) Poll(_ context.Context) ([]api.Session, error) {
 	if c.cfg.Dir == "" {
 		return nil, fmt.Errorf("collector: cdr_dir required")
 	}

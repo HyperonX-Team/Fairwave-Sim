@@ -28,7 +28,7 @@ import (
 
 type fakeChecker struct{}
 
-func (fakeChecker) Check(country, band string, indoor bool, licenseRef string) Verdict {
+func (fakeChecker) Check(country, band string, _ bool, licenseRef string) Verdict {
 	if country == "US" && band == "n48" && licenseRef != "" {
 		return Verdict{Allowed: true, Reasons: nil}
 	}
@@ -906,7 +906,7 @@ func gtpGPDU(teid uint32, n int) []byte {
 	return gtpWrap(gtp)
 }
 
-func waitCoreBytes(t *testing.T, srv *Server, imsi string, min uint64) {
+func waitCoreBytes(t *testing.T, srv *Server, imsi string, wantBytes uint64) {
 	t.Helper()
 	deadline := time.Now().Add(3 * time.Second)
 	for {
@@ -914,7 +914,7 @@ func waitCoreBytes(t *testing.T, srv *Server, imsi string, min uint64) {
 			t.Fatal(err)
 		}
 		for _, s := range srv.store.ListSessions() {
-			if s.IMSIHash == api.HashIMSI(imsi) && s.BytesUp+s.BytesDn >= min {
+			if s.IMSIHash == api.HashIMSI(imsi) && s.BytesUp+s.BytesDn >= wantBytes {
 				return
 			}
 		}

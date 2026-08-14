@@ -384,7 +384,7 @@ func (s *Server) AccumulateUsage(ctx context.Context) error {
 
 // enforceQuota suspends a SIM whose usage meets its quota (when the SIM is
 // currently usable) and raises an alert so the operator can react.
-func (s *Server) enforceQuota(ctx context.Context, imsi string, u *api.SimUsage) error {
+func (s *Server) enforceQuota(_ context.Context, imsi string, u *api.SimUsage) error {
 	if u.QuotaBytes == 0 {
 		return nil
 	}
@@ -508,7 +508,7 @@ func (s *Server) fireAlertLocked(sev api.AlertSeverity, key, message, target, no
 
 // resolveAlertLocked marks a previously fired alert as resolved.
 // Caller must hold s.mu.
-func (s *Server) resolveAlertLocked(ctx context.Context, key string, now time.Time) {
+func (s *Server) resolveAlertLocked(_ context.Context, key string, now time.Time) {
 	delete(s.fired, key)
 	for _, a := range s.store.ActiveAlerts() {
 		if a.Key != key {
@@ -612,5 +612,3 @@ func (s *Server) refreshMetrics() {
 		mTxArmed.Set(0)
 	}
 }
-
-var _ = api.LifecyclePhase("") // keep import linkage for API types used in routes

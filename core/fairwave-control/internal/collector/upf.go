@@ -503,7 +503,7 @@ func (u *UPF) tap(src PacketSource) {
 // Poll implements Source: it returns the current cumulative per-IMSI
 // usage snapshot. Sessions are reported even with zero bytes (the UE is
 // attached); the usage pipeline ignores zero deltas.
-func (u *UPF) Poll(ctx context.Context) ([]api.Session, error) {
+func (u *UPF) Poll(_ context.Context) ([]api.Session, error) {
 	if err := u.start(); err != nil {
 		return nil, err
 	}

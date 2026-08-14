@@ -27,7 +27,6 @@ type Identity struct {
 	CertPEM []byte
 	Cert    *x509.Certificate
 	ID      string // short id = sha256(pubkey)[:12]
-	Created time.Time
 }
 
 // LoadOrCreate loads identity from dir, or generates a fresh one.
@@ -51,7 +50,6 @@ func LoadOrCreate(dir string) (*Identity, error) {
 						}
 					}
 					id.ID = ShortID(id.PubKey)
-					id.Created = time.Now()
 					return id, nil
 				}
 			}
@@ -68,7 +66,6 @@ func LoadOrCreate(dir string) (*Identity, error) {
 	}
 	id := &Identity{dir: dir, PrivKey: priv, PubKey: priv.Public().(ed25519.PublicKey)}
 	id.ID = ShortID(id.PubKey)
-	id.Created = time.Now()
 
 	// self-signed cert for mTLS (control plane ↔ agent/CLI)
 	serial, _ := rand.Int(rand.Reader, big.NewInt(1<<62))

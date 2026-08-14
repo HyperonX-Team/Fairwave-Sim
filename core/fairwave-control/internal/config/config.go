@@ -192,10 +192,8 @@ func Default() *ControlConfig {
 // JSON Schema. Env override naming: FAIRWAVE_SERVER_LISTEN, FAIRWAVE_TAC, ...
 func Load(path string) (*ControlConfig, error) {
 	c := Default()
-	data := []byte{}
 	if path != "" {
-		var err error
-		data, err = os.ReadFile(path)
+		data, err := os.ReadFile(path)
 		if err != nil {
 			return nil, fmt.Errorf("read config %s: %w", path, err)
 		}

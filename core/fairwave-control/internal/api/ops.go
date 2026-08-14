@@ -29,7 +29,7 @@ func (s *Server) handleCreateToken(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusCreated, resp)
 }
 
-func (s *Server) handleListTokens(w http.ResponseWriter, r *http.Request) {
+func (s *Server) handleListTokens(w http.ResponseWriter, _ *http.Request) {
 	toks := s.store.ListTokens()
 	out := make([]api.Token, 0, len(toks))
 	for _, t := range toks {
@@ -202,7 +202,7 @@ func (s *Server) handleReconcileUsage(w http.ResponseWriter, r *http.Request) {
 
 // ---- alerts ----
 
-func (s *Server) handleListAlerts(w http.ResponseWriter, r *http.Request) {
+func (s *Server) handleListAlerts(w http.ResponseWriter, _ *http.Request) {
 	writeJSON(w, http.StatusOK, s.store.ListAlerts())
 }
 
@@ -210,7 +210,7 @@ func (s *Server) handleListAlerts(w http.ResponseWriter, r *http.Request) {
 
 // handleComplianceExport renders the regulator-ready CSV: the audit trail
 // plus a summary of SIM inventory and TX arm history.
-func (s *Server) handleComplianceExport(w http.ResponseWriter, r *http.Request) {
+func (s *Server) handleComplianceExport(w http.ResponseWriter, _ *http.Request) {
 	var sb strings.Builder
 	cw := csv.NewWriter(&sb)
 

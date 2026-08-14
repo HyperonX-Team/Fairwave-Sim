@@ -209,11 +209,11 @@ func readJSON(r *http.Request, v interface{}) error {
 
 // ---- handlers ----
 
-func (s *Server) handleHealthz(w http.ResponseWriter, r *http.Request) {
+func (s *Server) handleHealthz(w http.ResponseWriter, _ *http.Request) {
 	writeJSON(w, http.StatusOK, map[string]bool{"ok": true})
 }
 
-func (s *Server) handleVersion(w http.ResponseWriter, r *http.Request) {
+func (s *Server) handleVersion(w http.ResponseWriter, _ *http.Request) {
 	writeJSON(w, http.StatusOK, map[string]string{
 		"version": Version,
 		"mode":    s.cfg.Server.Mode,
@@ -222,7 +222,7 @@ func (s *Server) handleVersion(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (s *Server) handleStatus(w http.ResponseWriter, r *http.Request) {
+func (s *Server) handleStatus(w http.ResponseWriter, _ *http.Request) {
 	phase := api.PhaseProvision
 	if nodes := s.store.ListNodes(); len(nodes) > 0 {
 		phase = nodes[0].Phase
@@ -270,7 +270,7 @@ func (s *Server) handleLifecycle(w http.ResponseWriter, r *http.Request) {
 
 // ---- nodes ----
 
-func (s *Server) handleListNodes(w http.ResponseWriter, r *http.Request) {
+func (s *Server) handleListNodes(w http.ResponseWriter, _ *http.Request) {
 	writeJSON(w, http.StatusOK, s.store.ListNodes())
 }
 
@@ -348,7 +348,7 @@ func (s *Server) handleLeaveNode(w http.ResponseWriter, r *http.Request) {
 
 // ---- sims ----
 
-func (s *Server) handleListSIMs(w http.ResponseWriter, r *http.Request) {
+func (s *Server) handleListSIMs(w http.ResponseWriter, _ *http.Request) {
 	writeJSON(w, http.StatusOK, s.store.ListSIMs())
 }
 
@@ -484,7 +484,7 @@ func (s *Server) handleRevokeSIM(w http.ResponseWriter, r *http.Request) {
 
 // ---- peers ----
 
-func (s *Server) handleListPeers(w http.ResponseWriter, r *http.Request) {
+func (s *Server) handleListPeers(w http.ResponseWriter, _ *http.Request) {
 	writeJSON(w, http.StatusOK, s.store.ListPeers())
 }
 
@@ -519,11 +519,11 @@ func (s *Server) handleDeletePeer(w http.ResponseWriter, r *http.Request) {
 
 // ---- sessions / policy ----
 
-func (s *Server) handleListSessions(w http.ResponseWriter, r *http.Request) {
+func (s *Server) handleListSessions(w http.ResponseWriter, _ *http.Request) {
 	writeJSON(w, http.StatusOK, s.store.ListSessions())
 }
 
-func (s *Server) handleGetPolicy(w http.ResponseWriter, r *http.Request) {
+func (s *Server) handleGetPolicy(w http.ResponseWriter, _ *http.Request) {
 	writeJSON(w, http.StatusOK, s.store.GetPolicy())
 }
 
@@ -660,7 +660,7 @@ func (s *Server) handleTelemetry(w http.ResponseWriter, r *http.Request) {
 
 // handleListHealth returns the latest heartbeat per node, with Up computed
 // from recency so the dashboard can show stale/dead boxes.
-func (s *Server) handleListHealth(w http.ResponseWriter, r *http.Request) {
+func (s *Server) handleListHealth(w http.ResponseWriter, _ *http.Request) {
 	stale := s.cfg.Telemetry.StaleAfter
 	if stale <= 0 {
 		stale = 90 * time.Second
@@ -675,7 +675,7 @@ func (s *Server) handleListHealth(w http.ResponseWriter, r *http.Request) {
 
 // ---- audit ----
 
-func (s *Server) handleAudit(w http.ResponseWriter, r *http.Request) {
+func (s *Server) handleAudit(w http.ResponseWriter, _ *http.Request) {
 	writeJSON(w, http.StatusOK, s.store.ListAudit())
 }
 
@@ -684,7 +684,7 @@ func (s *Server) handleAudit(w http.ResponseWriter, r *http.Request) {
 // esimHandler returns the embedded SM-DP+ handler (503 when disabled).
 func (s *Server) esimHandler() http.Handler {
 	if s.esim == nil {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		return http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 			writeErr(w, http.StatusServiceUnavailable, "esim_disabled", "eSIM server is not configured")
 		})
 	}
@@ -709,7 +709,7 @@ func (s *Server) handleEsimIssue(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusCreated, resp)
 }
 
-func (s *Server) handleEsimList(w http.ResponseWriter, r *http.Request) {
+func (s *Server) handleEsimList(w http.ResponseWriter, _ *http.Request) {
 	if s.esim == nil || !s.esim.enabled {
 		writeErr(w, http.StatusServiceUnavailable, "esim_disabled", "eSIM server is not configured")
 		return

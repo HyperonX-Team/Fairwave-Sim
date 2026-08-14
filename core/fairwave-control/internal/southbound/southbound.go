@@ -10,7 +10,6 @@ import (
 	"os/exec"
 	"path/filepath"
 	"text/template"
-	"time"
 )
 
 // Open5GSConfig is the minimal templated EPC config (4G path).
@@ -73,7 +72,7 @@ parameters:
 `
 
 // RenderOpen5GS writes the EPC config to dir/open5gs.yaml.
-func RenderOpen5GS(ctx context.Context, dir string, cfg Open5GSConfig) (string, error) {
+func RenderOpen5GS(_ context.Context, dir string, cfg Open5GSConfig) (string, error) {
 	if cfg.Mongo == "" {
 		cfg.Mongo = "mongodb://mongo:27017"
 	}
@@ -145,7 +144,7 @@ s1ap:
 `
 
 // RenderENB writes the eNB config and returns its path.
-func RenderENB(ctx context.Context, dir string, cfg SrsranENBConfig) (string, error) {
+func RenderENB(_ context.Context, dir string, cfg SrsranENBConfig) (string, error) {
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return "", err
 	}
@@ -188,6 +187,5 @@ func RestartService(ctx context.Context, driver, name string) error {
 	if err != nil {
 		return fmt.Errorf("restart %s: %v: %s", name, err, out)
 	}
-	_ = time.Now()
 	return nil
 }
