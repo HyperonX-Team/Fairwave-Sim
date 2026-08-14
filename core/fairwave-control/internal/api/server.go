@@ -23,7 +23,7 @@ import (
 
 	"github.com/HyperonX-Team/Fairwave-Sim/core/fairwave-control/api"
 	"github.com/HyperonX-Team/Fairwave-Sim/core/fairwave-control/internal/collector"
-	"github.com/HyperonX-Team/Fairwave-Sim/core/fairwave-control/internal/config"
+	"github.com/HyperonX-Team/Fairwave-Sim/core/fairwave-control/config"
 	"github.com/HyperonX-Team/Fairwave-Sim/core/fairwave-control/internal/identity"
 	"github.com/HyperonX-Team/Fairwave-Sim/core/fairwave-control/internal/store"
 	"github.com/HyperonX-Team/Fairwave-Sim/core/sim-ops/hsswrite"

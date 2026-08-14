@@ -13,7 +13,7 @@ import (
 	"github.com/HyperonX-Team/Fairwave-Sim/core/esim/registry"
 	"github.com/HyperonX-Team/Fairwave-Sim/core/esim/smdp"
 	"github.com/HyperonX-Team/Fairwave-Sim/core/fairwave-control/api"
-	"github.com/HyperonX-Team/Fairwave-Sim/core/fairwave-control/internal/config"
+	"github.com/HyperonX-Team/Fairwave-Sim/core/fairwave-control/config"
 	"github.com/HyperonX-Team/Fairwave-Sim/core/sim-ops/simprov"
 )
 
