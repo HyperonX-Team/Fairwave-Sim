@@ -18,12 +18,14 @@ const DefaultControlURL = "http://localhost:8080"
 // Root returns the fairwave command tree.
 func Root() *cobra.Command {
 	root := &cobra.Command{
-		Use:           "fairwave",
-		Short:         "Fairwave - community carrier in a pizza box",
-		Long:          "Fairwave CLI: manage nodes, SIMs, peers, spectrum gates, and the local control plane.",
-		SilenceUsage:  true,
-		SilenceErrors: true,
+		Use:   "fairwave",
+		Short: "Fairwave - community carrier in a pizza box",
+		Long:  "Fairwave CLI: manage nodes, SIMs, peers, spectrum gates, and the local control plane.",
 	}
+	// Label flag-parse failures as usage errors (exit 2).
+	root.SetFlagErrorFunc(func(c *cobra.Command, err error) error {
+		return usageError(err)
+	})
 	root.PersistentFlags().String("control", envOr("FAIRWAVE_CONTROL", DefaultControlURL), "control plane base URL")
 	root.PersistentFlags().String("token", os.Getenv("FAIRWAVE_ADMIN_TOKEN"), "admin bearer token (or FAIRWAVE_ADMIN_TOKEN)")
 	root.PersistentFlags().String("data-dir", filepath.Join(".", "data"), "local data dir")

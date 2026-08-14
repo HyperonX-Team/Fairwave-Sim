@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/HyperonX-Team/Fairwave-Sim/core/fairwave-control/api"
@@ -22,10 +24,8 @@ func simImportCmd() *cobra.Command {
 			"CSV headers: imsi,msisdn,profile,apn,status,expires_at (RFC3339).\n" +
 			"JSON: an array of {\"imsi\",\"msisdn\",\"profile\",\"apn\",\"status\",\"expires_at\"}.\n" +
 			"Ki/OPc are never part of an import - they stay in the bureau's vault.",
+		Args: ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if len(args) < 1 {
-				return fmt.Errorf("usage: fairwave sim import <file.csv|file.json>")
-			}
 			items, err := parseSimImport(args[0])
 			if err != nil {
 				return err
@@ -45,13 +45,21 @@ func simImportCmd() *cobra.Command {
 }
 
 func parseSimImport(path string) ([]api.SimImportItem, error) {
+	if len(path) < 1 {
+		return nil, fmt.Errorf("sim import: empty path")
+	}
+	ext := strings.ToLower(filepath.Ext(path))
+	switch ext {
+	case ".json", ".csv":
+	default:
+		return nil, fmt.Errorf("sim import: %q: unsupported extension %q (use .csv or .json)", path, ext)
+	}
 	f, err := os.Open(path)
 	if err != nil {
 		return nil, err
 	}
 	defer f.Close()
-	ext := path[len(path)-4:]
-	if ext == "json" || len(path) > 5 && path[len(path)-5:] == ".json" {
+	if ext == ".json" {
 		var items []api.SimImportItem
 		if err := json.NewDecoder(f).Decode(&items); err != nil {
 			return nil, fmt.Errorf("parse %s: %w", path, err)
@@ -104,10 +112,8 @@ func simQuotaCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "quota",
 		Short: "Set a SIM's fair-use data allowance (0 = unlimited)",
+		Args:  ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if len(args) < 1 {
-				return fmt.Errorf("usage: fairwave sim quota <imsi> --bytes N")
-			}
 			c := newClient(cmd)
 			var sim api.SIM
 			if err := c.post("/v1/sims/"+args[0]+"/quota", api.SimQuotaRequest{QuotaBytes: bytes}, &sim); err != nil {
@@ -126,10 +132,8 @@ func simUsageCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "usage",
 		Short: "Show a SIM's accumulated data usage",
+		Args:  ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if len(args) < 1 {
-				return fmt.Errorf("usage: fairwave sim usage <imsi>")
-			}
 			c := newClient(cmd)
 			var u api.SimUsage
 			if err := c.get("/v1/sims/"+args[0]+"/usage", &u); err != nil {
@@ -190,6 +194,7 @@ func backupCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "backup",
 		Short: "Back up all control-plane state (tar.gz, optionally encrypted)",
+		Args:  ExactArgs(0),
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			c := newClient(cmd)
 			headers := map[string]string{}
@@ -220,10 +225,8 @@ func restoreCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "restore",
 		Short: "Restore a backup archive (restart the control plane afterwards)",
+		Args:  ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if len(args) < 1 {
-				return fmt.Errorf("usage: fairwave restore <backup.tar.gz> [--passphrase p]")
-			}
 			data, err := os.ReadFile(args[0])
 			if err != nil {
 				return err
@@ -308,10 +311,8 @@ func tokenRevokeCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "revoke",
 		Short: "Revoke a scoped token",
+		Args:  ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if len(args) < 1 {
-				return fmt.Errorf("usage: fairwave token revoke <id>")
-			}
 			c := newClient(cmd)
 			if err := c.do("DELETE", "/v1/tokens/"+args[0], nil, nil); err != nil {
 				return err

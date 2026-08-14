@@ -1,10 +1,13 @@
 package cli
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/HyperonX-Team/Fairwave-Sim/core/fairwave-control/api"
@@ -89,25 +92,33 @@ func nodeStatusCmd() *cobra.Command {
 
 func nodeJoinCmd() *cobra.Command {
 	return &cobra.Command{
-		Use:   "join",
-		Short: "Join a neighboring box's mesh (peer)",
+		Use:          "join",
+		Short:        "Join a neighboring box's mesh (peer)",
+		SilenceUsage: true, // not a usage problem - the feature is simply missing
 		RunE: func(cmd *cobra.Command, args []string) error {
-			// Full mesh enrollment lives in M2 (peering milestone). For v0.1
-			// we record the intent and print the documented manual path.
-			if len(args) < 1 {
-				return fmt.Errorf("usage: fairwave node join <endpoint host:port>")
-			}
-			fmt.Printf("join %s: peering mesh is a v0.3 feature; see docs/peering/\n", args[0])
-			return nil
+			// Full mesh enrollment lives in M2 (peering milestone). Until then
+			// the command must fail loudly instead of reporting success.
+			return fmt.Errorf("node join: peering is not yet implemented (M2); see docs/peering/ for the manual path")
 		},
 	}
 }
 
 func nodeLeaveCmd() *cobra.Command {
-	return &cobra.Command{
+	var yes bool
+	cmd := &cobra.Command{
 		Use:   "leave",
 		Short: "Decommission a node",
+		Args:  ExactArgs(0),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if !yes {
+				ok, err := confirmDestructive(cmd, "Decommission ALL node(s)")
+				if err != nil {
+					return err
+				}
+				if !ok {
+					return fmt.Errorf("aborted: no nodes were decommissioned")
+				}
+			}
 			c := newClient(cmd)
 			var nodes []api.Node
 			if err := c.get("/v1/nodes", &nodes); err != nil {
@@ -122,6 +133,28 @@ func nodeLeaveCmd() *cobra.Command {
 			return nil
 		},
 	}
+	cmd.Flags().BoolVar(&yes, "yes", false, "skip the confirmation prompt (required when stdout is not a TTY)")
+	return cmd
+}
+
+// confirmDestructive prompts for confirmation of a destructive action. When
+// stdout is not a TTY the operator cannot have answered interactively, so we
+// refuse unless --yes was passed. Confirmation is y/yes (case-insensitive).
+func confirmDestructive(cmd *cobra.Command, what string) (bool, error) {
+	fi, err := os.Stdout.Stat()
+	if err != nil || fi.Mode()&os.ModeCharDevice == 0 {
+		return false, fmt.Errorf("%s requires --yes (refusing: stdout is not a TTY)", what)
+	}
+	fmt.Fprintf(cmd.OutOrStdout(), "%s? [y/N] ", what)
+	line, err := bufio.NewReader(os.Stdin).ReadString('\n')
+	if err != nil && err != io.EOF {
+		return false, err
+	}
+	switch strings.ToLower(strings.TrimSpace(line)) {
+	case "y", "yes":
+		return true, nil
+	}
+	return false, nil
 }
 
 // ---- sim ----
@@ -166,10 +199,8 @@ func simRevokeCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "revoke",
 		Short: "Revoke a SIM by IMSI (removed from the HSS)",
+		Args:  ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if len(args) < 1 {
-				return fmt.Errorf("usage: fairwave sim revoke <imsi>")
-			}
 			c := newClient(cmd)
 			var sim api.SIM
 			if err := c.post("/v1/sims/"+args[0]+"/revoke", nil, &sim); err != nil {
@@ -185,10 +216,8 @@ func simSuspendCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "suspend",
 		Short: "Suspend a SIM (deactivate, credentials kept)",
+		Args:  ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if len(args) < 1 {
-				return fmt.Errorf("usage: fairwave sim suspend <imsi>")
-			}
 			c := newClient(cmd)
 			var sim api.SIM
 			if err := c.post("/v1/sims/"+args[0]+"/suspend", nil, &sim); err != nil {
@@ -204,10 +233,8 @@ func simResumeCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "resume",
 		Short: "Resume a suspended SIM",
+		Args:  ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if len(args) < 1 {
-				return fmt.Errorf("usage: fairwave sim resume <imsi>")
-			}
 			c := newClient(cmd)
 			var sim api.SIM
 			if err := c.post("/v1/sims/"+args[0]+"/resume", nil, &sim); err != nil {
@@ -223,10 +250,8 @@ func simGetCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "get",
 		Short: "Show one SIM by IMSI",
+		Args:  ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if len(args) < 1 {
-				return fmt.Errorf("usage: fairwave sim get <imsi>")
-			}
 			c := newClient(cmd)
 			var sim api.SIM
 			if err := c.get("/v1/sims/"+args[0], &sim); err != nil {
@@ -361,10 +386,8 @@ func peerAddCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "add",
 		Short: "Add a peer (manual; mDNS auto-discovery in M2)",
+		Args:  ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if len(args) < 2 {
-				return fmt.Errorf("usage: fairwave peer add <name> <endpoint host:port>")
-			}
 			c := newClient(cmd)
 			var p api.Peer
 			if err := c.post("/v1/peers", api.Peer{Name: args[0], Endpoint: args[1]}, &p); err != nil {
@@ -440,13 +463,13 @@ func spectrumArmCmd() *cobra.Command {
 			}
 			if resp.Armed {
 				fmt.Println("TX ARMED (authorization recorded)")
-			} else {
-				fmt.Println("TX DENIED:")
-				for _, r := range resp.Reasons {
-					fmt.Printf("  - %s\n", r)
-				}
+				return nil
 			}
-			return nil
+			reason := strings.Join(resp.Reasons, "; ")
+			if reason == "" {
+				reason = "gate refused"
+			}
+			return fmt.Errorf("%w: TX arming denied (%s)", ErrPolicyBlocked, reason)
 		},
 	}
 	cmd.Flags().StringVar(&country, "country", "", "country code (required)")
