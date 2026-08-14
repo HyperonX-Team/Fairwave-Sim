@@ -41,6 +41,7 @@ func Root() *cobra.Command {
 		alertsCmd(),
 		tokenCmd(),
 		complianceCmd(),
+		configCmd(),
 		backupCmd(),
 		restoreCmd(),
 		doctorCmd(),

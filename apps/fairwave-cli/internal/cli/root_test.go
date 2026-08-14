@@ -22,6 +22,7 @@ var groupOnlyCommands = map[string]string{
 	"fairwave policy":   "group: routing/QoS policy subcommands (get/set)",
 	"fairwave spectrum": "group: spectrum gate subcommands (check/arm/disarm)",
 	"fairwave token":    "group: scoped API token subcommands (create/list/revoke)",
+	"fairwave config":   "group: configuration subcommands (validate)",
 }
 
 // newTestRoot returns a fresh command tree with cobra's error/usage printing
@@ -59,8 +60,8 @@ func TestCommandTreeShape(t *testing.T) {
 	}
 
 	wantTop := []string{
-		"alerts", "audit", "backup", "compliance", "doctor", "esim", "node",
-		"peer", "policy", "restore", "sim", "spectrum", "token", "version",
+		"alerts", "audit", "backup", "compliance", "config", "doctor", "esim",
+		"node", "peer", "policy", "restore", "sim", "spectrum", "token", "version",
 	}
 	var gotTop []string
 	for _, c := range root.Commands() {
