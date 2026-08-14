@@ -200,7 +200,14 @@ func esimServeCmd() *cobra.Command {
 			}
 			srv := smdp.NewServer("fairwave-esim", smdp.NewMemStore(), reg.Resolve)
 			fmt.Printf("fairwave esim SM-DP+ listening on %s (lab mode, TLS terminates elsewhere)\n", addr)
-			return http.ListenAndServe(addr, srv.Handler())
+			httpSrv := &http.Server{
+				Addr:              addr,
+				Handler:           srv.Handler(),
+				ReadHeaderTimeout: 5 * time.Second,
+				WriteTimeout:      30 * time.Second,
+				IdleTimeout:       120 * time.Second,
+			}
+			return httpSrv.ListenAndServe()
 		},
 	}
 	cmd.Flags().StringVar(&addr, "addr", "127.0.0.1:8443", "listen address")
