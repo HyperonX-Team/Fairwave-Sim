@@ -35,19 +35,19 @@ Expected output (abridged):
 [fairwave] bootstrap complete in 42s
 ```
 
-`bootstrap.sh` verifies the environment, pulls container images, seeds the database, and writes the local lab config under `deployments/lab/`.
+`bootstrap.sh` verifies the environment and writes the local lab config under `deploy/config/`.
 
 ## 2. Build the CLI
 
 ```bash
-make cli
+make build
 fairwave version
 ```
 
 Expected output:
 
 ```
-fairwave-cli 0.1.0 (lab)
+fairwave 0.1.0
 ```
 
 If you do not want to build from source, a signed release binary is available in the v0.1.0 release assets (see [release signing](../security/release-signing.md)).

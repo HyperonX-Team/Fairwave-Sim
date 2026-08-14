@@ -8,10 +8,10 @@ This tutorial covers the operator-facing knobs: PLMN, TAC, APNs, bands, and cust
 
 > Fairwave defaults to lab/no-RF mode. Transmitting on cellular bands without proper authorization is illegal in most jurisdictions. You are solely responsible for licenses, SAS grants, indoor restrictions, and type approval. HyperonX and contributors provide software as-is for lawful private networks, research, and shared-spectrum regimes only.
 
-All configuration lives in YAML validated by JSON Schema - see [ADR-0012](../adr/0012-config-format.md). Two places matter:
+All configuration lives in YAML validated by JSON Schema - see [ADR-0012](../adr/0012-config-format.md). The places that matter:
 
-- `deployments/lab/config.yaml` - node/EPC configuration used in lab mode.
-- `deployments/prod/config.yaml` (template) - the same schema, meant for real deployments.
+- `deploy/config/fairwave-control.yaml` - node/control-plane configuration used in lab mode (mounted read-only into the container).
+- Production deployments use the same schema via `deploy/helm/fairwave/` (ConfigMap) or `deploy/ansible/`.
 
 Environment variables override any key (prefix `FW_`, nested keys separated by `_`), so containers can be parameterized without editing files.
 
@@ -134,7 +134,7 @@ If you changed YAML schema version or srsRAN/Open5GS image tags, a full rebuild 
 
 ```bash
 ./scripts/bootstrap.sh
-make cli
+make build
 make lab-up
 ```
 

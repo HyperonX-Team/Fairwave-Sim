@@ -126,7 +126,7 @@ make lab-down                            # stop everything
 exercises the full data path over the `tun_srsue` tunnel.)
 
 Everything above is **RF-silent**: the radio is emulated with `srsran/zmq` virtual RF devices.
-For real hardware, follow [docs/tutorials/cafe-pilot.md](docs/tutorials/cafe-pilot.md) -
+For real hardware, follow [docs/ops/cafe-pilot.md](docs/ops/cafe-pilot.md) -
 which will not let you enable TX without completing the legal checklist.
 
 ## Documentation
@@ -136,7 +136,7 @@ Full site: **run `make docs-serve`** - or read it in-tree under [`docs/`](docs/i
 | Start here | Then |
 |---|---|
 | [Vision](docs/vision.md) | [Architecture](docs/architecture/overview.md) |
-| [Quickstart (30 min, no RF)](docs/tutorials/quickstart-no-rf.md) | [Café pilot (2 h, with legal checklist)](docs/tutorials/cafe-pilot.md) |
+| [Quickstart (30 min, no RF)](docs/tutorials/quickstart-no-rf.md) | [Café pilot (2 h, with legal checklist)](docs/ops/cafe-pilot.md) |
 | [Spectrum & law](docs/spectrum-and-law/index.md) | [Threat model](design/threat-model.md) |
 | [SIM lifecycle](docs/sim-lifecycle/index.md) | [Peering fabric](docs/peering/index.md) |
 | [API reference](docs/api/index.md) | [ADRs](docs/adr/0000-index.md) |

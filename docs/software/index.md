@@ -10,14 +10,14 @@ Fairwave's software is split into repo paths (one repository, multiple component
 
 | Path | Component | Language | What it does |
 |---|---|---|---|
-| `control/` | fairwave-control | Go | identity, enrollment, reconcile loop, REST API v1, southbound drivers |
-| `agent/` | fairwave-agent | Go | hardware probes, heartbeat, watchdog, safe-TX flag |
-| `cli/` | fairwave-cli | Go | operator commands against `/v1` |
-| `ui/` | Operator UI | web (local-first) | dashboard: coverage, UEs, backhaul, peering, lab toggle |
-| `portal/` | Captive portal | web | onboarding for Wi-Fi calling / non-cellular devices |
-| `core/` | Open5GS stack | containers | EPC: MME/SGW/PGW/HSS/PCRF |
-| `ran/` | srsRAN stack | containers | eNB (and srsUE for lab) |
-| `compose/` | Docker Compose | - | single-command lab stack, v0.1 default |
+| `core/fairwave-control/` | fairwave-control | Go | identity, enrollment, reconcile loop, REST API v1, southbound drivers |
+| `core/fairwave-agent/` | fairwave-agent | Go | hardware probes, heartbeat, watchdog, safe-TX flag |
+| `apps/fairwave-cli/` | fairwave-cli | Go | operator commands against `/v1` |
+| `apps/fairwave-ui/` | Operator UI | web (local-first) | dashboard: coverage, UEs, backhaul, peering, lab toggle |
+| `apps/captive-portal/` | Captive portal | web | onboarding for Wi-Fi calling / non-cellular devices |
+| `core/open5gs/` | Open5GS stack | containers | EPC: MME/SGW/PGW/HSS/PCRF |
+| `core/ran/` | srsRAN stack | containers | eNB (and srsUE for lab) |
+| `deploy/` | Docker Compose + ops | - | single-command lab stack, v0.1 default (compose, helm, ansible, terraform) |
 | `docs/` | documentation | markdown | this site |
 | `design/` | design docs | markdown | roadmap, threat model, spectrum matrix |
 | `mkdocs.yml` | site config | - | docs rendering |
@@ -34,10 +34,10 @@ Fairwave's software is split into repo paths (one repository, multiple component
 
 | Image | Source | Tag policy |
 |---|---|---|
-| `fairwave/control` | built from `control/` | per release (v0.1.0…) |
-| `fairwave/agent` | built from `agent/` | per release |
-| `fairwave/ui` | built from `ui/` | per release |
-| `fairwave/portal` | built from `portal/` | per release |
+| `fairwave/control` | built from `core/fairwave-control/` | per release (v0.1.0…) |
+| `fairwave/agent` | built from `core/fairwave-agent/` | per release |
+| `fairwave/ui` | built from `apps/fairwave-ui/` | per release |
+| `fairwave/portal` | built from `apps/captive-portal/` | per release |
 | `open5gs:dev` | pinned Open5GS build | pinned, hash-pinned in compose |
 | `srsran:dev` | pinned srsRAN build | pinned, hash-pinned in compose |
 

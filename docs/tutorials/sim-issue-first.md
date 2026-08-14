@@ -84,7 +84,7 @@ The hook inserts the Ki/OPc into the HSS database via the Open5GS internal API. 
 The lab UE container reads the minted IMSI from the shared subscriber store:
 
 ```bash
-docker compose -f deployments/lab/docker-compose.yml logs -f ue
+docker compose -f deploy/docker-compose.yml logs -f ue
 ```
 
 ```

@@ -22,7 +22,7 @@ This page goes one level below the quickstart: what the lab stack contains, how 
 
 ## The compose stack
 
-`make lab-up` runs `docker compose up -d` against `deployments/lab/docker-compose.yml` (lab compose). Five services:
+`make lab-up` runs `docker compose up -d` against `deploy/docker-compose.yml` (lab compose). Five services:
 
 | Service | Image / role | Ports exposed |
 | --- | --- | --- |
@@ -37,7 +37,7 @@ The two ZMQ sockets (`tcp://*:2100`, `tcp://*:2200`) are the only "RF": IQ sampl
 ## Boot order and the attach timeline
 
 1. `mongo` starts, waits for readiness.
-2. `open5gs` starts, seeds HSS subscribers from `deployments/lab/subscribers.json` if present (or from the provisioner output mounted into the container).
+2. `open5gs` starts and the init script (`core/open5gs/hss-init.sh`, mounted into the container) seeds the two lab subscribers (IMSI 999991234567001/002).
 3. `enb` starts and registers its S1 connection with the MME (Open5GS). Watch for `S1Setup` / `S1-AP connection established`.
 4. `ue` starts, scans the virtual PLMN, and attaches: RRC → NAS attach → authentication against HSS → default EPS bearer.
 5. `control-plane` health-checks the EPC and marks state `on-air` (lab).
@@ -45,7 +45,7 @@ The two ZMQ sockets (`tcp://*:2100`, `tcp://*:2200`) are the only "RF": IQ sampl
 ## Watching the attach
 
 ```bash
-cd deployments/lab
+cd deploy
 
 # EPC side: MME signalling
 docker compose logs -f open5gs | grep -iE "attach|IMSI|S1|bearer"

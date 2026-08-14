@@ -29,7 +29,7 @@ Rules:
 - Default TTL 15 minutes, hard max 24 h; tokens are single-use and scoped to the role in the invite.
 - Issuance and use are both audit-logged (principal, token hash, role, IP).
 - No API exists to extend a token; re-invite instead.
-- `fairwave operator revoke-invite --email ...` invalidates before expiry.
+- Invites cannot be revoked via CLI before expiry; they are single-use and TTL-bounded.
 
 ## WebAuthn passkeys (primary)
 
@@ -46,10 +46,10 @@ Rules:
 ## Session handling
 
 - **Access tokens:** short-lived JWTs (15 min) signed by the control plane key; refreshed with a refresh token bound to the session (30 day max, sliding).
-- **Sessions list:** `fairwave operator sessions`; admin can kill any session (`--kill session_id`).
+- **Sessions list:** the operator UI lists active sessions; an admin can kill any session from there (there is no CLI equivalent - the CLI manages API tokens with `fairwave token create|list|revoke`).
 - **Idle timeout:** 30 minutes for UI sessions, 15 minutes for API-only.
 - **Device binding:** refresh tokens are bound to the client's key (DPoP-style); token theft without the key is useless.
-- **Logout everywhere:** `fairwave operator logout --all` invalidates all sessions for the account.
+- **Logout everywhere:** the UI's sign-out-everywhere invalidates all sessions for the account; CLI-issued tokens are revoked individually with `fairwave token revoke <id>`.
 
 ## RBAC roles
 
@@ -81,8 +81,8 @@ Retention: 400 days default (configurable), exportable as JSONL by auditors only
 | --- | --- |
 | Lost all passkeys | Admin re-invites; TOTP remains as fallback; identity re-verified out of band |
 | Account lockout after TOTP attempts | Admin reset, audit entry, forced passkey re-registration |
-| Token leaked | Single-use + TTL bounds exposure; `operator revoke-invite` for pending ones |
-| Session stolen | Device-bound refresh token; kill via `operator sessions --kill` |
+| Token leaked | Single-use + TTL bounds exposure; `fairwave token revoke <id>` for issued ones |
+| Session stolen | Device-bound refresh token; kill the session from the UI (no CLI equivalent) |
 
 ## Related
 

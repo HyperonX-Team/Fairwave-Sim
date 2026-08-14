@@ -86,6 +86,6 @@ The control plane supervises one mobile core at a time, selected by `core:` in t
 
 ## Design notes
 
-- OpenAPI file location: `api/openapi.yaml` (root of repo). Validate changes with `make api-lint` (spectral) in CI.
+- OpenAPI file location: `api/openapi.yaml` (root of repo); the canonical contract, validated in CI.
 - All mutating endpoints are idempotent where the semantics allow; state transitions are logged in the audit trail.
 - Rate limits are per-principal and documented on each endpoint in [rest.md](rest.md).

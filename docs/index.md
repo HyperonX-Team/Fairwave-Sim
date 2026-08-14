@@ -46,7 +46,7 @@ Fairwave targets lawful private networks, research, education, and shared-spectr
 | Operator security | [Security overview](security/index.md) · [Operator auth](security/operator-auth.md) · [Privacy](security/privacy.md) · [Release signing](security/release-signing.md) |
 | APIs | [API overview](api/index.md) · [REST reference](api/rest.md) · [gRPC note](api/grpc.md) · `api/openapi.yaml` |
 | Reference | [Glossary](reference/glossary.md) · [Troubleshooting](reference/troubleshooting.md) · [Regulator FAQ](reference/faq-regulators.md) · [Carrier FAQ](reference/faq-carriers.md) · [What Fairwave is NOT](reference/not-fairwave.md) |
-| Decisions | [ADR index](adr/0002-4g-first.md) and siblings - ADR-0001, 0003–0012 |
+| Decisions | [ADR index](adr/0000-index.md) - ADR-0001 through ADR-0013 |
 | Design documents | `/design/threat-model.md`, `/design/spectrum-matrix.md`, `/design/roadmap.md` (mirrored in nav) |
 
 ```mermaid

@@ -84,7 +84,7 @@ The control plane exchanges subnet routes over the mTLS channel; the agent insta
 - A UE attached at site-a can ping `10.45.0.2` at site-b through the mesh - this is **peered breakout**; without the mesh, traffic breaks out locally at each edge.
 
 ```bash
-docker compose -f deployments/lab/docker-compose.yml exec ue ping -c 2 10.45.0.2
+docker compose -f deploy/docker-compose.yml exec ue ping -c 2 10.45.0.2
 ```
 
 ```

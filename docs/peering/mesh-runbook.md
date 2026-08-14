@@ -84,7 +84,7 @@ fairwave node join --token ... --rendezvous rdz.example.net:2468
 | Symptom | Diagnosis | Action |
 | --- | --- | --- |
 | `peer list` shows unreachable | Keepalives lost > 180 s | Wait for renegotiation; check NAT mapping, firewall 51820/udp |
-| wg handshake timeout | Keys or endpoint stale | `fairwave doctor --peer site-b`; re-run join if certs revoked |
+| wg handshake timeout | Keys or endpoint stale | `fairwave doctor`; `fairwave peer list`; re-run join if certs revoked |
 | Routes withdrawn | Peer unreachable or config conflict | Traffic falls back to local breakout - verify PGW NAT still up |
 | Peer re-joins with new identity | Reboot/re-init | Control plane rejects same-node-id with different pubkey; re-issue token |
 | Split brain (two CAs) | Manual misconfig | Re-join node to the authoritative mesh; stale CA certs rotate |

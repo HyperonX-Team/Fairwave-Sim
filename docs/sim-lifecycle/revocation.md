@@ -45,14 +45,17 @@ Revocation is write-ahead: the HSS subscriber record is marked blocked, the vaul
 - **Vault block list**: per credential bundle; prevents re-loading a revoked bundle into any store.
 - **Node-level block list**: pushed to the eNB's RRC accept list so a revoked IMSI is refused before it reaches the EPC (belt and suspenders; M5+).
 
-`fairwave sim status --imsi ...` shows which lists the IMSI is on:
+`fairwave sim get <imsi>` shows the SIM's current state (JSON):
 
-```
-IMSI 9999912345678901  state: revoked
-  hss:   blocked
-  vault: revoked
-  node:  absent
-  reason: lost-card (2026-08-02T10:15:00Z, op: alice@fairwave)
+```json
+{
+  "imsi": "9999912345678901",
+  "msisdn": "",
+  "profile": "lab",
+  "status": "revoked",
+  "apn": "internet",
+  "created_at": "2026-08-02T10:15:00Z"
+}
 ```
 
 ## SIM swap controls
