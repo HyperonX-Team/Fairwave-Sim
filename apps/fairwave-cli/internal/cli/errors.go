@@ -63,8 +63,8 @@ func MaximumNArgs(n int) cobra.PositionalArgs {
 	return wrapArgs(cobra.MaximumNArgs(n))
 }
 
-// RangeArgs requires between min and max positional arguments (inclusive);
+// RangeArgs requires between minArgs and maxArgs positional arguments (inclusive);
 // violations are usage errors.
-func RangeArgs(min, max int) cobra.PositionalArgs {
-	return wrapArgs(cobra.RangeArgs(min, max))
+func RangeArgs(minArgs, maxArgs int) cobra.PositionalArgs {
+	return wrapArgs(cobra.RangeArgs(minArgs, maxArgs))
 }

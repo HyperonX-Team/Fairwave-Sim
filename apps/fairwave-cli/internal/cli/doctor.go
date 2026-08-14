@@ -14,7 +14,7 @@ func doctorCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "doctor",
 		Short: "Diagnose this machine for Fairwave deployment",
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			fail := 0
 			check := func(name string, ok bool, note string) {
 				mark := "OK "

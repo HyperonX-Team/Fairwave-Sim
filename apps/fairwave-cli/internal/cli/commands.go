@@ -39,7 +39,7 @@ func nodeInitCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "init",
 		Short: "Initialize a node on the control plane",
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			c := newClient(cmd)
 			if country == "" {
 				country = "LAB"
@@ -67,7 +67,7 @@ func nodeStatusCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "status",
 		Short: "Show control plane + node status",
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			c := newClient(cmd)
 			var st api.Status
 			if err := c.get("/v1/status", &st); err != nil {
@@ -95,7 +95,7 @@ func nodeJoinCmd() *cobra.Command {
 		Use:          "join",
 		Short:        "Join a neighboring box's mesh (peer)",
 		SilenceUsage: true, // not a usage problem - the feature is simply missing
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 			// Full mesh enrollment lives in M2 (peering milestone). Until then
 			// the command must fail loudly instead of reporting success.
 			return fmt.Errorf("node join: peering is not yet implemented (M2); see docs/peering/ for the manual path")
@@ -109,7 +109,7 @@ func nodeLeaveCmd() *cobra.Command {
 		Use:   "leave",
 		Short: "Decommission a node",
 		Args:  ExactArgs(0),
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			if !yes {
 				ok, err := confirmDestructive(cmd, "Decommission ALL node(s)")
 				if err != nil {
@@ -176,7 +176,7 @@ func simIssueCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "issue",
 		Short: "Issue SIMs (lab profile generates Ki/OPc locally)",
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			c := newClient(cmd)
 			var issued []api.SIM
 			req := api.SimIssueRequest{Profile: profile, Count: count}
@@ -274,7 +274,7 @@ func simExportCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "export",
 		Short: "Export issued SIMs as a bureau batch (CSV/JSON)",
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			if format != "csv" && format != "json" {
 				return fmt.Errorf("format must be csv or json (got %q)", format)
 			}
@@ -339,7 +339,7 @@ func simListCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "list",
 		Short: "List SIMs",
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			c := newClient(cmd)
 			var sims []api.SIM
 			if err := c.get("/v1/sims", &sims); err != nil {
@@ -367,7 +367,7 @@ func peerListCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "list",
 		Short: "List known peers",
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			c := newClient(cmd)
 			var peers []api.Peer
 			if err := c.get("/v1/peers", &peers); err != nil {
@@ -416,7 +416,7 @@ func spectrumCheckCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "check",
 		Short: "Check whether a band may transmit in a country",
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			c := newClient(cmd)
 			var resp api.SpectrumCheckResponse
 			if err := c.post("/v1/spectrum/check", api.SpectrumCheckRequest{
@@ -450,7 +450,7 @@ func spectrumArmCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "arm",
 		Short: "Arm TX (requires acknowledgment; lab mode refuses)",
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			c := newClient(cmd)
 			var resp api.TxArmResponse
 			if err := c.post("/v1/tx/arm", api.TxArmRequest{
@@ -495,7 +495,7 @@ func policyGetCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "get",
 		Short: "Show current policy",
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			c := newClient(cmd)
 			var p api.Policy
 			if err := c.get("/v1/policy", &p); err != nil {
@@ -519,7 +519,7 @@ func policySetCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "set",
 		Short: "Set policy knobs (only the ones you pass change)",
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			c := newClient(cmd)
 			var p api.Policy
 			if err := c.get("/v1/policy", &p); err != nil {

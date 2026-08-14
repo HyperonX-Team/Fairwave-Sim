@@ -23,7 +23,7 @@ func Root() *cobra.Command {
 		Long:  "Fairwave CLI: manage nodes, SIMs, peers, spectrum gates, and the local control plane.",
 	}
 	// Label flag-parse failures as usage errors (exit 2).
-	root.SetFlagErrorFunc(func(c *cobra.Command, err error) error {
+	root.SetFlagErrorFunc(func(_ *cobra.Command, err error) error {
 		return usageError(err)
 	})
 	root.PersistentFlags().String("control", envOr("FAIRWAVE_CONTROL", DefaultControlURL), "control plane base URL")
@@ -80,7 +80,7 @@ func versionCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "version",
 		Short: "Print version",
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 			fmt.Printf("fairwave %s\n", Version)
 			return nil
 		},
