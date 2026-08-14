@@ -11,7 +11,7 @@ concurrency:
 
 jobs:
   go:
-    name: Go build + test + vet
+    name: Go build + test + vet + lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -19,10 +19,23 @@ jobs:
         with:
           go-version: "1.22"
           cache: true
+      - name: Format check (gofmt)
+        run: |
+          unformatted=$(gofmt -l core apps)
+          if [ -n "$unformatted" ]; then
+            echo "The following files are not gofmt-formatted:"
+            echo "$unformatted"
+            exit 1
+          fi
       - name: Vet
         run: go vet ./...
-      - name: Test
-        run: go test ./... -count=1
+      - name: Test (race)
+        run: go test -race -count=1 ./...
+      - name: Lint
+        uses: golangci/golangci-lint-action@v9
+        with:
+          version: v1.64.8
+          args: --config=.golangci.yml ./...
       - name: Build binaries
         run: |
           mkdir -p bin
