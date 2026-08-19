@@ -21,13 +21,14 @@ import (
 // registry. The registry file holds the encrypted profile payloads (0600,
 // like the SIM vault); the SM-DP+ sessions themselves stay in memory.
 type esimSvc struct {
-	enabled bool
-	reg     *registry.Registry
-	smdp    *smdp.Server
-	address string
-	smdpID  string
-	codeTTL time.Duration // 0 = no code-level expiry
-	now     func() time.Time
+	enabled       bool
+	reg           *registry.Registry
+	smdp          *smdp.Server
+	address       string
+	smdpID        string
+	codeTTL       time.Duration // 0 = no code-level expiry
+	now           func() time.Time
+	profileSource func(imsi string) (simprov.Subscriber, error) // defaults to lab vectors
 }
 
 // newEsimSvc builds the eSIM service from config. A nil option or a
@@ -58,12 +59,26 @@ func newEsimSvc(cfg *config.ControlConfig, o *ESIMOptions) *esimSvc {
 	svc.reg = reg
 	svc.address = address
 	svc.smdpID = smdpID
+	if o.ProfileSource != nil {
+		svc.profileSource = o.ProfileSource
+	} else {
+		svc.profileSource = simprov.LoadTestVector
+	}
 	// ProfileSource enforces the code-level policy: single-use codes refuse
 	// a second download and codes expire after their TTL.
 	resolve := func(token string) (*profile.Profile, error) {
 		return reg.ResolvePolicy(token, o.SingleUse, svc.now().UTC())
 	}
-	srv := smdp.NewServer(smdpID, smdp.NewMemStore(), resolve)
+	store := smdp.Store(smdp.NewMemStore())
+	if o.SessionStorePath != "" {
+		fs, err := smdp.NewFileStore(o.SessionStorePath)
+		if err != nil {
+			log.Printf("esim: session store %s: %v (falling back to memory)", o.SessionStorePath, err)
+		} else {
+			store = fs
+		}
+	}
+	srv := smdp.NewServer(smdpID, store, resolve)
 	// Mark the code as downloaded as soon as the package is delivered.
 	srv.OnDelivered = reg.MarkDownloaded
 	svc.smdp = srv
@@ -100,9 +115,9 @@ func (s *Server) issueEsim(req *api.EsimIssueRequest, principal string) (*api.Es
 	if sim.Status == "revoked" || sim.Status == "suspended" || sim.Status == "expired" {
 		return nil, fmt.Errorf("SIM %s is %s; reactivate before issuing an eSIM", req.IMSI, sim.Status)
 	}
-	// Credentials never cross the API; the lab server resolves them from the
-	// reference test vectors (production: HSM import path, docs/sim-lifecycle).
-	sub, err := simprov.LoadTestVector(req.IMSI)
+	// Credentials never cross the API; the source (lab vectors by default,
+	// or an injected production/HSM source) resolves them for issuance.
+	sub, err := s.esim.profileSource(req.IMSI)
 	if err != nil {
 		return nil, fmt.Errorf("eSIM issue: %v (lab vectors only; see docs/sim-lifecycle)", err)
 	}

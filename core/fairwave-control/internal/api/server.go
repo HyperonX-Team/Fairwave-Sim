@@ -27,6 +27,7 @@ import (
 	"github.com/HyperonX-Team/Fairwave-Sim/core/fairwave-control/internal/identity"
 	"github.com/HyperonX-Team/Fairwave-Sim/core/fairwave-control/internal/store"
 	"github.com/HyperonX-Team/Fairwave-Sim/core/sim-ops/hsswrite"
+	"github.com/HyperonX-Team/Fairwave-Sim/core/sim-ops/simprov"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -92,6 +93,14 @@ type ESIMOptions struct {
 	SMDPID       string        //
 	SingleUse    bool          // activation codes die after one download
 	CodeTTL      time.Duration // activation codes expire after this long (0 = no code-level expiry)
+	// ProfileSource resolves a SIM's credentials for eSIM issuance. If nil,
+	// the server uses the lab test vectors (simprov.LoadTestVector). A
+	// production/H SM deployment injects a source backed by the vault/HSM.
+	ProfileSource func(imsi string) (simprov.Subscriber, error)
+	// SessionStorePath, when non-empty, persists download sessions to this
+	// directory (file-backed Store) so a reboot survives an in-flight
+	// exchange. Empty keeps sessions in memory (lab default).
+	SessionStorePath string
 }
 
 // New creates the API server with default options. sc may be nil (all

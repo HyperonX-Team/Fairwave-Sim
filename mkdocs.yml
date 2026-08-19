@@ -93,6 +93,7 @@ nav:
   - Ops:
       - ops/index.md
       - ops/cafe-pilot.md
+      - ops/compact.md
       - ops/incident-response.md
       - ops/backup-restore.md
       - ops/monitoring.md
@@ -110,6 +111,7 @@ nav:
   - Security:
       - security/index.md
       - security/operator-auth.md
+      - security/esim.md
       - security/privacy.md
       - security/release-signing.md
   - API:

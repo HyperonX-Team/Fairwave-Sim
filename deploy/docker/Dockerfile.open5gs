@@ -27,7 +27,7 @@ WORKDIR /src
 # warning surface intact.
 RUN meson setup build --prefix=/usr/local -Dbuildtype=release \
         -Dc_args="-Wno-error=stringop-overflow" \
-    && ninja -C build \
+    && ninja -C build -j2 \
     && ninja -C build install
 
 # ---------------------------------------------------------------------------
@@ -36,7 +36,7 @@ RUN meson setup build --prefix=/usr/local -Dbuildtype=release \
 FROM debian:12-slim AS runtime
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-        procps ca-certificates gdb \
+        procps ca-certificates \
         libsctp1 libgnutls30 libgcrypt20 libssl3 \
         libmongoc-1.0-0 libbson-1.0-0 libyaml-0-2 \
         libmicrohttpd12 libcurl3-gnutls libnghttp2-14 \
@@ -71,6 +71,12 @@ RUN apt-get install -y --no-install-recommends openssl && \
 # Entrypoint: run the EPC daemons together with a respawn loop; forward
 # signals to all. Open5GS v2.7 renamed daemons: SGW -> sgwc+sgwu,
 # PGW -> smf+upf. A crashed daemon is restarted (crash-loops are capped).
+#
+# Memory tuning: the daemon set is selectable via the FW_DAEMONS env var,
+# a space-separated list of open5gs-* daemon names. The default (unset)
+# launches all eight. Low-memory ("compact") deployments set FW_DAEMONS to
+# the six daemons the lab attach path actually needs (mme, sgwc, sgwu, smf,
+# upf, hss) to omit nrfd and pcrfd and save memory.
 RUN <<'EOF'
 cat > /usr/local/bin/open5gs-entry.sh <<'SH'
 #!/usr/bin/env bash
@@ -82,7 +88,24 @@ if command -v ip >/dev/null 2>&1; then
     ip addr add 10.45.0.1/16 dev ogstun 2>/dev/null || true
     ip link set ogstun up 2>/dev/null || true
 fi
-DAEMONS=(open5gs-nrfd open5gs-mmed open5gs-sgwcd open5gs-sgwud open5gs-smfd open5gs-upfd open5gs-hssd open5gs-pcrfd)
+ALL_DAEMONS=(open5gs-nrfd open5gs-mmed open5gs-sgwcd open5gs-sgwud open5gs-smfd open5gs-upfd open5gs-hssd open5gs-pcrfd)
+if [[ -n "${FW_DAEMONS:-}" ]]; then
+    read -r -a DAEMONS <<< "${FW_DAEMONS}"
+    # Validate that every requested daemon is a known binary; ignore unknowns
+    # so a stale env value cannot silently launch a wrong process.
+    known=0
+    for d in "${DAEMONS[@]}"; do
+        for a in "${ALL_DAEMONS[@]}"; do
+            if [[ "$d" == "$a" ]]; then known=1; break; fi
+        done
+        if [[ "$known" != 1 ]]; then
+            echo "[open5gs-entry] WARNING: unknown daemon '$d' ignored"
+        fi
+    done
+    echo "[open5gs-entry] FW_DAEMONS set -> launching: ${DAEMONS[*]}"
+else
+    DAEMONS=("${ALL_DAEMONS[@]}")
+fi
 declare -A pids
 shutdown() { echo "[open5gs-entry] stopping"; kill "${pids[@]}" 2>/dev/null || true; wait; exit 0; }
 trap shutdown TERM INT

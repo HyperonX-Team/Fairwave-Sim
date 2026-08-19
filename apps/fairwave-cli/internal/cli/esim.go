@@ -186,10 +186,15 @@ func esimIssueCmd() *cobra.Command {
 }
 
 // esimServeCmd runs the lab SM-DP+ server backed by the local registry.
-// It serves plain HTTP; in production terminate TLS at a reverse proxy or
-// front the control plane (docs/security/esim.md).
+// It serves plain HTTP by default; pass --tls-cert/--tls-key to serve the
+// ES9+ surface over HTTPS directly (otherwise terminate TLS at a reverse
+// proxy or front the control plane - docs/security/esim.md).
 func esimServeCmd() *cobra.Command {
-	var addr string
+	var (
+		addr    string
+		tlsCert string
+		tlsKey  string
+	)
 	cmd := &cobra.Command{
 		Use:   "serve",
 		Short: "Run the lab SM-DP+ server (ES9+ endpoints)",
@@ -199,7 +204,6 @@ func esimServeCmd() *cobra.Command {
 				return err
 			}
 			srv := smdp.NewServer("fairwave-esim", smdp.NewMemStore(), reg.Resolve)
-			fmt.Printf("fairwave esim SM-DP+ listening on %s (lab mode, TLS terminates elsewhere)\n", addr)
 			httpSrv := &http.Server{
 				Addr:              addr,
 				Handler:           srv.Handler(),
@@ -207,10 +211,20 @@ func esimServeCmd() *cobra.Command {
 				WriteTimeout:      30 * time.Second,
 				IdleTimeout:       120 * time.Second,
 			}
+			if tlsCert != "" || tlsKey != "" {
+				if tlsCert == "" || tlsKey == "" {
+					return fmt.Errorf("--tls-cert and --tls-key must be set together")
+				}
+				fmt.Printf("fairwave esim SM-DP+ listening on %s (TLS)\n", addr)
+				return httpSrv.ListenAndServeTLS(tlsCert, tlsKey)
+			}
+			fmt.Printf("fairwave esim SM-DP+ listening on %s (lab mode, TLS terminates elsewhere)\n", addr)
 			return httpSrv.ListenAndServe()
 		},
 	}
 	cmd.Flags().StringVar(&addr, "addr", "127.0.0.1:8443", "listen address")
+	cmd.Flags().StringVar(&tlsCert, "tls-cert", "", "path to TLS certificate (enables HTTPS when set with --tls-key)")
+	cmd.Flags().StringVar(&tlsKey, "tls-key", "", "path to TLS private key (enables HTTPS when set with --tls-cert)")
 	return cmd
 }
 

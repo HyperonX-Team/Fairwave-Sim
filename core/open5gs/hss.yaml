@@ -8,7 +8,7 @@ logger:
 
 global:
   max:
-    ue: 1024
+    ue: 16
 
 hss:
   freeDiameter: /usr/local/etc/freeDiameter/hss.conf

@@ -7,9 +7,15 @@
 package registry
 
 import (
+	"crypto/aes"
+	"crypto/cipher"
+	"crypto/rand"
+	"crypto/sha256"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"sync"
@@ -18,13 +24,18 @@ import (
 	"github.com/HyperonX-Team/Fairwave-Sim/core/esim/profile"
 )
 
-// Entry is one activation code in the registry.
+// Entry is one activation code in the registry. The sensitive carrier
+// profile (which holds Milenage KI/OPc) is stored either directly in
+// Profile (plaintext, lab default) or, when an encryption key is set, as
+// ProfileCipher: base64(nonce || AES-GCM ciphertext || tag) of the
+// marshaled profile. Metadata stays readable for audit/policy layers.
 type Entry struct {
-	Token        string           `json:"token"`
-	Profile      *profile.Profile `json:"profile"`
-	CreatedAt    time.Time        `json:"created_at"`
-	DownloadedAt *time.Time       `json:"downloaded_at,omitempty"`
-	ExpiresAt    *time.Time       `json:"expires_at,omitempty"` // code-level expiry (may be nil)
+	Token          string           `json:"token"`
+	Profile        *profile.Profile `json:"profile,omitempty"`
+	ProfileCipher  string           `json:"profile_cipher,omitempty"`
+	CreatedAt      time.Time        `json:"created_at"`
+	DownloadedAt   *time.Time       `json:"downloaded_at,omitempty"`
+	ExpiresAt      *time.Time       `json:"expires_at,omitempty"` // code-level expiry (may be nil)
 }
 
 // ErrActivationCodeUsed means a single-use code was already downloaded.
@@ -37,13 +48,25 @@ var ErrActivationCodeExpired = errors.New("registry: activation code expired")
 type Registry struct {
 	mu      sync.Mutex
 	path    string
+	key     []byte // nil = plaintext entries (lab default)
 	entries map[string]*Entry
 }
 
-// Open loads the registry from path, creating it if absent. The file is
-// always chmod 0600.
+// Open loads the registry from path, creating it if absent, in plaintext
+// mode. The file is always chmod 0600.
 func Open(path string) (*Registry, error) {
-	r := &Registry{path: path, entries: make(map[string]*Entry)}
+	return OpenWithKey(path, nil)
+}
+
+// OpenWithKey loads the registry with an optional encryption key. A nil key
+// keeps plaintext entries (backward compatible). A key (16/24/32 bytes)
+// encrypts each profile payload with AES-GCM at rest. An existing registry
+// opened with the wrong key fails loudly rather than returning garbage.
+func OpenWithKey(path string, key []byte) (*Registry, error) {
+	if err := validateKey(key); err != nil {
+		return nil, err
+	}
+	r := &Registry{path: path, key: key, entries: make(map[string]*Entry)}
 	data, err := os.ReadFile(path)
 	switch {
 	case os.IsNotExist(err):
@@ -62,9 +85,108 @@ func Open(path string) (*Registry, error) {
 		return nil, fmt.Errorf("registry: corrupt file %s: %w", path, err)
 	}
 	for _, e := range entries {
+		if err := r.decryptEntry(e); err != nil {
+			return nil, fmt.Errorf("registry: %s: %w", path, err)
+		}
 		r.entries[e.Token] = e
 	}
 	return r, nil
+}
+
+// ValidateKey reports whether key is a usable AES key length (nil allowed).
+func validateKey(key []byte) error {
+	if key == nil {
+		return nil
+	}
+	switch len(key) {
+	case 16, 24, 32:
+		return nil
+	default:
+		return fmt.Errorf("registry: key must be 16/24/32 bytes, got %d", len(key))
+	}
+}
+
+// KeyFromPassphrase derives a 32-byte AES key from a passphrase (SHA-256).
+// Use this to persist a human-held secret rather than a raw key.
+func KeyFromPassphrase(passphrase string) []byte {
+	h := sha256.Sum256([]byte(passphrase))
+	return h[:]
+}
+
+func (r *Registry) encryptEntry(e *Entry) error {
+	if r.key == nil || e.Profile == nil {
+		return nil
+	}
+	plain, err := json.Marshal(e.Profile)
+	if err != nil {
+		return err
+	}
+	ct, err := aeadSeal(r.key, plain)
+	if err != nil {
+		return err
+	}
+	e.ProfileCipher = base64.StdEncoding.EncodeToString(ct)
+	e.Profile = nil
+	return nil
+}
+
+func (r *Registry) decryptEntry(e *Entry) error {
+	if e.ProfileCipher == "" {
+		return nil
+	}
+	ct, err := base64.StdEncoding.DecodeString(e.ProfileCipher)
+	if err != nil {
+		return fmt.Errorf("registry: corrupt profile_cipher (base64): %w", err)
+	}
+	plain, err := aeadOpen(r.key, ct)
+	if err != nil {
+		return fmt.Errorf("registry: cannot decrypt profile (wrong key?): %w", err)
+	}
+	p := &profile.Profile{}
+	if err := json.Unmarshal(plain, p); err != nil {
+		return fmt.Errorf("registry: decrypt ok but corrupt profile json: %w", err)
+	}
+	e.Profile = p
+	return nil
+}
+
+// aeadSeal encrypts plain with AES-GCM under key, returning
+// nonce || ciphertext || tag.
+func aeadSeal(key, plain []byte) ([]byte, error) {
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		return nil, err
+	}
+	gcm, err := cipher.NewGCM(block)
+	if err != nil {
+		return nil, err
+	}
+	nonce := make([]byte, gcm.NonceSize())
+	if _, err := io.ReadFull(rand.Reader, nonce); err != nil {
+		return nil, err
+	}
+	return gcm.Seal(nonce, nonce, plain, nil), nil
+}
+
+// aeadOpen decrypts nonce || ciphertext || tag under key.
+func aeadOpen(key, sealed []byte) ([]byte, error) {
+	if key == nil {
+		return nil, errors.New("registry: encrypted entry but no key configured")
+	}
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		return nil, err
+	}
+	gcm, err := cipher.NewGCM(block)
+	if err != nil {
+		return nil, err
+	}
+	if len(sealed) < gcm.NonceSize() {
+		return nil, errors.New("registry: ciphertext too short")
+	}
+	nonce := sealed[:gcm.NonceSize()]
+	body := sealed[gcm.NonceSize():]
+	return gcm.Open(nil, nonce, body, nil)
 }
 
 // Add registers an activation code with its profile (no code-level expiry).
@@ -89,6 +211,9 @@ func (r *Registry) AddWithExpiry(token string, p *profile.Profile, expiresAt tim
 	if !expiresAt.IsZero() {
 		t := expiresAt.UTC()
 		e.ExpiresAt = &t
+	}
+	if err := r.encryptEntry(e); err != nil {
+		return err
 	}
 	r.entries[token] = e
 	return r.saveLocked()
@@ -174,9 +299,21 @@ func (r *Registry) Revoke(token string) error {
 }
 
 func (r *Registry) saveLocked() error {
-	entries := make([]*Entry, 0, len(r.entries))
+	// Serialize a copy with profiles encrypted so the in-memory entries keep
+	// their plaintext Profile (callers read r.entries directly).
+	type encEntry struct {
+		*Entry
+		Profile *profile.Profile `json:"profile,omitempty"`
+	}
+	entries := make([]encEntry, 0, len(r.entries))
 	for _, e := range r.entries {
-		entries = append(entries, e)
+		cp := *e
+		if r.key != nil && e.Profile != nil {
+			if err := r.encryptEntry(&cp); err != nil {
+				return err
+			}
+		}
+		entries = append(entries, encEntry{Entry: &cp})
 	}
 	data, err := json.MarshalIndent(entries, "", "  ")
 	if err != nil {

@@ -16,8 +16,8 @@ logger:
 
 global:
   max:
-    ue: 1024
-    peer: 128
+    ue: 16
+    peer: 16
 
 mme:
   freeDiameter: /etc/freeDiameter/mme.conf

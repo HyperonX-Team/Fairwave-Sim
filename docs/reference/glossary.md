@@ -30,7 +30,7 @@ Terms used across the Fairwave docs. Line-oriented; 3GPP-heavy where noted.
 - **SQN** - Sequence Number: used in authentication (AKA) to resist replay; managed by HSS and SIM.
 - **AUX** - Not standard 3GPP; in Fairwave docs, auxiliary provisioning data (ICCID, labels) that accompanies a credential.
 - **SIM** - Subscriber Identity Module: the credential (physical card or virtual) that authenticates a device.
-- **eSIM / LPA** - eSIM: embedded SIM; LPA: the device software that downloads profiles from an SM-DP+. Fairwave does not run an SM-DP+ (see [eSIM](../sim-lifecycle/esim.md) - note: file is under `docs/sim-lifecycle/esim.md`).
+- **eSIM / LPA** - eSIM: embedded SIM; LPA: the device software that downloads profiles from an SM-DP+. Fairwave runs a lab SM-DP+ server (see [eSIM](../sim-lifecycle/esim.md)); production eSIM requires GSMA certification.
 - **CBRS** - Citizens Broadband Radio Service: US shared-spectrum band (3550–3700 MHz).
 - **SAS** - Spectrum Access System: the US database/enforcement system granting CBRS channel access.
 - **GAA** - General Authorized Access: CBRS tier usable without individual license but under SAS rules.

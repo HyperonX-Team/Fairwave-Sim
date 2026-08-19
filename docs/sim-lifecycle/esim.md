@@ -53,10 +53,24 @@ flow with real cryptography, clearly labeled as such (see
   does not need one because it interprets the profile directly. This is a
   hardware/module milestone, not a protocol one.
 - **No production IMSIs, no bypass flags.** Profile issuance accepts only
-  the dummy lab vectors (MCC 999). Production issuance waits for GSMA
-  certification.
-- **No KEK-wrapped registry encryption yet.** The registry file is 0600 but
-  plaintext; the ADR-0006 encrypted vault applies to it in a follow-up.
+  the dummy lab vectors (MCC 999) by default. A production source can be
+  injected via the control plane's `ProfileSource` (vault/HSM backed); the
+  issuance path itself never accepts a non-lab class unless such a source
+  is wired in.
+
+The registry and SM-DP+ server also gained production-facing hardening:
+
+- **Encrypted registry at rest.** The 0600 profile registry can be opened
+  with an AES-GCM encryption key (`registry.OpenWithKey` /
+  `KeyFromPassphrase`), so Milenage KI/OPc no longer sit in plaintext on
+  disk. Metadata stays readable for audit/listing. Pass the key to the
+  control plane to enable it (see the control config `esim` section).
+- **TLS on the SM-DP+ surface.** `fairwave esim serve --tls-cert/--tls-key`
+  serves the ES9+ endpoints over HTTPS directly, in addition to the
+  reverse-proxy termination path.
+- **Persistent download sessions.** SM-DP+ sessions survive a restart via a
+  file-backed store (`smdp.NewFileStore`, control `esim` session-store
+  path); a half-finished exchange is no longer lost on reboot.
 
 ## Alternatives to a full SM-DP+ for production
 

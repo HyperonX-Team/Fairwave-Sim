@@ -38,6 +38,10 @@ services:
   mongo:
     image: ${FW_MONGO_IMAGE:-mongo:6.0}
     restart: unless-stopped
+    # Cap the WiredTiger cache. mongo's default is ~50% of host RAM, which is
+    # wasteful on a shared laptop and can swap-thrash even a mid-size box. A
+    # small fixed cache is ample for the lab's handful of subscriber docs.
+    command: ["mongod", "--wiredTigerCacheSizeGB", "0.12"]
     networks:
       fwnet:
         ipv4_address: ${FW_MONGO_IP:-10.10.0.10} # pinned to keep .2 free for the MME

@@ -1,0 +1,71 @@
+# Fairwave COMPACT profile - the no-RF lab tuned to run on a 4 GB RAM laptop.
+#
+# Layer this ON TOP of the base lab compose. Compose merges override files so
+# only the keys mentioned here change; everything else comes from
+# docker-compose.yml.
+#
+#   make compact-up                       # (preferred) brings up the 4G lab
+#   docker compose -f deploy/docker-compose.yml \
+#                 -f deploy/docker-compose.compact.yml up -d --build
+#
+# Budget (hard cuda. limits, sum ~2.6 GB so the host keeps headroom):
+#   mongo        600m   (WiredTiger cache capped to 0.12 GB via command)
+#   open5gs      600m   (only the 6 attach-path daemons, see FW_DAEMONS)
+#   enb         1024m   (srsENB PHY - the largest single consumer)
+#   ue1          256m
+#   control-plane 256m
+#   ---- total ~2.7 GB of the 4 GB budget ----
+#
+# The Open5GS container is also told via FW_DAEMONS to launch only the six
+# daemons the 4G lab path exercises (mme sgwc sgwu smf upf hss), omitting
+# the nrfd and pcrfd daemons to save several hundred MB of RSS. The Go
+# control plane gets GOMEMLIMIT/GOMAXPROCS so its GC/heap stays bounded.
+#
+# NOTE: this override targets the 4G lab (docker-compose.yml). The 5G SA
+# stack (docker-compose.5g.yml) runs ~15 containers and is NOT the
+# 4 GB-laptop path; use it only on 16 GB+ hosts.
+
+name: fairwave-lab
+
+services:
+  mongo:
+    mem_limit: 600m
+    deploy:
+      resources:
+        limits:
+          memory: 600m
+
+  open5gs:
+    # Launch only the 6 daemons the lab attach path needs (see entrypoint).
+    environment:
+      FW_DAEMONS: "open5gs-mmed open5gs-sgwcd open5gs-sgwud open5gs-smfd open5gs-upfd open5gs-hssd"
+    mem_limit: 600m
+    deploy:
+      resources:
+        limits:
+          memory: 600m
+
+  enb:
+    mem_limit: 1024m
+    deploy:
+      resources:
+        limits:
+          memory: 1024m
+
+  ue1:
+    mem_limit: 256m
+    deploy:
+      resources:
+        limits:
+          memory: 256m
+
+  control-plane:
+    mem_limit: 256m
+    deploy:
+      resources:
+        limits:
+          memory: 256m
+    # Bound the Go runtime so its heap cannot balloon on a small host.
+    environment:
+      GOMEMLIMIT: 192MiB
+      GOMAXPROCS: "2"

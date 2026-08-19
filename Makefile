@@ -9,7 +9,7 @@ BIN_DIR := bin
 GO ?= go
 
 .PHONY: all check build test lint fmt gen docs docs-serve \
-        lab-up lab-down lab-status rf-dry-run \
+        lab-up lab-down lab-status compact-up compact-down compact-status rf-dry-run \
         sbom release vet e2e help bootstrap
 
 all: check
@@ -54,6 +54,20 @@ lab-up:
 
 lab-down:
 	docker compose -f deploy/docker-compose.yml down -v
+
+# Compact profile: the same no-RF lab tuned for a 4 GB RAM laptop. Layers the
+# compact override (memory limits + FW_DAEMONS subset) on the base compose.
+compact-up:
+	docker compose -f deploy/docker-compose.yml -f deploy/docker-compose.compact.yml up -d --build
+	@echo "== seeding lab subscribers into HSS =="
+	@docker compose -f deploy/docker-compose.yml -f deploy/docker-compose.compact.yml exec -T mongo bash /init/hss-init.sh || echo "[warn] HSS seed failed (manual: see docs/sim-lifecycle/bureau-runbook.md)"
+	./tests/e2e-sim/assert-lab-up.sh
+
+compact-down:
+	docker compose -f deploy/docker-compose.yml -f deploy/docker-compose.compact.yml down -v
+
+compact-status:
+	docker compose -f deploy/docker-compose.yml -f deploy/docker-compose.compact.yml ps
 
 lab-status:
 	docker compose -f deploy/docker-compose.yml ps
@@ -101,6 +115,9 @@ help:
 	@echo "  lab-up          start no-RF lab (Open5GS + srsRAN zmq + srsUE) + assert attach"
 	@echo "  lab-down        stop and wipe lab volumes"
 	@echo "  lab-status      compose ps + UE tail"
+	@echo "  compact-up      same lab tuned for a 4 GB RAM laptop (memory limits + trimmed daemons)"
+	@echo "  compact-down    stop and wipe compact lab volumes"
+	@echo "  compact-status  compact compose ps + UE tail"
 	@echo "  rf-dry-run      validate RF configs, never transmits"
 	@echo "  e2e             alias for lab-up"
 	@echo "  docs / docs-serve  build / serve MkDocs site"

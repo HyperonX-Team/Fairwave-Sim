@@ -95,13 +95,15 @@ replicate the telecom cartel - it makes the cartel's local monopoly contestable.
 
 ## Quickstart - first UE attach in <30 minutes (no RF, no license needed)
 
-> Requirements: Docker Engine 24+, 8 GB RAM. Everything runs in containers; nothing transmits.
+> Requirements: Docker Engine 24+, 4 GB RAM (`make compact-up`; 8–16 GB comfortable for `make lab-up`).
+> Everything runs in containers; nothing transmits.
 > For the full data path (UE IP + ping) use native Linux; Docker Desktop on
 > Windows/macOS passes all EPC-side attach checks (see [docs](docs/tutorials/lab-attach.md)).
 
 ```bash
 ./scripts/bootstrap.sh      # checks/installs toolchains (Go, Docker, pre-commit)
 make lab-up                 # builds images, brings up EPC + eNB + srsUE, runs attach checks
+make compact-up             # same lab, tuned for a 4 GB RAM laptop (memory limits + trimmed daemons)
 make status                 # one-glance health: mme, sgwu/upf, enb, ue1
 ```
 

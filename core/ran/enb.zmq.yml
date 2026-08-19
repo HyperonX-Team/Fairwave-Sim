@@ -31,3 +31,10 @@ dl_earfcn = 3350
 [log]
 all_level = info
 all_hex_limit = 0
+
+[expert]
+# Low-memory tuning: one PHY thread instead of the default 3 and a smaller
+# preallocated UE pool (8 -> 2). Halves PHY working-set RAM; sufficient for
+# a single-UE lab cell.
+nof_phy_threads = 1
+nof_prealloc_ues = 2

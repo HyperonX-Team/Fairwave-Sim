@@ -44,6 +44,20 @@ lab-up:
 lab-down:
     docker compose -f deploy/docker-compose.yml down -v
 
+# Compact profile: the same no-RF lab tuned for a 4 GB RAM laptop. Layers the
+# compact override (memory limits + FW_DAEMONS subset) on the base compose.
+compact-up:
+    docker compose -f deploy/docker-compose.yml -f deploy/docker-compose.compact.yml up -d --build
+    echo "== seeding lab subscribers into HSS =="
+    docker compose -f deploy/docker-compose.yml -f deploy/docker-compose.compact.yml exec -T mongo bash /init/hss-init.sh || echo "[warn] HSS seed failed (manual: see docs/sim-lifecycle/bureau-runbook.md)"
+    ./tests/e2e-sim/assert-lab-up.sh
+
+compact-down:
+    docker compose -f deploy/docker-compose.yml -f deploy/docker-compose.compact.yml down -v
+
+compact-status:
+    docker compose -f deploy/docker-compose.yml -f deploy/docker-compose.compact.yml ps
+
 lab-status:
     docker compose -f deploy/docker-compose.yml ps
     echo "--- attach check ---"

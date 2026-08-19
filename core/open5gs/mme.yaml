@@ -6,11 +6,11 @@
 logger:
   file:
     path: /var/log/open5gs/mme.log
-  level: debug
+  level: info
 
 global:
   max:
-    ue: 1024
+    ue: 16
 
 mme:
   freeDiameter: /usr/local/etc/freeDiameter/mme.conf

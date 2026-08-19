@@ -11,7 +11,7 @@ This tutorial gets a complete private LTE network running on your laptop in abou
 | Requirement | Minimum | Notes |
 | --- | --- | --- |
 | Docker Engine | 24+ | Docker Compose v2 included |
-| RAM | 8 GB | 16 GB recommended |
+| RAM | 4 GB | `make compact-up` for 4 GB; 8–16 GB comfortable for `make lab-up` |
 | Disk | 10 GB free | Container images |
 | Go | 1.22+ | Only needed to build `fairwave-cli` |
 | OS | Linux, macOS, or Windows (WSL2) | Lab stack runs in containers |

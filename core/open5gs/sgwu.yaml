@@ -6,7 +6,7 @@ logger:
 
 global:
   max:
-    ue: 1024
+    ue: 16
 
 sgwu:
   pfcp:

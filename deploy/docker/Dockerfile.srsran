@@ -36,7 +36,7 @@ WORKDIR /src
 RUN mkdir build \
     && cd build \
     && cmake .. -DCMAKE_BUILD_TYPE=Release \
-    && make -j"$(nproc)" srsenb srsepc srsue \
+    && make -j2 srsenb srsepc srsue \
     && make install \
     && install -m 0755 srsenb/src/srsenb srsue/src/srsue srsepc/src/srsepc /usr/local/bin/
 
@@ -53,7 +53,7 @@ RUN mkdir build \
     && cd build \
     && cmake .. -DCMAKE_BUILD_TYPE=Release \
         -DENABLE_EXPORT=ON -DENABLE_ZEROMQ=ON -DBUILD_TESTS=OFF \
-    && make -j"$(nproc)" gnb \
+    && make -j2 gnb \
     && make install \
     && install -m 0755 apps/gnb/gnb /usr/local/bin/gnb
 
@@ -74,7 +74,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 COPY --from=build /usr/local/bin/srsenb /usr/local/bin/srsenb
 COPY --from=build /usr/local/bin/srsue /usr/local/bin/srsue
-COPY --from=build /usr/local/bin/srsepc /usr/local/bin/srsepc
 COPY --from=build /usr/local/bin/gnb /usr/local/bin/gnb
 COPY --from=build /usr/local/lib /usr/local/lib
 COPY docker/srs-entry.sh /usr/local/bin/srs-entry.sh

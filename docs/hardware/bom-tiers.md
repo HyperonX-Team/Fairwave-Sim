@@ -12,10 +12,11 @@ No RF. srsRAN zmq + srsUE, Open5GS, control plane - all in Docker Compose.
 
 | Part | Example | Price |
 |---|---|---|
-| x86 mini-PC, 8 GB RAM, 256 GB NVMe | Beelink MINI S12 / N100-class | $170 |
+| x86 mini-PC, 4 GB RAM, 256 GB NVMe | Beelink MINI S12 / N100-class (4 GB) | $150 |
+| - or - 8 GB RAM variant (Dev Tier recommended) | Beelink MINI S12 / N100-class (8 GB) | $170 |
 | USB 3.0 flash (unattended-upgrades log, optional) | 32 GB | $10 |
 | Ethernet cable, PSU included | - | incl. |
-| **Total** | | **~$180–200** |
+| **Total** | | **~$150–180** |
 
 SDR not required; add any tier-2 SDR later without rework.
 
