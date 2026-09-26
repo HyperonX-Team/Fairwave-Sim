@@ -36,6 +36,9 @@ jobs:
               GOOS=$os GOARCH=$arch CGO_ENABLED=0 go build \
                 -ldflags "-X github.com/HyperonX-Team/Fairwave-Sim/apps/fairwave-cli/internal/cli.Version=${{ steps.version.outputs.VERSION }}" \
                 -o dist/fairwave-${os}-${arch} ./apps/fairwave-cli/cmd/fairwave
+              GOOS=$os GOARCH=$arch CGO_ENABLED=0 go build \
+                -ldflags "-X main.Version=${{ steps.version.outputs.VERSION }}" \
+                -o dist/fairwave-hydra-${os}-${arch} ./core/hydra/cmd/fairwave-hydra
             done
           done
 

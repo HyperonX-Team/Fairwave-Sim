@@ -10,7 +10,7 @@ GO ?= go
 
 .PHONY: all check build test lint fmt gen docs docs-serve \
         lab-up lab-down lab-status compact-up compact-down compact-status rf-dry-run \
-        hydra-up hydra-down hydra-test hydra-image demo \
+        hydra-up hydra-down hydra-test hydra-image install demo \
         sbom release vet e2e help bootstrap
 
 all: check
@@ -100,6 +100,9 @@ hydra-test:
 hydra-image:
 	docker build -f deploy/docker/Dockerfile.hydra -t fairwave/hydra:$(VERSION) .
 
+install:
+	bash install.sh
+
 demo:
 	bash scripts/hydra-demo.sh
 
@@ -143,6 +146,7 @@ help:
 	@echo "  hydra-down      stop and wipe the Hydra overlay volumes"
 	@echo "  hydra-test      unit tests for the Hydra engine packages"
 	@echo "  hydra-image     build the fairwave-hydra data-plane container image"
+	@echo "  install         install Fairwave binaries (bash install.sh)"
 	@echo "  demo            local Hydra demo (control plane + dashboard + weave), no Docker"
 	@echo "  e2e             alias for lab-up"
 	@echo "  docs / docs-serve  build / serve MkDocs site"

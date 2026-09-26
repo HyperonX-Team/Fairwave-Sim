@@ -8,6 +8,14 @@ versions follow [SemVer](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **`install.sh` - cross-platform installer (macOS, Linux, Windows):**
+  downloads the published release binary for the platform when one exists
+  (verifying its `.sha256` when present) and otherwise builds from source
+  (Go 1.22+). Flags: `--only`, `--prefix`, `--bindir`, `--version`,
+  `--from-source`, `--add-to-path`, `--uninstall`, `--dry-run`. Windows
+  installs a native `.exe`; verified end to end on Windows (Git Bash) and
+  Linux (WSL) - install, run, and uninstall. `fairwave-hydra` is now built
+  by the release workflow so it is installable too.
 - **Operator dashboard is now actually served:** the control plane serves
   `apps/fairwave-ui` at `/` (config `server.ui_dir`, env
   `FAIRWAVE_SERVER_UIDIR`, default `apps/fairwave-ui`) with the restrictive

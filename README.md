@@ -93,6 +93,23 @@ replicate the telecom cartel - it makes the cartel's local monopoly contestable.
 
 ---
 
+## Install (macOS, Linux, Windows)
+
+```bash
+# macOS / Linux
+curl -fsSL https://raw.githubusercontent.com/HyperonX-Team/Fairwave-Sim/main/install.sh | bash
+
+# from a checkout, with options (Windows: run this in Git Bash / MSYS2 / WSL)
+bash install.sh --prefix "$HOME/.local" --add-to-path
+bash install.sh --only fairwave,fairwave-hydra
+bash install.sh --uninstall
+```
+
+The installer uses the published release binaries for your platform when they
+exist (verifying the `.sha256` when the release ships one) and otherwise
+builds from source, which needs Go 1.22+. Windows binaries install with a
+`.exe` suffix. `bash install.sh --help` lists every flag.
+
 ## Quickstart - first UE attach in <30 minutes (no RF, no license needed)
 
 > Requirements: Docker Engine 24+, 4 GB RAM (`make compact-up`; 8–16 GB comfortable for `make lab-up`).
