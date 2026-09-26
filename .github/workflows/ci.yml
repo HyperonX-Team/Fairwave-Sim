@@ -79,7 +79,7 @@ jobs:
           go-version: "1.22"
           cache: true
       - name: Run Hydra smoke test
-        run: ./tests/hydra/smoke.sh
+        run: bash tests/hydra/smoke.sh
 
   compose:
     name: Compose config validation

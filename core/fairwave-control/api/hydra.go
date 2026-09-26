@@ -1,7 +1,8 @@
-// Package api: Hydra request/response types. Hydra is the cooperative
-// bearer multiplexing subsystem; these are the northbound wire shapes for
-// managing threads and weaves from the CLI, UI, and lab bench.
 package api
+
+// This file holds the Hydra (cooperative bearer multiplexing) northbound
+// wire shapes: the CLI, UI, and lab bench use them to manage threads and
+// weaves. See docs/architecture/hydra.md.
 
 // HydraThreadRequest adds or updates one bearer thread.
 type HydraThreadRequest struct {
