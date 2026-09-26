@@ -46,3 +46,6 @@ docs/_gen/
 Thumbs.db
 .idea/
 .vscode/
+
+# local demo runtime data (make demo)
+.demo/

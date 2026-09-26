@@ -4,6 +4,9 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"net/http"
+	"os"
+	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/HyperonX-Team/Fairwave-Sim/core/fairwave-control/api"
@@ -222,6 +225,41 @@ func TestHydraThreadHealth(t *testing.T) {
 	// Unknown thread is a 404, not a 500.
 	if w := doJSON(t, h, "POST", "/v1/hydra/threads/ghost/health", tok, api.HydraThreadHealth{Up: true}); w.Code != 404 {
 		t.Fatalf("ghost health: %d", w.Code)
+	}
+}
+
+func TestUIServedUnauthenticated(t *testing.T) {
+	srv, tok := newTestServer(t)
+	dir := t.TempDir()
+	if err := os.WriteFile(filepath.Join(dir, "index.html"), []byte("<!doctype html><title>fairwave</title>"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	srv.cfg.Server.UIDir = dir
+	h := srv.Handler()
+
+	// The dashboard is served without a token...
+	w := doJSON(t, h, "GET", "/", "", nil)
+	if w.Code != 200 {
+		t.Fatalf("ui: %d", w.Code)
+	}
+	if ct := w.Header().Get("Content-Type"); !strings.Contains(ct, "text/html") {
+		t.Fatalf("ui content-type = %q", ct)
+	}
+	if w.Header().Get("Content-Security-Policy") == "" {
+		t.Fatal("ui is missing its Content-Security-Policy")
+	}
+
+	// ...but the API still is not.
+	if w := doJSON(t, h, "GET", "/v1/status", "", nil); w.Code != 401 {
+		t.Fatalf("api without token: %d want 401", w.Code)
+	}
+	if w := doJSON(t, h, "GET", "/v1/status", tok, nil); w.Code != 200 {
+		t.Fatalf("api with token: %d", w.Code)
+	}
+
+	// Writing to the dashboard is refused.
+	if w := doJSON(t, h, "POST", "/", "", nil); w.Code != 405 {
+		t.Fatalf("ui POST: %d want 405", w.Code)
 	}
 }
 

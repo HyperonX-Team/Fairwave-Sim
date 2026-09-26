@@ -29,6 +29,7 @@ type ControlConfig struct {
 	Server struct {
 		Listen    string        `yaml:"listen" json:"listen"`
 		DataDir   string        `yaml:"data_dir" json:"data_dir"`
+		UIDir     string        `yaml:"ui_dir" json:"ui_dir"`
 		Mode      string        `yaml:"mode" json:"mode"` // lab | rf
 		Country   string        `yaml:"country" json:"country"`
 		LogLevel  string        `yaml:"log_level" json:"log_level"`
@@ -137,6 +138,7 @@ func Default() *ControlConfig {
 	c.Core = "open5gs"
 	c.Server.Listen = ":8080"
 	c.Server.DataDir = "./data"
+	c.Server.UIDir = "apps/fairwave-ui"
 	c.Server.Mode = "lab"
 	c.Server.Country = "LAB"
 	c.Server.LogLevel = "info"
@@ -217,6 +219,7 @@ func applyEnv(c *ControlConfig) {
 	mapping := map[string]func(string){
 		"FAIRWAVE_SERVER_LISTEN":     func(v string) { c.Server.Listen = v },
 		"FAIRWAVE_SERVER_DATADIR":    func(v string) { c.Server.DataDir = v },
+		"FAIRWAVE_SERVER_UIDIR":      func(v string) { c.Server.UIDir = v },
 		"FAIRWAVE_SERVER_MODE":       func(v string) { c.Server.Mode = v },
 		"FAIRWAVE_SERVER_COUNTRY":    func(v string) { c.Server.Country = v },
 		"FAIRWAVE_SERVER_LOGLEVEL":   func(v string) { c.Server.LogLevel = v },

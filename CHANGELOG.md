@@ -8,6 +8,17 @@ versions follow [SemVer](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **Operator dashboard is now actually served:** the control plane serves
+  `apps/fairwave-ui` at `/` (config `server.ui_dir`, env
+  `FAIRWAVE_SERVER_UIDIR`, default `apps/fairwave-ui`) with the restrictive
+  Content-Security-Policy the UI README always promised. Auth is now
+  scoped to `/v1/*` (plus the `/v1/healthz` probe), so the dashboard loads
+  without a token and authenticates its own API calls - previously the page
+  documented at `/` was unreachable because no static handler existed.
+- **One-command local demo:** `make demo` (or `scripts/hydra-demo.sh`)
+  starts a control plane, registers a three-thread weave, runs the speedup
+  bench, and serves the dashboard. No Docker, no RF, loopback only.
+
 - **Fairwave Hydra - cooperative bearer multiplexing (`core/hydra/`):**
   multiplex one subscriber flow across many independent SIMs, modems, and
   boxes, and reassemble it in order at a weave anchor. New packages:

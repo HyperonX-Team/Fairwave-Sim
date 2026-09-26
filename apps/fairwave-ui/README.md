@@ -3,6 +3,15 @@
 Single-file, framework-free dashboard (`index.html`) served statically by
 the control plane - no build step, no node_modules.
 
+## Try it now
+
+```bash
+make demo        # control plane + a three-thread weave + the dashboard
+```
+
+Then open the printed URL and paste the demo token. `scripts/hydra-demo.sh`
+never touches a radio or your real network: everything is loopback.
+
 ## Serving
 
 The control plane serves this directory as the static root (config:

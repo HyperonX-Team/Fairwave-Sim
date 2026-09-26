@@ -10,6 +10,7 @@
       "properties": {
         "listen": { "type": "string", "default": ":8080" },
         "data_dir": { "type": "string", "minLength": 1 },
+        "ui_dir": { "type": "string" },
         "mode": { "type": "string", "enum": ["lab", "rf"] },
         "country": { "type": "string", "minLength": 2 },
         "log_level": { "type": "string", "enum": ["trace", "debug", "info", "warn", "error"] },

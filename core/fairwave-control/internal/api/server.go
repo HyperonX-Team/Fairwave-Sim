@@ -167,6 +167,9 @@ func NewWithOptions(cfg *config.ControlConfig, st *store.Store, id *identity.Ide
 	s.registerMetrics()
 	s.mux = http.NewServeMux()
 	s.routes()
+	if _, err := os.Stat(cfg.Server.UIDir); err != nil {
+		log.Printf("ui: %s not found; the dashboard will 404 (set server.ui_dir)", cfg.Server.UIDir)
+	}
 	return s
 }
 
@@ -176,6 +179,32 @@ func (s *Server) Token() string { return s.adminTok }
 // Handler returns the HTTP handler for the whole API surface.
 func (s *Server) Handler() http.Handler {
 	return s.recoverMW(s.authMW(s.logMW(s.mux)))
+}
+
+// uiCSP is the Content-Security-Policy sent with dashboard responses. The
+// page complies: no inline handlers, no external resources. The style-src
+// allowance is for its single inline <style> block.
+const uiCSP = "default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; " +
+	"connect-src 'self'; img-src 'self' data:; base-uri 'none'; frame-ancestors 'none'"
+
+// uiHandler serves the operator dashboard and its assets from the configured
+// UI directory. It is unauthenticated by design: the page carries no
+// secrets and authenticates its own API calls with a bearer token supplied
+// in the browser.
+func (s *Server) uiHandler() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet && r.Method != http.MethodHead {
+			http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+		w.Header().Set("Content-Security-Policy", uiCSP)
+		dir := s.cfg.Server.UIDir
+		if r.URL.Path == "/" {
+			http.ServeFile(w, r, filepath.Join(dir, "index.html"))
+			return
+		}
+		http.FileServer(http.Dir(dir)).ServeHTTP(w, r)
+	})
 }
 
 // RunBackground drives the periodic jobs: session collection, SIM expiry

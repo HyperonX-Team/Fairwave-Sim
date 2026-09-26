@@ -95,6 +95,11 @@ func (s *Server) routes() {
 	m.Handle("/es9plus/", s.esimHandler())
 
 	m.HandleFunc("GET /metrics", promhttp.Handler().ServeHTTP)
+
+	// The operator dashboard is served from the configured UI directory on
+	// every path the /v1 API does not own. It is unauthenticated (the page
+	// authenticates its own API calls); see uiHandler.
+	m.Handle("/", s.uiHandler())
 }
 
 // ---- middleware ----
@@ -125,7 +130,11 @@ func principalFrom(r *http.Request) string {
 // name is stored in the context for audit attribution.
 func (s *Server) authMW(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path == "/v1/healthz" || r.URL.Path == "/metrics" || strings.HasPrefix(r.URL.Path, "/es9plus/") {
+		// Only the northbound /v1 API is authenticated. healthz is a
+		// liveness probe, and everything else (the static dashboard,
+		// /metrics, the SM-DP+ ES9+ surface) is either public by design or
+		// carries its own challenge/response crypto.
+		if !strings.HasPrefix(r.URL.Path, "/v1/") || r.URL.Path == "/v1/healthz" {
 			next.ServeHTTP(w, r)
 			return
 		}
