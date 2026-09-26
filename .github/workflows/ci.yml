@@ -48,6 +48,39 @@ jobs:
           name: fairwave-binaries
           path: bin/
 
+  go-cross:
+    name: Cross-platform build (linux/windows/darwin)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+          cache: true
+      # The GTP-U AF_PACKET tap is Linux-only (upf_raw_linux.go vs
+      # upf_raw_other.go stub). This job proves `go build` stays green
+      # for devs on Windows/macOS.
+      - name: Build linux/amd64
+        run: GOOS=linux GOARCH=amd64 go build ./...
+      - name: Build windows/amd64
+        run: GOOS=windows GOARCH=amd64 go build ./...
+      - name: Build darwin/arm64
+        run: GOOS=darwin GOARCH=arm64 go build ./...
+      - name: Vet windows/amd64
+        run: GOOS=windows GOARCH=amd64 go vet ./...
+
+  hydra-smoke:
+    name: Hydra end-to-end smoke (real binaries, no Docker)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+          cache: true
+      - name: Run Hydra smoke test
+        run: ./tests/hydra/smoke.sh
+
   compose:
     name: Compose config validation
     runs-on: ubuntu-latest
@@ -57,6 +90,8 @@ jobs:
         run: docker compose -f deploy/docker-compose.yml config -q
       - name: Validate 5G compose
         run: docker compose -f deploy/docker-compose.5g.yml config -q
+      - name: Validate Hydra overlay (layered on lab)
+        run: docker compose -f deploy/docker-compose.yml -f deploy/docker-compose.hydra.yml config -q
       - name: Validate RF compose (gate)
         run: |
           set +e

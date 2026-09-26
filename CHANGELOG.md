@@ -8,6 +8,34 @@ versions follow [SemVer](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **Fairwave Hydra - cooperative bearer multiplexing (`core/hydra/`):**
+  multiplex one subscriber flow across many independent SIMs, modems, and
+  boxes, and reassemble it in order at a weave anchor. New packages:
+  `shim` (24-byte sequencing header), `sched` (delay-inflation scheduler
+  that minimises projected completion time, not RTT), `reorder` (bounded
+  sliding-window reassembler), `bearer` (thread registry + capacity
+  aggregation), `fabric` (weave engine: strip/reassemble/ingest/bench),
+  and `anchor` (egress interface). One box is capped by its own modem;
+  a three-thread weave reports ~3x aggregate in `fairwave hydra bench`.
+- **Hydra control-plane API:** `GET /v1/hydra/status`, thread CRUD
+  (`/v1/hydra/threads`), weave CRUD (`/v1/hydra/weaves`), per-weave stats,
+  and lab strip/ingest/bench endpoints. RBAC: reads are viewer-role,
+  mutations operator-role. Prometheus gauges
+  (`fairwave_hydra_threads`, `_threads_up`, `_weaves`, `_aggregate_mbps`)
+  and a Hydra summary in `/v1/status`.
+- **Hydra CLI:** `fairwave hydra status|threads|thread-add|thread-remove|
+  weaves|weave-create|weave-remove|weave-stats|bench|strip|ingest`.
+- **Hydra lab overlay:** `deploy/docker-compose.hydra.yml` seeds three
+  threads, creates a weave, and runs the speedup bench; `make hydra-up` /
+  `hydra-down` / `hydra-test`. CI validates the layered compose and an
+  e2e test drives the full surface against a live lab.
+- Docs: `docs/architecture/hydra.md`; OpenAPI paths and schemas for the
+  Hydra surface; CHANGELOG entry.
+
+- **Live dashboard stream (`GET /v1/events` SSE):** 5s `event: snapshot`
+  heartbeat (status, sessions, bytes, alerts, nodes_up); operator UI shows
+  a live pill and updates cards without 9-way polling (EventSource with
+  polling fallback); OpenAPI documented; RBAC viewer-readable.
 - Peering mesh data-plane runbook (v0.3 preview)
 - CBRS/SAS client interface stubs (M4 preview)
 - **Lab eSIM (SM-DP+) stack (`core/esim/`):** SGP.22-shaped remote SIM
@@ -33,6 +61,11 @@ versions follow [SemVer](https://semver.org/spec/v2.0.0.html).
   issue/revoke) and `fairwave esim issue --hss-driver`; config
   `hss.driver`/`hss.container` + `FAIRWAVE_HSS_*` env; lab compose config
   enables it.
+- **Cross-platform build fix:** GTP-U `AF_PACKET` tap split into
+  `upf_raw_linux.go` (Linux-only) + `upf_raw_other.go` stub with a clear
+  error on macOS/Windows; `go build ./...` now green on linux/windows/
+  darwin; new `go-cross` CI job guards it; `CollectOnce` SIM activation
+  re-indexed O(sessions+sims); gofmt clean.
 - **free5GC core integration (5G SA lab):** `core: free5gc` switches the
   control plane to a free5GC backend - UDR mongosh write-back with the
   webconsole document set (`hsswrite` driver `free5gc`), live sessions from

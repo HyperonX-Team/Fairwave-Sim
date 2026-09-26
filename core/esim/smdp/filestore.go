@@ -34,12 +34,12 @@ type fileSession struct {
 
 func (f *fileSession) toSession() (*Session, error) {
 	s := &Session{
-		TransactionID:  f.TransactionID,
-		ActivationCode: f.ActivationCode,
-		EID:            f.EID,
-		ICCID:          f.ICCID,
-		Status:         f.Status,
-		SeqCounter:     f.SeqCounter,
+		TransactionID:   f.TransactionID,
+		ActivationCode:  f.ActivationCode,
+		EID:             f.EID,
+		ICCID:           f.ICCID,
+		Status:          f.Status,
+		SeqCounter:      f.SeqCounter,
 		EuiccChallenge:  f.EuiccChallenge,
 		EuiccEKPb:       f.EuiccEKPb,
 		ServerChallenge: f.ServerChallenge,
@@ -62,12 +62,12 @@ func (f *fileSession) toSession() (*Session, error) {
 
 func fromSession(s *Session) (*fileSession, error) {
 	f := &fileSession{
-		TransactionID:  s.TransactionID,
-		ActivationCode: s.ActivationCode,
-		EID:            s.EID,
-		ICCID:          s.ICCID,
-		Status:         s.Status,
-		SeqCounter:     s.SeqCounter,
+		TransactionID:   s.TransactionID,
+		ActivationCode:  s.ActivationCode,
+		EID:             s.EID,
+		ICCID:           s.ICCID,
+		Status:          s.Status,
+		SeqCounter:      s.SeqCounter,
 		EuiccChallenge:  s.EuiccChallenge,
 		EuiccEKPb:       s.EuiccEKPb,
 		ServerChallenge: s.ServerChallenge,

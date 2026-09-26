@@ -1,0 +1,67 @@
+# Fairwave Hydra overlay (lab, no RF).
+#
+# Layers on the base lab compose to declare a Hydra anchor, seed bearer
+# threads, and run the synthetic weave bench. Nothing here transmits: the
+# threads are declared over the REST API and the bench stripes synthetic
+# packets inside the control plane.
+#
+#   docker compose -f deploy/docker-compose.yml \
+#                  -f deploy/docker-compose.hydra.yml up -d
+#   docker compose -f deploy/docker-compose.yml \
+#                  -f deploy/docker-compose.hydra.yml logs hydra-bench
+#
+# See docs/architecture/hydra.md.
+
+services:
+  control-plane:
+    environment:
+      FAIRWAVE_HYDRA_ANCHOR: ${FW_HYDRA_ANCHOR:-local}
+      # Lab-only fixed token so the bench sidecar can authenticate. Never
+      # use a fixed token outside a disposable lab.
+      FAIRWAVE_ADMIN_TOKEN: ${FW_HYDRA_TOKEN:-lab-hydra-token}
+
+  # Seats three threads (three SIMs on three boxes) into one weave, then
+  # runs the bench and prints the aggregate-versus-single-thread speedup.
+  hydra-bench:
+    image: curlimages/curl:8.10.1
+    restart: "no"
+    networks: [fwnet]
+    depends_on:
+      control-plane:
+        condition: service_healthy
+    environment:
+      CONTROL: http://control-plane:8080
+      TOKEN: ${FW_HYDRA_TOKEN:-lab-hydra-token}
+      WEAVE: ${FW_HYDRA_WEAVE:-lab-weave}
+      THREADS: ${FW_HYDRA_THREADS:-sim-a:300,sim-b:300,sim-c:300}
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        set -e
+        echo "hydra: waiting for control plane"
+        until curl -sf "$$CONTROL/v1/healthz" >/dev/null; do sleep 1; done
+
+        echo "hydra: declaring threads"
+        for spec in $$(echo "$$THREADS" | tr ',' ' '); do
+          id=$${spec%%:*}; mbps=$${spec##*:}
+          curl -sf -X POST "$$CONTROL/v1/hydra/threads" \
+            -H "Authorization: Bearer $$TOKEN" \
+            -H 'Content-Type: application/json' \
+            -d "{\"id\":\"$$id\",\"mbps\":$$mbps,\"rtt_ms\":20,\"loss_pct\":0.1,\"up\":true}" >/dev/null
+          echo "  thread $$id ($$mbps Mbps)"
+        done
+
+        threads_json=$$(echo "$$THREADS" | tr ',' '\n' | cut -d: -f1 \
+          | awk 'BEGIN{ORS=""} {if(NR>1)printf ","; printf "\"%s\"", $$0}')
+        echo "hydra: creating weave $$WEAVE over [$$threads_json]"
+        curl -sf -X POST "$$CONTROL/v1/hydra/weaves" \
+          -H "Authorization: Bearer $$TOKEN" \
+          -H 'Content-Type: application/json' \
+          -d "{\"id\":\"$$WEAVE\",\"threads\":[$$threads_json]}" >/dev/null
+
+        echo "hydra: bench"
+        curl -sf -X POST "$$CONTROL/v1/hydra/weaves/$$WEAVE/bench" \
+          -H "Authorization: Bearer $$TOKEN" \
+          -H 'Content-Type: application/json' -d '{}'
+        echo
+        echo "hydra: done"

@@ -19,6 +19,7 @@ var groupOnlyCommands = map[string]string{
 	"fairwave sim":      "group: SIM lifecycle subcommands (issue/revoke/.../import)",
 	"fairwave esim":     "group: eSIM (SM-DP+) subcommands (issue/list/revoke/serve)",
 	"fairwave peer":     "group: peering subcommands (list/add)",
+	"fairwave hydra":    "group: cooperative bearer multiplexing subcommands (status/threads/weaves/bench)",
 	"fairwave policy":   "group: routing/QoS policy subcommands (get/set)",
 	"fairwave spectrum": "group: spectrum gate subcommands (check/arm/disarm)",
 	"fairwave token":    "group: scoped API token subcommands (create/list/revoke)",
@@ -63,7 +64,7 @@ func TestCommandTreeShape(t *testing.T) {
 
 	wantTop := []string{
 		"alerts", "audit", "backup", "compliance", "config", "doctor", "esim",
-		"node", "peer", "policy", "restore", "sim", "spectrum", "token", "version",
+		"hydra", "node", "peer", "policy", "restore", "sim", "spectrum", "token", "version",
 	}
 	var gotTop []string
 	for _, c := range root.Commands() {

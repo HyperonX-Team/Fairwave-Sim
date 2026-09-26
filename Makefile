@@ -10,6 +10,7 @@ GO ?= go
 
 .PHONY: all check build test lint fmt gen docs docs-serve \
         lab-up lab-down lab-status compact-up compact-down compact-status rf-dry-run \
+        hydra-up hydra-down hydra-test \
         sbom release vet e2e help bootstrap
 
 all: check
@@ -83,6 +84,18 @@ rf-dry-run:
 	docker compose -f deploy/docker-compose.rf.yml config -q && echo "rf compose OK"
 	./core/ran/check-freq.sh 2>/dev/null || echo "note: check-freq.sh not present; manual review required"
 
+# ---- hydra: cooperative bearer multiplexing (no RF) ----
+hydra-up:
+	docker compose -f deploy/docker-compose.yml -f deploy/docker-compose.hydra.yml up -d --build
+	@echo "== hydra bench (seed threads, weave, speedup) =="
+	@docker compose -f deploy/docker-compose.yml -f deploy/docker-compose.hydra.yml logs hydra-bench
+
+hydra-down:
+	docker compose -f deploy/docker-compose.yml -f deploy/docker-compose.hydra.yml down -v
+
+hydra-test:
+	$(GO) test ./core/hydra/... -count=1 -v
+
 # ---- e2e (full lab: requires docker) ----
 e2e: lab-up
 
@@ -119,6 +132,9 @@ help:
 	@echo "  compact-down    stop and wipe compact lab volumes"
 	@echo "  compact-status  compact compose ps + UE tail"
 	@echo "  rf-dry-run      validate RF configs, never transmits"
+	@echo "  hydra-up        lab overlay: seed a Hydra weave and print the speedup bench"
+	@echo "  hydra-down      stop and wipe the Hydra overlay volumes"
+	@echo "  hydra-test      unit tests for the Hydra engine packages"
 	@echo "  e2e             alias for lab-up"
 	@echo "  docs / docs-serve  build / serve MkDocs site"
 	@echo "  sbom            generate SPDX SBOM (+ cosign attest if present)"

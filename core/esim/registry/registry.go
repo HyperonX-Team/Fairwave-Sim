@@ -30,12 +30,12 @@ import (
 // ProfileCipher: base64(nonce || AES-GCM ciphertext || tag) of the
 // marshaled profile. Metadata stays readable for audit/policy layers.
 type Entry struct {
-	Token          string           `json:"token"`
-	Profile        *profile.Profile `json:"profile,omitempty"`
-	ProfileCipher  string           `json:"profile_cipher,omitempty"`
-	CreatedAt      time.Time        `json:"created_at"`
-	DownloadedAt   *time.Time       `json:"downloaded_at,omitempty"`
-	ExpiresAt      *time.Time       `json:"expires_at,omitempty"` // code-level expiry (may be nil)
+	Token         string           `json:"token"`
+	Profile       *profile.Profile `json:"profile,omitempty"`
+	ProfileCipher string           `json:"profile_cipher,omitempty"`
+	CreatedAt     time.Time        `json:"created_at"`
+	DownloadedAt  *time.Time       `json:"downloaded_at,omitempty"`
+	ExpiresAt     *time.Time       `json:"expires_at,omitempty"` // code-level expiry (may be nil)
 }
 
 // ErrActivationCodeUsed means a single-use code was already downloaded.

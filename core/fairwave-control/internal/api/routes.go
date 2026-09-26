@@ -56,10 +56,24 @@ func (s *Server) routes() {
 	m.HandleFunc("POST /v1/tx/arm", s.handleTxArm)
 	m.HandleFunc("POST /v1/tx/disarm", s.handleTxDisarm)
 
+	m.HandleFunc("GET /v1/hydra/status", s.handleHydraStatus)
+	m.HandleFunc("GET /v1/hydra/threads", s.handleHydraListThreads)
+	m.HandleFunc("POST /v1/hydra/threads", s.handleHydraAddThread)
+	m.HandleFunc("DELETE /v1/hydra/threads/{id}", s.handleHydraDeleteThread)
+	m.HandleFunc("GET /v1/hydra/weaves", s.handleHydraListWeaves)
+	m.HandleFunc("POST /v1/hydra/weaves", s.handleHydraCreateWeave)
+	m.HandleFunc("GET /v1/hydra/weaves/{id}", s.handleHydraGetWeave)
+	m.HandleFunc("DELETE /v1/hydra/weaves/{id}", s.handleHydraDeleteWeave)
+	m.HandleFunc("GET /v1/hydra/weaves/{id}/stats", s.handleHydraWeaveStats)
+	m.HandleFunc("POST /v1/hydra/weaves/{id}/strip", s.handleHydraStrip)
+	m.HandleFunc("POST /v1/hydra/weaves/{id}/ingest", s.handleHydraIngest)
+	m.HandleFunc("POST /v1/hydra/weaves/{id}/bench", s.handleHydraBench)
+
 	m.HandleFunc("POST /v1/telemetry", s.handleTelemetry)
 	m.HandleFunc("GET /v1/health", s.handleListHealth)
 	m.HandleFunc("GET /v1/audit", s.handleAudit)
 	m.HandleFunc("GET /v1/alerts", s.handleListAlerts)
+	m.HandleFunc("GET /v1/events", s.handleEvents)
 
 	m.HandleFunc("POST /v1/tokens", s.handleCreateToken)
 	m.HandleFunc("GET /v1/tokens", s.handleListTokens)
@@ -237,6 +251,11 @@ func (s *Server) handleStatus(w http.ResponseWriter, _ *http.Request) {
 		UEs:       len(s.store.ListSessions()),
 		Peers:     len(s.store.ListPeers()),
 		UptimeSec: int64(time.Since(s.started).Seconds()),
+	}
+	if hst := s.hydra.Status(); hst.Threads > 0 || hst.Weaves > 0 {
+		st.HydraThreads = hst.Threads
+		st.HydraWeaves = hst.Weaves
+		st.HydraAggMbps = hst.AggregateMbps
 	}
 	s.refreshMetrics()
 	writeJSON(w, http.StatusOK, st)

@@ -144,6 +144,100 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/LifecycleTransitionRequest"
+  /v1/events:
+    get:
+      summary: Live snapshot stream (SSE, viewer OK)
+      parameters:
+        - { name: interval, in: query, schema: { type: string }, description: "e.g. 5s (min 1s, max 60s)" }
+      responses:
+        "200":
+          description: "text/event-stream of `event: snapshot` JSON heartbeats"
+  /v1/hydra/status:
+    get:
+      summary: Hydra weave summary (threads, capacity, frames)
+  /v1/hydra/threads:
+    get:
+      summary: List bearer threads
+    post:
+      summary: Add or update a bearer thread (one SIM/modem/path)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HydraThread"
+      responses:
+        "201": { description: Created }
+  /v1/hydra/threads/{id}:
+    delete:
+      summary: Remove a bearer thread
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+  /v1/hydra/weaves:
+    get:
+      summary: List weaves
+    post:
+      summary: Create a weave (bind threads to an anchor)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HydraWeaveRequest"
+      responses:
+        "201": { description: Created }
+  /v1/hydra/weaves/{id}:
+    get:
+      summary: Get a weave
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+    delete:
+      summary: Delete a weave
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+  /v1/hydra/weaves/{id}/stats:
+    get:
+      summary: Weave counters (aggregate capacity, reorder stats)
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+  /v1/hydra/weaves/{id}/strip:
+    post:
+      summary: Lab - assign one payload to a thread and return the framed packet
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [payload_b64]
+              properties:
+                payload_b64: { type: string }
+  /v1/hydra/weaves/{id}/ingest:
+    post:
+      summary: Lab - feed a framed packet back into reassembly
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [frame_b64]
+              properties:
+                frame_b64: { type: string }
+  /v1/hydra/weaves/{id}/bench:
+    post:
+      summary: Synthetic stripe/reassemble bench (aggregate speedup)
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HydraBenchRequest"
   /metrics:
     get:
       summary: Prometheus metrics
@@ -235,6 +329,29 @@ components:
       required: [phase]
       properties:
         phase: { type: string, enum: [provision, register, on-air, peer, breakout] }
+    HydraThread:
+      type: object
+      required: [id, mbps]
+      properties:
+        id: { type: string }
+        box: { type: string }
+        sim: { type: string }
+        mbps: { type: number }
+        rtt_ms: { type: number }
+        loss_pct: { type: number }
+        up: { type: boolean }
+    HydraWeaveRequest:
+      type: object
+      required: [id, threads]
+      properties:
+        id: { type: string }
+        anchor: { type: string }
+        threads: { type: array, items: { type: string } }
+    HydraBenchRequest:
+      type: object
+      properties:
+        packets: { type: integer, minimum: 1 }
+        pkt_bytes: { type: integer, minimum: 1 }
     Error:
       type: object
       properties:

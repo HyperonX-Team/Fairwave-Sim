@@ -276,6 +276,11 @@ type Status struct {
 	UEs       int    `json:"ues"`
 	Peers     int    `json:"peers"`
 	UptimeSec int64  `json:"uptime_sec"`
+
+	// Hydra (cooperative bearer multiplexing) summary.
+	HydraThreads int     `json:"hydra_threads"`
+	HydraWeaves  int     `json:"hydra_weaves"`
+	HydraAggMbps float64 `json:"hydra_aggregate_mbps"`
 }
 
 // SpectrumCheckRequest is the input to /v1/spectrum/check.

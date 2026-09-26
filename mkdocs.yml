@@ -70,6 +70,7 @@ nav:
       - architecture/mobile-core.md
       - architecture/ran.md
       - architecture/peering.md
+      - architecture/hydra.md
       - architecture/security.md
       - architecture/telemetry.md
   - Hardware:

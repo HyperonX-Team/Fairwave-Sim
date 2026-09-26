@@ -26,6 +26,8 @@ import (
 	"github.com/HyperonX-Team/Fairwave-Sim/core/fairwave-control/internal/collector"
 	"github.com/HyperonX-Team/Fairwave-Sim/core/fairwave-control/internal/identity"
 	"github.com/HyperonX-Team/Fairwave-Sim/core/fairwave-control/internal/store"
+	"github.com/HyperonX-Team/Fairwave-Sim/core/hydra/anchor"
+	"github.com/HyperonX-Team/Fairwave-Sim/core/hydra/fabric"
 	"github.com/HyperonX-Team/Fairwave-Sim/core/sim-ops/hsswrite"
 	"github.com/HyperonX-Team/Fairwave-Sim/core/sim-ops/simprov"
 	"github.com/prometheus/client_golang/prometheus"
@@ -58,6 +60,7 @@ type Server struct {
 	hss       hsswrite.Writer
 	collector collector.Source
 	esim      *esimSvc
+	hydra     *fabric.Engine
 	now       func() time.Time
 	mux       *http.ServeMux
 
@@ -134,6 +137,14 @@ func NewWithOptions(cfg *config.ControlConfig, st *store.Store, id *identity.Ide
 	if opts.ESIM != nil {
 		s.esim = newEsimSvc(cfg, opts.ESIM)
 	}
+	// Hydra weaves capacity across threads (SIMs, modems, boxes). The
+	// engine is always present; it is empty until an operator declares
+	// threads and weaves, so it has no effect on the lab default.
+	anchorName := strings.TrimSpace(os.Getenv("FAIRWAVE_HYDRA_ANCHOR"))
+	if anchorName == "" {
+		anchorName = "local"
+	}
+	s.hydra = fabric.NewEngine(anchor.NewSink(), fabric.WithAnchorName(anchorName))
 	s.adminTok = strings.TrimSpace(os.Getenv(cfg.Auth.AdminTokenEnv))
 	if s.adminTok == "" {
 		tokPath := filepath.Join(cfg.Server.DataDir, "admin_token")
@@ -225,9 +236,22 @@ func (s *Server) CollectOnce(ctx context.Context) error {
 	s.refreshMetrics()
 	// A UE attaching is the first evidence its SIM works: promote issued
 	// SIMs to active when their (hashed) IMSI shows up in a session.
-	for _, sess := range sessions {
-		for _, sim := range s.store.ListSIMs() {
-			if sim.Status == "issued" && api.HashIMSI(sim.IMSI) == sess.IMSIHash {
+	// Indexed by hash first: O(sessions + sims) instead of O(sessions × sims).
+	if len(sessions) > 0 {
+		active := make(map[string]struct{}, len(sessions))
+		for _, sess := range sessions {
+			if sess.IMSIHash != "" {
+				active[sess.IMSIHash] = struct{}{}
+			}
+		}
+		if len(active) > 0 {
+			for _, sim := range s.store.ListSIMs() {
+				if sim.Status != "issued" {
+					continue
+				}
+				if _, ok := active[api.HashIMSI(sim.IMSI)]; !ok {
+					continue
+				}
 				sim.Status = "active"
 				if err := s.store.UpsertSIM(sim); err != nil {
 					log.Printf("mark sim %s active: %v", sim.IMSI, err)
@@ -602,11 +626,17 @@ var (
 	mTxArmed  = prometheus.NewGauge(prometheus.GaugeOpts{Name: "fairwave_tx_armed", Help: "1 if TX is armed"})
 	mTxDenied = prometheus.NewCounter(prometheus.CounterOpts{Name: "fairwave_tx_denied_total", Help: "denied TX arm attempts"})
 	mSpectrum = prometheus.NewCounterVec(prometheus.CounterOpts{Name: "fairwave_spectrum_checks_total", Help: "spectrum checks"}, []string{"allowed"})
+
+	mHydraThreads   = prometheus.NewGauge(prometheus.GaugeOpts{Name: "fairwave_hydra_threads", Help: "bearer threads registered"})
+	mHydraThreadsUp = prometheus.NewGauge(prometheus.GaugeOpts{Name: "fairwave_hydra_threads_up", Help: "bearer threads currently up"})
+	mHydraWeaves    = prometheus.NewGauge(prometheus.GaugeOpts{Name: "fairwave_hydra_weaves", Help: "active hydra weaves"})
+	mHydraAggMbps   = prometheus.NewGauge(prometheus.GaugeOpts{Name: "fairwave_hydra_aggregate_mbps", Help: "sum of up-thread capacity in Mbps"})
 )
 
 func (s *Server) registerMetrics() {
 	metricsOnce.Do(func() {
-		prometheus.MustRegister(mNodes, mSIMs, mPeers, mSessions, mTxArmed, mTxDenied, mSpectrum)
+		prometheus.MustRegister(mNodes, mSIMs, mPeers, mSessions, mTxArmed, mTxDenied, mSpectrum,
+			mHydraThreads, mHydraThreadsUp, mHydraWeaves, mHydraAggMbps)
 	})
 }
 
@@ -619,5 +649,12 @@ func (s *Server) refreshMetrics() {
 		mTxArmed.Set(1)
 	} else {
 		mTxArmed.Set(0)
+	}
+	if s.hydra != nil {
+		hst := s.hydra.Status()
+		mHydraThreads.Set(float64(hst.Threads))
+		mHydraThreadsUp.Set(float64(hst.ThreadsUp))
+		mHydraWeaves.Set(float64(hst.Weaves))
+		mHydraAggMbps.Set(hst.AggregateMbps)
 	}
 }

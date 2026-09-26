@@ -73,6 +73,7 @@
     <span class="pill" id="statusPill" role="status" aria-live="polite">loading…</span>
     <span class="pill" id="modePill"></span>
     <span class="pill" id="txPill"></span>
+    <span class="pill" id="livePill" title="live event stream">live: …</span>
   </div>
 </header>
 
@@ -149,6 +150,24 @@
         <thead><tr><th>Name</th><th>State</th><th>Endpoint</th>
           <th>Allowed IPs</th><th>Last seen</th></tr></thead>
         <tbody id="peersBody"><tr><td colspan="5" class="muted">-</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section aria-label="Hydra bearer weaving">
+    <h2>Hydra <span class="muted" style="text-transform:none">(cooperative bearer multiplexing)</span></h2>
+    <div class="grid" id="hydraGrid"></div>
+    <div class="card" style="padding:0; margin-top:12px">
+      <table aria-label="Bearer threads">
+        <thead><tr><th>Thread</th><th>Box</th><th>SIM</th><th>Mbps</th>
+          <th>RTT</th><th>Loss</th><th>Up</th></tr></thead>
+        <tbody id="hydraThreadsBody"><tr><td colspan="7" class="muted">-</td></tr></tbody>
+      </table>
+    </div>
+    <div class="card" style="padding:0; margin-top:12px">
+      <table aria-label="Hydra weaves">
+        <thead><tr><th>Weave</th><th>Anchor</th><th>Mode</th><th>Threads</th></tr></thead>
+        <tbody id="hydraWeavesBody"><tr><td colspan="4" class="muted">-</td></tr></tbody>
       </table>
     </div>
   </section>
@@ -354,6 +373,43 @@ async function refreshAll() {
   } catch (err) {
     showError(err);
   }
+  refreshHydra();
+}
+
+// refreshHydra renders the Hydra weave panel. It is self-contained and
+// swallows its own errors so the core dashboard never breaks when the
+// Hydra surface is empty or unavailable.
+async function refreshHydra() {
+  try {
+    const [hstatus, threads, weaves] = await Promise.all([
+      api("/hydra/status"), api("/hydra/threads"), api("/hydra/weaves"),
+    ]);
+    const cards = [
+      ["Aggregate", (hstatus.aggregate_mbps || 0).toFixed(0) + " Mbps", "sum of up threads"],
+      ["Threads", `${hstatus.threads_up ?? 0}/${hstatus.threads ?? 0}`, "up / total"],
+      ["Weaves", String(hstatus.weaves ?? 0), "logical links"],
+      ["Delivered", String(hstatus.delivered ?? 0), "reassembled payloads"],
+    ];
+    $("hydraGrid").innerHTML = cards.map(([l, v, sub]) =>
+      `<div class="card"><div class="label">${l}</div><div class="value">${escapeHtml(v)}</div>
+       <div class="sub">${sub}</div></div>`).join("");
+
+    const tl = threads || [];
+    $("hydraThreadsBody").innerHTML = tl.length ? tl.map((t) =>
+      `<tr><td><code>${escapeHtml(t.id)}</code></td><td>${escapeHtml(t.box || "-")}</td>
+       <td>${escapeHtml(t.sim || "-")}</td><td class="mono">${(t.mbps || 0).toFixed(0)}</td>
+       <td class="mono">${(t.rtt_ms || 0).toFixed(0)} ms</td>
+       <td class="mono">${(t.loss_pct || 0).toFixed(1)}%</td>
+       <td>${t.up ? "yes" : "no"}</td></tr>`).join("")
+      : `<tr><td colspan="7" class="muted">no threads - add one with <code>fairwave hydra thread-add</code></td></tr>`;
+
+    const wl = weaves || [];
+    $("hydraWeavesBody").innerHTML = wl.length ? wl.map((w) =>
+      `<tr><td><code>${escapeHtml(w.id)}</code></td><td>${escapeHtml(w.anchor || "-")}</td>
+       <td>${escapeHtml(w.mode || "-")}</td>
+       <td>${escapeHtml((w.threads || []).join(", "))}</td></tr>`).join("")
+      : `<tr><td colspan="4" class="muted">no weaves - create one with <code>fairwave hydra weave-create</code></td></tr>`;
+  } catch (_) { /* hydra surface optional; never break the dashboard */ }
 }
 
 function fmtBytes(n) {
@@ -400,8 +456,70 @@ $("lifecycleBtn").addEventListener("click", lifecycle);
 $("breakoutBtn").addEventListener("click", toggleBreakout);
 $("disarmBtn").addEventListener("click", disarmTx);
 
+function renderLive(snap) {
+  if (!snap) return;
+  renderStatus({
+    version: snap.version, mode: snap.mode, phase: snap.phase,
+    tx_armed: snap.tx_armed, nodes: snap.nodes, ues: snap.sessions,
+    peers: snap.peers, uptime_sec: snap.uptime_sec,
+  }, null);
+  const banner = $("alertBanner");
+  if (snap.alerts_active > 0) {
+    banner.innerHTML = `<strong>${snap.alerts_active} active alert(s)</strong>` +
+      (snap.alerts_critical ? ` - ${snap.alerts_critical} critical` : "") +
+      ` &middot; <span class="muted">${snap.nodes_up}/${snap.nodes} nodes up &middot; ` +
+      `${fmtBytes(snap.bytes_up || 0)} up / ${fmtBytes(snap.bytes_dn || 0)} down</span>`;
+    banner.classList.add("show");
+  }
+}
+
+let liveOk = false;
+function setLive(state) {
+  const el = $("livePill");
+  if (!el) return;
+  el.textContent = state === "live" ? "live ●" : state === "retry" ? "live: retry…" : "live: polling";
+  el.className = "pill " + (state === "live" ? "ok" : state === "retry" ? "warn" : "");
+}
+
+function connectLive() {
+  if (!window.EventSource) { setLive("poll"); return; }
+  setLive("retry");
+  const qs = token ? ("?interval=5s") : "?interval=5s";
+  // EventSource cannot send Authorization headers; token lives in
+  // localStorage for fetch. SSE still works loopback-lab (no token) and
+  // with cookie-less bearer only if the browser already authenticated.
+  // We use it as a fast-path hint: snapshots update pills/cards live,
+  // full tables still refresh on the slow poll below.
+  let es;
+  try { es = new EventSource(API + "/events" + qs); }
+  catch (_) { setLive("poll"); return; }
+  es.addEventListener("snapshot", (ev) => {
+    try {
+      liveOk = true;
+      setLive("live");
+      renderLive(JSON.parse(ev.data));
+    } catch (_) { /* ignore malformed heartbeat */ }
+  });
+  es.onerror = () => {
+    if (!liveOk) setLive("poll");
+    else setLive("retry");
+    // Keep the socket; browser auto-reconnects. Full tables covered by poll.
+  };
+}
+
 refreshAll();
+connectLive();
+// Slow poll for full tables (15s); live pills/cards arrive via SSE (~5s).
 window.setInterval(refreshAll, 15000);
+// Refresh tables promptly when a live snapshot shows a count change.
+window.setInterval(async () => {
+  try {
+    const s = await api("/status");
+    const cur = (s.ues ?? 0) + ":" + (s.nodes ?? 0) + ":" + (s.peers ?? 0);
+    if (window.__lastCounts && window.__lastCounts !== cur) refreshAll();
+    window.__lastCounts = cur;
+  } catch (_) { /* next tick */ }
+}, 5000);
 </script>
 </body>
 </html>

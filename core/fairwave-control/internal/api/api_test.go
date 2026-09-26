@@ -1145,3 +1145,49 @@ func TestBackupRestoreWithPassphrase(t *testing.T) {
 		t.Fatalf("restore with passphrase: %d %s", wr2.Code, wr2.Body.String())
 	}
 }
+
+func TestEventsStreamSnapshot(t *testing.T) {
+	srv, tok := newTestServer(t)
+	h := srv.Handler()
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	req := httptest.NewRequest("GET", "/v1/events?interval=1s", nil).WithContext(ctx)
+	req.Header.Set("Authorization", "Bearer "+tok)
+	w := httptest.NewRecorder()
+
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		h.ServeHTTP(w, req)
+	}()
+
+	// Let two heartbeats flush, then cancel.
+	time.Sleep(2200 * time.Millisecond)
+	cancel()
+	<-done
+
+	res := w.Result()
+	if ct := res.Header.Get("Content-Type"); ct != "text/event-stream" {
+		t.Fatalf("content-type: %q", ct)
+	}
+	body := w.Body.String()
+	if !strings.Contains(body, "event: snapshot") {
+		t.Fatalf("expected snapshot events, got: %.300s", body)
+	}
+	if !strings.Contains(body, `"tx_armed"`) || !strings.Contains(body, `"sessions"`) {
+		t.Fatalf("snapshot missing keys: %.500s", body)
+	}
+}
+
+func TestEventsRequiresAuth(t *testing.T) {
+	srv, _ := newTestServer(t)
+	h := srv.Handler()
+	req := httptest.NewRequest("GET", "/v1/events", nil)
+	req.RemoteAddr = "203.0.113.9:1234" // non-loopback, no token
+	w := httptest.NewRecorder()
+	h.ServeHTTP(w, req)
+	if w.Code != http.StatusUnauthorized {
+		t.Fatalf("events without auth: %d, want 401", w.Code)
+	}
+}
