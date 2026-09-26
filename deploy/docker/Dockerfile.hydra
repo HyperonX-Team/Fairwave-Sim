@@ -1,0 +1,32 @@
+# Fairwave Hydra data-plane image - fairwave-hydra.
+#
+# Build context is the REPO ROOT:
+#   docker build -f deploy/docker/Dockerfile.hydra -t fairwave/hydra:0.1.0 .
+
+FROM golang:1.22-alpine AS build
+
+RUN apk add --no-cache git ca-certificates
+WORKDIR /src
+
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY core ./core
+
+ARG VERSION=0.1.0
+RUN CGO_ENABLED=0 GOOS=linux go build -trimpath \
+        -ldflags "-s -w -X main.Version=${VERSION}" \
+        -o /out/fairwave-hydra ./core/hydra/cmd/fairwave-hydra
+
+# The data plane forwards UDP, so it needs no shell; a static binary on
+# alpine is enough and keeps the image small.
+FROM alpine:3.20 AS runtime
+
+RUN adduser -D -u 10001 fairwave && apk add --no-cache ca-certificates
+COPY --from=build /out/fairwave-hydra /usr/local/bin/fairwave-hydra
+
+USER fairwave
+EXPOSE 7000/udp 10001-10032/udp
+
+ENTRYPOINT ["/usr/local/bin/fairwave-hydra"]
+CMD ["--config", "/etc/fairwave/hydra.yaml"]

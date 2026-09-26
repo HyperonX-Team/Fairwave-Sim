@@ -1,6 +1,9 @@
 package reorder
 
-import "testing"
+import (
+	"testing"
+	"time"
+)
 
 func TestInOrder(t *testing.T) {
 	b := New(8)
@@ -40,6 +43,29 @@ func TestOutOfOrderReassembly(t *testing.T) {
 	}
 }
 
+// TestLateFirstPacketIsHeld is the regression test for the bug where the
+// window aligned to the first packet seen and discarded the true first
+// packet as a duplicate.
+func TestLateFirstPacketIsHeld(t *testing.T) {
+	b := New(8)
+	if got := b.Push(2, []byte("b")); got != nil {
+		t.Fatalf("seq2 should buffer, got %v", got)
+	}
+	if got := b.Push(3, []byte("c")); got != nil {
+		t.Fatalf("seq3 should buffer, got %v", got)
+	}
+	got := b.Push(1, []byte("a"))
+	if len(got) != 3 {
+		t.Fatalf("late seq1 must release all three, got %d", len(got))
+	}
+	if string(got[0]) != "a" || string(got[1]) != "b" || string(got[2]) != "c" {
+		t.Fatalf("order = %q", got)
+	}
+	if s := b.Stats(); s.Duplicates != 0 {
+		t.Fatalf("late first packet counted as duplicate: %+v", s)
+	}
+}
+
 func TestDuplicateAfterDelivery(t *testing.T) {
 	b := New(8)
 	b.Push(1, []byte("a"))
@@ -75,25 +101,86 @@ func TestTooFarDrop(t *testing.T) {
 	}
 }
 
-func TestAlignToFirstSequence(t *testing.T) {
-	b := New(8)
-	// A weave that starts at sequence 100 must still deliver.
-	got := b.Push(100, []byte("a"))
-	if len(got) != 1 {
-		t.Fatalf("align failed: %v", got)
+func TestRespectsStartSequence(t *testing.T) {
+	b := NewAt(8, 100)
+	if got := b.Push(100, []byte("a")); len(got) != 1 {
+		t.Fatalf("start sequence not honoured: %v", got)
 	}
-	if b.Next() != 101 {
-		t.Fatalf("next = %d", b.Next())
+	if got := b.Push(99, []byte("z")); got != nil {
+		t.Fatalf("pre-start packet delivered: %v", got)
+	}
+	if s := b.Stats(); s.Duplicates != 1 {
+		t.Fatalf("stats: %+v", s)
+	}
+}
+
+func TestGapTimeoutSkipsLostPacket(t *testing.T) {
+	b := New(8)
+	now := time.Now()
+	b.now = func() time.Time { return now }
+	b.SetGapTimeout(100 * time.Millisecond)
+
+	b.Push(1, []byte("a")) // delivered, next=2
+	b.Push(3, []byte("c")) // buffered, gap at 2
+	if b.Depth() != 1 {
+		t.Fatalf("depth = %d", b.Depth())
+	}
+	// Sequence 2 never arrives; after the timeout the weave must resume.
+	now = now.Add(200 * time.Millisecond)
+	got := b.Push(4, []byte("d"))
+	if len(got) != 2 || string(got[0]) != "c" || string(got[1]) != "d" {
+		t.Fatalf("gap not skipped: %v", got)
+	}
+	if s := b.Stats(); s.Skipped != 1 {
+		t.Fatalf("stats: %+v", s)
+	}
+}
+
+func TestNoGapTimeoutByDefault(t *testing.T) {
+	b := New(8)
+	now := time.Now()
+	b.now = func() time.Time { return now }
+	b.Push(1, []byte("a"))
+	b.Push(3, []byte("c"))
+	now = now.Add(time.Hour)
+	if got := b.Push(4, []byte("d")); got != nil {
+		t.Fatalf("gap skipped without a configured timeout: %v", got)
+	}
+}
+
+func TestResyncAfterSenderRestart(t *testing.T) {
+	b := New(1 << 20)
+	for i := uint64(1); i <= 100; i++ {
+		b.Push(i, []byte{byte(i)})
+	}
+	// The sender restarts and begins again at 1. The first ResyncAfter-1
+	// packets look like duplicates...
+	for i := uint64(1); i < ResyncAfter; i++ {
+		if got := b.Push(i, []byte{1}); got != nil {
+			t.Fatalf("pre-resync packet %d delivered: %v", i, got)
+		}
+	}
+	// ...then the buffer re-aligns and resumes delivery.
+	got := b.Push(ResyncAfter, []byte("x"))
+	if len(got) != 1 {
+		t.Fatalf("resync did not resume delivery: %v", got)
+	}
+	if s := b.Stats(); s.Resyncs != 1 {
+		t.Fatalf("stats: %+v", s)
+	}
+	// The stream continues normally after the resync.
+	if got := b.Push(ResyncAfter+1, []byte("y")); len(got) != 1 {
+		t.Fatalf("post-resync delivery broken: %v", got)
 	}
 }
 
 func TestPayloadIsCopied(t *testing.T) {
 	b := New(8)
-	b.Push(1, []byte("a")) // align + deliver seq 1
+	b.Push(1, []byte("a"))
 	buf := []byte("mutate-me")
-	b.Push(3, buf) // buffered as a copy
+	b.Push(3, buf)
 	copy(buf, []byte("XXXXX"))
-	got := b.Push(2, []byte("b")) // drains 2 and 3
+	got := b.Push(2, []byte("b"))
 	if len(got) != 2 || string(got[1]) != "mutate-me" {
 		t.Fatalf("payload aliased caller buffer: %q", got)
 	}

@@ -1,0 +1,30 @@
+# Fairwave Hydra - edge node (the serving box that stripes its traffic).
+#
+# Threads point at the anchor's thread ports. Replace HOST with the anchor's
+# address (a Docker service name, a mesh hostname, or an IP).
+node_id: edge-1
+weave: neighborhood
+anchor: hub
+# Payloads arriving here (typically from the local UPF's N6/breakout) are
+# striped across the threads.
+ingress: 0.0.0.0:7100
+# Reassembled return traffic leaves here for the local LAN / UEs.
+egress: ""
+probe_interval: 2s
+probe_failures: 3
+queue_frames: 4096
+report: http://control-plane:8080
+report_interval: 5s
+threads:
+  - id: sim-a
+    local: 0.0.0.0:0
+    remote: HOST:10001
+    mbps: 300
+  - id: sim-b
+    local: 0.0.0.0:0
+    remote: HOST:10002
+    mbps: 300
+  - id: sim-c
+    local: 0.0.0.0:0
+    remote: HOST:10003
+    mbps: 300

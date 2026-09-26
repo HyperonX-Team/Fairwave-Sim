@@ -17,6 +17,23 @@ versions follow [SemVer](https://semver.org/spec/v2.0.0.html).
   aggregation), `fabric` (weave engine: strip/reassemble/ingest/bench),
   and `anchor` (egress interface). One box is capped by its own modem;
   a three-thread weave reports ~3x aggregate in `fairwave hydra bench`.
+- **Hydra data plane (`core/hydra/transport`, `core/hydra/node`,
+  `core/hydra/cmd/fairwave-hydra`):** a runnable node that actually carries
+  traffic. Per-thread UDP endpoints paced at each link's declared rate;
+  per-thread writer/reader goroutines; continuous liveness probing that
+  marks dead links down and recovers them automatically; a gap timeout so
+  a single lost datagram cannot stall the weave; per-weave egress
+  serialisation so payloads leave in order; and health reporting back to
+  the control plane. Bidirectional weaves over real UDP are covered by
+  integration tests.
+- **Hydra durability + live health:** threads and weaves persist
+  (`hydra_threads.json`, `hydra_weaves.json`) and restore on restart, so a
+  weave survives a control-plane restart; new
+  `POST /v1/hydra/threads/{id}/health` ingests a running node's measured
+  RTT/loss/up state into the scheduler and the store.
+- **`fairwave-hydra` daemon + image:** config-driven data-plane binary
+  (`deploy/config/fairwave-hydra.{anchor,edge}.yaml`), with
+  `deploy/docker/Dockerfile.hydra` and `make hydra-image`.
 - **Hydra control-plane API:** `GET /v1/hydra/status`, thread CRUD
   (`/v1/hydra/threads`), weave CRUD (`/v1/hydra/weaves`), per-weave stats,
   and lab strip/ingest/bench endpoints. RBAC: reads are viewer-role,

@@ -145,6 +145,10 @@ func NewWithOptions(cfg *config.ControlConfig, st *store.Store, id *identity.Ide
 		anchorName = "local"
 	}
 	s.hydra = fabric.NewEngine(anchor.NewSink(), fabric.WithAnchorName(anchorName))
+	// Restore persisted threads and weaves so a weave survives a restart.
+	if err := s.hydra.Restore(st.ListHydraThreads(), st.ListHydraWeaves()); err != nil {
+		log.Printf("hydra: restore persisted state: %v", err)
+	}
 	s.adminTok = strings.TrimSpace(os.Getenv(cfg.Auth.AdminTokenEnv))
 	if s.adminTok == "" {
 		tokPath := filepath.Join(cfg.Server.DataDir, "admin_token")

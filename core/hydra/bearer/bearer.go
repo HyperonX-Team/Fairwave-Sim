@@ -153,6 +153,20 @@ func (r *Registry) AggregateMbps() float64 {
 	return sum
 }
 
+// Update applies mutate in place to the thread with the given id,
+// reporting whether the thread existed. It is used by the data plane to
+// feed live link health (measured RTT, loss, up/down) into the scheduler.
+func (r *Registry) Update(id string, mutate func(*Thread)) bool {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	t, ok := r.threads[id]
+	if !ok {
+		return false
+	}
+	mutate(t)
+	return true
+}
+
 // AddQueue increases a thread's outstanding-byte counter.
 func (r *Registry) AddQueue(id string, bytes uint64) {
 	r.mu.Lock()

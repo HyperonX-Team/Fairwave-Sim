@@ -1,0 +1,31 @@
+# Fairwave Hydra - anchor node (the weave endpoint that owns real transit).
+#
+# Every thread is one independent SIM/modem/path. A thread's peer address is
+# learned from the first datagram it receives, so an anchor does not need to
+# be told its edges' addresses. See docs/architecture/hydra.md.
+node_id: anchor-1
+weave: neighborhood
+anchor: hub
+# Payloads arriving here are striped across the threads toward the edges.
+ingress: 0.0.0.0:7000
+# Reassembled payloads leave here for the local breakout / internet path.
+# Point it at the UPF's N6 gateway; empty discards (useful for a dry run).
+egress: ""
+# Continuous liveness probing: a thread that misses probe_failures probes in
+# a row is skipped by the scheduler and comes back automatically.
+probe_interval: 2s
+probe_failures: 3
+queue_frames: 4096
+# Report measured link health back to the control plane.
+report: http://control-plane:8080
+report_interval: 5s
+threads:
+  - id: sim-a
+    local: 0.0.0.0:10001
+    mbps: 300
+  - id: sim-b
+    local: 0.0.0.0:10002
+    mbps: 300
+  - id: sim-c
+    local: 0.0.0.0:10003
+    mbps: 300

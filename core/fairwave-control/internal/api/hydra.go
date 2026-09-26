@@ -44,6 +44,10 @@ func (s *Server) handleHydraAddThread(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusInternalServerError, "internal", "thread vanished after upsert")
 		return
 	}
+	if err := s.store.UpsertHydraThread(&stored); err != nil {
+		writeErr(w, http.StatusInternalServerError, "persist", err.Error())
+		return
+	}
 	writeJSON(w, http.StatusCreated, stored)
 }
 
@@ -53,8 +57,35 @@ func (s *Server) handleHydraDeleteThread(w http.ResponseWriter, r *http.Request)
 		writeErr(w, http.StatusNotFound, "not_found", "no such thread")
 		return
 	}
+	if err := s.store.DeleteHydraThread(id); err != nil {
+		writeErr(w, http.StatusInternalServerError, "persist", err.Error())
+		return
+	}
 	s.auditReq(r, "hydra_thread_remove", id, "")
 	w.WriteHeader(http.StatusNoContent)
+}
+
+// handleHydraThreadHealth ingests a running node's measured link health.
+// It is deliberately not audited: it fires on a heartbeat cadence and
+// would otherwise drown the append-only regulatory trail.
+func (s *Server) handleHydraThreadHealth(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("id")
+	var req api.HydraThreadHealth
+	if err := readJSON(r, &req); err != nil {
+		writeErr(w, http.StatusBadRequest, "bad_request", err.Error())
+		return
+	}
+	if !s.hydra.SetThreadHealth(id, req.Mbps, req.RTTms, req.LossPct, req.Up) {
+		writeErr(w, http.StatusNotFound, "not_found", "no such thread")
+		return
+	}
+	if t, ok := s.hydra.Thread(id); ok {
+		if err := s.store.UpsertHydraThread(&t); err != nil {
+			writeErr(w, http.StatusInternalServerError, "persist", err.Error())
+			return
+		}
+	}
+	writeJSON(w, http.StatusOK, map[string]any{"id": id, "up": req.Up})
 }
 
 // ---- weaves ----
@@ -85,6 +116,10 @@ func (s *Server) handleHydraCreateWeave(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 	s.auditReq(r, "hydra_weave_create", wv.ID, fmt.Sprintf("anchor=%s threads=%d", wv.Anchor, len(wv.Threads)))
+	if err := s.store.UpsertHydraWeave(&wv); err != nil {
+		writeErr(w, http.StatusInternalServerError, "persist", err.Error())
+		return
+	}
 	writeJSON(w, http.StatusCreated, wv)
 }
 
@@ -92,6 +127,10 @@ func (s *Server) handleHydraDeleteWeave(w http.ResponseWriter, r *http.Request) 
 	id := r.PathValue("id")
 	if !s.hydra.DeleteWeave(id) {
 		writeErr(w, http.StatusNotFound, "not_found", "no such weave")
+		return
+	}
+	if err := s.store.DeleteHydraWeave(id); err != nil {
+		writeErr(w, http.StatusInternalServerError, "persist", err.Error())
 		return
 	}
 	s.auditReq(r, "hydra_weave_delete", id, "")

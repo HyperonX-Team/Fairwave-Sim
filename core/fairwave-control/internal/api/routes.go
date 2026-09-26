@@ -60,6 +60,7 @@ func (s *Server) routes() {
 	m.HandleFunc("GET /v1/hydra/threads", s.handleHydraListThreads)
 	m.HandleFunc("POST /v1/hydra/threads", s.handleHydraAddThread)
 	m.HandleFunc("DELETE /v1/hydra/threads/{id}", s.handleHydraDeleteThread)
+	m.HandleFunc("POST /v1/hydra/threads/{id}/health", s.handleHydraThreadHealth)
 	m.HandleFunc("GET /v1/hydra/weaves", s.handleHydraListWeaves)
 	m.HandleFunc("POST /v1/hydra/weaves", s.handleHydraCreateWeave)
 	m.HandleFunc("GET /v1/hydra/weaves/{id}", s.handleHydraGetWeave)

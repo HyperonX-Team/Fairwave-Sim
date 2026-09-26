@@ -10,7 +10,7 @@ GO ?= go
 
 .PHONY: all check build test lint fmt gen docs docs-serve \
         lab-up lab-down lab-status compact-up compact-down compact-status rf-dry-run \
-        hydra-up hydra-down hydra-test \
+        hydra-up hydra-down hydra-test hydra-image \
         sbom release vet e2e help bootstrap
 
 all: check
@@ -45,6 +45,7 @@ build:
 	$(GO) build -ldflags "-X github.com/HyperonX-Team/Fairwave-Sim/core/fairwave-control/internal/api.Version=$(VERSION) -X github.com/HyperonX-Team/Fairwave-Sim/apps/fairwave-cli/internal/cli.Version=$(VERSION)" -o $(BIN_DIR)/fairwave-control ./core/fairwave-control/cmd/fairwave-control
 	$(GO) build -ldflags "-X github.com/HyperonX-Team/Fairwave-Sim/apps/fairwave-cli/internal/cli.Version=$(VERSION)" -o $(BIN_DIR)/fairwave-agent ./core/fairwave-agent/cmd/fairwave-agent
 	$(GO) build -ldflags "-X github.com/HyperonX-Team/Fairwave-Sim/apps/fairwave-cli/internal/cli.Version=$(VERSION)" -o $(BIN_DIR)/fairwave ./apps/fairwave-cli/cmd/fairwave
+	$(GO) build -ldflags "-X main.Version=$(VERSION)" -o $(BIN_DIR)/fairwave-hydra ./core/hydra/cmd/fairwave-hydra
 
 # ---- lab (no RF, zmq) ----
 lab-up:
@@ -96,6 +97,9 @@ hydra-down:
 hydra-test:
 	$(GO) test ./core/hydra/... -count=1 -v
 
+hydra-image:
+	docker build -f deploy/docker/Dockerfile.hydra -t fairwave/hydra:$(VERSION) .
+
 # ---- e2e (full lab: requires docker) ----
 e2e: lab-up
 
@@ -135,6 +139,7 @@ help:
 	@echo "  hydra-up        lab overlay: seed a Hydra weave and print the speedup bench"
 	@echo "  hydra-down      stop and wipe the Hydra overlay volumes"
 	@echo "  hydra-test      unit tests for the Hydra engine packages"
+	@echo "  hydra-image     build the fairwave-hydra data-plane container image"
 	@echo "  e2e             alias for lab-up"
 	@echo "  docs / docs-serve  build / serve MkDocs site"
 	@echo "  sbom            generate SPDX SBOM (+ cosign attest if present)"

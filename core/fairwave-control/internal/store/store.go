@@ -8,11 +8,14 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
 	"sync"
 
 	"time"
 
 	"github.com/HyperonX-Team/Fairwave-Sim/core/fairwave-control/api"
+	"github.com/HyperonX-Team/Fairwave-Sim/core/hydra/bearer"
+	"github.com/HyperonX-Team/Fairwave-Sim/core/hydra/fabric"
 )
 
 // Store persists nodes, SIMs, peers, sessions, health, the audit log, TX
@@ -31,6 +34,9 @@ type Store struct {
 	alerts   []*api.Alert
 	txArmed  bool
 	policy   *api.Policy
+
+	hydraThreads map[string]*bearer.Thread
+	hydraWeaves  map[string]*fabric.Weave
 }
 
 // Open creates the store directory and loads any existing state.
@@ -48,6 +54,9 @@ func Open(dir string) (*Store, error) {
 		usage:   map[string]*api.SimUsage{},
 		policy:  &api.Policy{LocalBreakout: true, MaxUEs: 128, APNs: []string{"internet", "ims"}},
 		txArmed: false,
+
+		hydraThreads: map[string]*bearer.Thread{},
+		hydraWeaves:  map[string]*fabric.Weave{},
 	}
 	if err := s.load(); err != nil {
 		return nil, err
@@ -69,6 +78,8 @@ func (s *Store) load() error {
 	loadJSON(filepath.Join(s.dir, "alerts.json"), &s.alerts)
 	loadJSON(filepath.Join(s.dir, "tx.json"), &s.txArmed)
 	loadJSON(filepath.Join(s.dir, "policy.json"), &s.policy)
+	loadJSON(filepath.Join(s.dir, "hydra_threads.json"), &s.hydraThreads)
+	loadJSON(filepath.Join(s.dir, "hydra_weaves.json"), &s.hydraWeaves)
 	return nil
 }
 
@@ -431,6 +442,64 @@ func (s *Store) SetPolicy(p *api.Policy) error {
 
 // Uptime helper for status endpoint.
 var startedAt = time.Now()
+
+// ---- hydra (cooperative bearer multiplexing) ----
+
+// UpsertHydraThread stores a weave thread so weaves survive a restart.
+func (s *Store) UpsertHydraThread(t *bearer.Thread) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.hydraThreads[t.ID] = t
+	return s.save("hydra_threads", s.hydraThreads)
+}
+
+// ListHydraThreads returns the persisted threads, sorted by id.
+func (s *Store) ListHydraThreads() []bearer.Thread {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	out := make([]bearer.Thread, 0, len(s.hydraThreads))
+	for _, t := range s.hydraThreads {
+		out = append(out, *t)
+	}
+	sort.Slice(out, func(i, j int) bool { return out[i].ID < out[j].ID })
+	return out
+}
+
+// DeleteHydraThread removes a persisted thread.
+func (s *Store) DeleteHydraThread(id string) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	delete(s.hydraThreads, id)
+	return s.save("hydra_threads", s.hydraThreads)
+}
+
+// UpsertHydraWeave stores a weave definition.
+func (s *Store) UpsertHydraWeave(w *fabric.Weave) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.hydraWeaves[w.ID] = w
+	return s.save("hydra_weaves", s.hydraWeaves)
+}
+
+// ListHydraWeaves returns the persisted weaves, sorted by id.
+func (s *Store) ListHydraWeaves() []fabric.Weave {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	out := make([]fabric.Weave, 0, len(s.hydraWeaves))
+	for _, w := range s.hydraWeaves {
+		out = append(out, *w)
+	}
+	sort.Slice(out, func(i, j int) bool { return out[i].ID < out[j].ID })
+	return out
+}
+
+// DeleteHydraWeave removes a persisted weave.
+func (s *Store) DeleteHydraWeave(id string) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	delete(s.hydraWeaves, id)
+	return s.save("hydra_weaves", s.hydraWeaves)
+}
 
 // Uptime returns seconds since the store opened.
 func Uptime() int64 { return int64(time.Since(startedAt).Seconds()) }

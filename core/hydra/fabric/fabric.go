@@ -98,6 +98,7 @@ type BenchResult struct {
 type weaveState struct {
 	w              Weave
 	rb             *reorder.Buffer
+	sendMu         sync.Mutex // serializes push+egress so payloads leave in order
 	seq            uint64
 	framesSent     uint64
 	bytesSent      uint64
@@ -204,8 +205,16 @@ func (e *Engine) CreateWeave(id, anchorName string, threadIDs []string) (Weave, 
 		Mode:      DefaultMode,
 		CreatedAt: e.now().UTC(),
 	}
-	e.weaves[id] = &weaveState{w: w, rb: reorder.New(0)}
+	e.weaves[id] = newWeaveState(w)
 	return w, nil
+}
+
+// newWeaveState builds a weave's state with a reassembler that starts at
+// sequence 1 and recovers from a lost packet after the default gap timeout.
+func newWeaveState(w Weave) *weaveState {
+	rb := reorder.NewAt(0, 1)
+	rb.SetGapTimeout(reorder.DefaultGapTimeout)
+	return &weaveState{w: w, rb: rb}
 }
 
 // validateThreads requires at least one known thread. Caller holds e.mu.
@@ -309,12 +318,28 @@ func (e *Engine) Reassemble(weaveID string, frame []byte) ([][]byte, error) {
 }
 
 // Ingest reassembles an inbound frame and forwards every now-contiguous
-// payload to the weave's anchor egress. It returns the number delivered.
+// payload to the weave's anchor egress, in order. Thread readers run
+// concurrently, so push and egress are serialized per weave: without that,
+// two readers could deliver two contiguous payloads and race to send them,
+// letting the egress observe them out of order. It returns the number
+// delivered.
 func (e *Engine) Ingest(weaveID string, frame []byte) (int, error) {
-	payloads, err := e.Reassemble(weaveID, frame)
+	h, payload, err := shim.Decode(frame)
 	if err != nil {
 		return 0, err
 	}
+	if h.WeaveID != weaveHash(weaveID) {
+		return 0, ErrWeaveMismatch
+	}
+	e.mu.Lock()
+	ws, ok := e.weaves[weaveID]
+	e.mu.Unlock()
+	if !ok {
+		return 0, ErrNoWeave
+	}
+	ws.sendMu.Lock()
+	defer ws.sendMu.Unlock()
+	payloads := ws.rb.Push(h.Seq, payload)
 	for _, p := range payloads {
 		if err := e.egress.Send(p); err != nil {
 			return 0, err
@@ -346,6 +371,54 @@ func (e *Engine) WeaveStats(id string) (WeaveStats, bool) {
 	return stats, true
 }
 
+// SetThreadHealth updates a thread's measured capability and liveness. It
+// is how a running data-plane node feeds live link health into the
+// scheduler: RTT and loss refine the projected completion time, and a
+// down thread is skipped entirely. A non-positive mbps leaves the declared
+// capacity untouched; a zero rttMs/lossPct on a healthy update is ignored
+// when the thread is being marked down.
+func (e *Engine) SetThreadHealth(id string, mbps, rttMs, lossPct float64, up bool) bool {
+	return e.reg.Update(id, func(t *bearer.Thread) {
+		if mbps > 0 {
+			t.Mbps = mbps
+		}
+		t.RTTms = rttMs
+		t.LossPct = lossPct
+		t.Up = up
+		t.LastSeen = e.now().UTC()
+	})
+}
+
+// Restore loads persisted threads and weaves into the engine at startup.
+// Threads are loaded first so weaves find them. Existing entries are kept
+// (a duplicate weave id is ignored) so a restore never clobbers live state.
+func (e *Engine) Restore(threads []bearer.Thread, weaves []Weave) error {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	for _, t := range threads {
+		if err := e.reg.Upsert(t); err != nil {
+			return err
+		}
+	}
+	for _, w := range weaves {
+		if w.ID == "" {
+			continue
+		}
+		if _, ok := e.weaves[w.ID]; ok {
+			continue
+		}
+		if w.Mode == "" {
+			w.Mode = DefaultMode
+		}
+		e.weaves[w.ID] = newWeaveState(w)
+	}
+	return nil
+}
+
+// WeaveHash is the 32-bit weave id carried in the shim header. The data
+// plane needs it to build probe frames for a weave.
+func WeaveHash(id string) uint32 { return weaveHash(id) }
+
 // Status returns the engine-wide summary.
 func (e *Engine) Status() Status {
 	e.mu.Lock()
@@ -354,7 +427,7 @@ func (e *Engine) Status() Status {
 	var delivered uint64
 	for _, ws := range e.weaves {
 		frames += ws.framesSent
-		delivered += ws.rb.Stats().Delivered + ws.benchDelivered
+		delivered += ws.rb.Stats().Delivered
 	}
 	up := e.reg.Up()
 	return Status{
@@ -405,9 +478,13 @@ func (e *Engine) Bench(weaveID string, packets, pktBytes int) (BenchResult, erro
 		bytes += uint64(r.FrameLen)
 	}
 
-	// A fresh reorder buffer sized to the batch, fed in an interleaved
-	// order (first, then evens, then odds) to exercise reassembly hard.
-	rb := reorder.New(uint64(packets) + 8)
+	// Feed the weave's own reassembler in an interleaved order (first, then
+	// evens, then odds) to exercise reassembly hard. Using the weave's
+	// buffer - not a throwaway one - keeps the sender's sequence and the
+	// receiver's expectation in lockstep, so a bench never desynchronises
+	// live traffic on the same weave. sendMu serialises against Ingest.
+	ws.sendMu.Lock()
+	defer ws.sendMu.Unlock()
 	start := e.now()
 	delivered := 0
 	feed := func(r StripResult) error {
@@ -415,7 +492,7 @@ func (e *Engine) Bench(weaveID string, packets, pktBytes int) (BenchResult, erro
 		if err != nil {
 			return err
 		}
-		delivered += len(rb.Push(r.Seq, payload))
+		delivered += len(ws.rb.Push(r.Seq, payload))
 		return nil
 	}
 	for i := 0; i < len(results); i += 2 {
@@ -429,6 +506,9 @@ func (e *Engine) Bench(weaveID string, packets, pktBytes int) (BenchResult, erro
 		}
 	}
 	elapsed := e.now().Sub(start)
+	ws.benchRuns++
+	ws.benchDelivered += uint64(delivered)
+	stats := ws.rb.Stats()
 
 	aggregate := e.reg.AggregateMbps()
 	single := 0.0
@@ -442,15 +522,6 @@ func (e *Engine) Bench(weaveID string, packets, pktBytes int) (BenchResult, erro
 		speedup = aggregate / single
 	}
 
-	// Record the bench so status/weave-stats reflect the synthetic run
-	// alongside the live reorder path.
-	e.mu.Lock()
-	if cur, ok := e.weaves[weaveID]; ok {
-		cur.benchRuns++
-		cur.benchDelivered += uint64(delivered)
-	}
-	e.mu.Unlock()
-
 	return BenchResult{
 		WeaveID:          weaveID,
 		Packets:          packets,
@@ -459,7 +530,7 @@ func (e *Engine) Bench(weaveID string, packets, pktBytes int) (BenchResult, erro
 		AggregateMbps:    aggregate,
 		SingleThreadMbps: single,
 		Speedup:          speedup,
-		Reorder:          rb.Stats(),
+		Reorder:          stats,
 		ElapsedMs:        float64(elapsed.Microseconds()) / 1000,
 	}, nil
 }

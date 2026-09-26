@@ -45,6 +45,11 @@ jobs:
           go build -o bin/fairwave-control ./core/fairwave-control/cmd/fairwave-control
           go build -o bin/fairwave-agent ./core/fairwave-agent/cmd/fairwave-agent
           go build -o bin/fairwave ./apps/fairwave-cli/cmd/fairwave
+          go build -o bin/fairwave-hydra ./core/hydra/cmd/fairwave-hydra
+      - name: Smoke the Hydra data-plane binary
+        run: |
+          ./bin/fairwave-hydra --version
+          ./bin/fairwave-hydra --help >/dev/null
       - name: Upload binaries
         uses: actions/upload-artifact@v4
         with:

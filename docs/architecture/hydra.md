@@ -75,6 +75,9 @@ credentials.
 | `core/hydra/reorder` | Bounded sliding-window reassembler + stats. |
 | `core/hydra/bearer` | Thread registry, capacity aggregation, queue accounting. |
 | `core/hydra/fabric` | Weave engine: strip, reassemble, ingest, bench, status. |
+| `core/hydra/transport` | Per-thread UDP endpoint: paced sends, loss hook, peer learning. |
+| `core/hydra/node` | The runtime: sockets, per-thread writers/readers, probing, health reporting. |
+| `core/hydra/cmd/fairwave-hydra` | The runnable data-plane daemon. |
 | `core/hydra/anchor` | Egress interface (real uplink, or a counting sink in the lab). |
 
 ## CLI
@@ -109,6 +112,41 @@ hydra bench: gig
   reorder events: 150 (max depth 150)
 ```
 
+## Running the data plane
+
+`fairwave-hydra` is the runtime. It stripes payloads arriving on its
+**ingress** socket across the configured threads and delivers reassembled
+payloads to its **egress** target. Two nodes with mirrored thread sockets
+form a bidirectional weave.
+
+```yaml
+# /etc/fairwave/hydra-edge.yaml
+node_id: edge-1
+weave: neighborhood
+anchor: hub
+ingress: 0.0.0.0:7100        # local traffic to stripe (from the UPF's N6)
+egress: ""                   # reassembled return traffic (empty = discard)
+probe_interval: 2s           # liveness probing
+probe_failures: 3            # consecutive misses before a thread goes down
+report: http://control-plane:8080   # report measured health back
+threads:
+  - {id: sim-a, local: 0.0.0.0:0, remote: anchor-1:10001, mbps: 300}
+  - {id: sim-b, local: 0.0.0.0:0, remote: anchor-1:10002, mbps: 300}
+  - {id: sim-c, local: 0.0.0.0:0, remote: anchor-1:10003, mbps: 300}
+```
+
+```bash
+fairwave-hydra --config /etc/fairwave/hydra-edge.yaml
+```
+
+Ready-made configs live in `deploy/config/fairwave-hydra.anchor.yaml` and
+`deploy/config/fairwave-hydra.edge.yaml`; the container image is built by
+`make hydra-image` (`deploy/docker/Dockerfile.hydra`).
+
+A node reports each thread's measured RTT and up/down state back to the
+control plane, so the dashboard shows live link health instead of only the
+declared values.
+
 ## REST surface
 
 Mutations are operator-role; reads are viewer-role.
@@ -118,6 +156,7 @@ Mutations are operator-role; reads are viewer-role.
 | GET | `/v1/hydra/status` | Weave summary |
 | GET/POST | `/v1/hydra/threads` | List / add threads |
 | DELETE | `/v1/hydra/threads/{id}` | Remove a thread |
+| POST | `/v1/hydra/threads/{id}/health` | Report measured link health from a running node |
 | GET/POST | `/v1/hydra/weaves` | List / create weaves |
 | GET/DELETE | `/v1/hydra/weaves/{id}` | Get / delete a weave |
 | GET | `/v1/hydra/weaves/{id}/stats` | Live weave counters |
@@ -128,15 +167,38 @@ Mutations are operator-role; reads are viewer-role.
 Metrics: `fairwave_hydra_threads`, `fairwave_hydra_threads_up`,
 `fairwave_hydra_weaves`, `fairwave_hydra_aggregate_mbps`.
 
-## Honest limits
+## Staying live
 
-- **Reorder costs memory and a little latency.** The window is bounded; a
-  packet beyond it is dropped rather than stalled.
-- **Heterogeneous NATs need the anchor.** The anchor is a mesh member with
-  real transit; the existing WireGuard fabric carries the threads.
-- **One thread is one ceiling.** Hydra cannot beat physics - it beats islands.
-- **Carrier terms of service** only bind when you do not own the SIMs. On a
-  Fairwave deployment you do, which is what makes weaving lawful here.
+A weave is only trustworthy if it survives a failing link:
+
+- **Per-thread writers** are paced at each link's declared rate, so the
+  scheduler's view of backlog is real and a fast link is never starved by
+  a slow one.
+- **Liveness probes** run continuously; a thread that misses
+  `probe_failures` probes in a row is marked down and skipped, and the
+  first successful probe brings it back. No operator action required.
+- **Gap recovery** means a single lost datagram cannot deadlock the
+  stream: if the expected sequence does not arrive within the gap timeout,
+  the reassembler abandons it and resumes. The packet is lost (the layer
+  above retransmits); the weave does not stall.
+- **Egress ordering** is serialized per weave, so payloads leave in the
+  order they were reassembled even though several thread readers run
+  concurrently.
+- **Durability**: threads and weaves are persisted by the control plane
+  (`hydra_threads.json`, `hydra_weaves.json`) and restored on restart.
+
+## Operational notes
+
+- **You must own the SIMs.** Multiplexing bearers is lawful here because
+  Fairwave issues its own SIMs and runs its own core. Bonding someone
+  else's SIMs is a terms-of-service violation.
+- **UDP semantics.** Hydra carries datagrams: it preserves boundaries and
+  order but not delivery. A packet lost on every thread stays lost.
+- **Capacity is declared, health is measured.** Operators declare each
+  thread's Mbps (the modem's known rate); RTT, loss, and up/down are
+  measured by probes and reported to the control plane.
+- **The anchor's uplink is the ceiling.** Threads are whatever the boxes
+  have; the anchor's transit link caps the total.
 
 ## Related
 

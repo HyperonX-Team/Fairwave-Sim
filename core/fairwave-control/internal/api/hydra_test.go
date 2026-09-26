@@ -162,6 +162,69 @@ func TestHydraBenchEndpoint(t *testing.T) {
 	}
 }
 
+func TestHydraPersistsAcrossRestart(t *testing.T) {
+	srv, tok := newTestServer(t)
+	h := srv.Handler()
+	doJSON(t, h, "POST", "/v1/hydra/threads", tok, api.HydraThreadRequest{ID: "p1", Mbps: 300, Up: true})
+	doJSON(t, h, "POST", "/v1/hydra/threads", tok, api.HydraThreadRequest{ID: "p2", Mbps: 200, Up: true})
+	doJSON(t, h, "POST", "/v1/hydra/weaves", tok, api.HydraWeaveRequest{ID: "pw", Threads: []string{"p1", "p2"}})
+
+	// A fresh server over the same store must restore both.
+	srv2 := New(srv.cfg, srv.store, srv.id, fakeChecker{}, nil)
+	h2 := srv2.Handler()
+	w := doJSON(t, h2, "GET", "/v1/hydra/threads", tok, nil)
+	var threads []bearer.Thread
+	_ = json.Unmarshal(w.Body.Bytes(), &threads)
+	if len(threads) != 2 {
+		t.Fatalf("restored threads = %d want 2", len(threads))
+	}
+	w = doJSON(t, h2, "GET", "/v1/hydra/weaves", tok, nil)
+	var weaves []fabric.Weave
+	_ = json.Unmarshal(w.Body.Bytes(), &weaves)
+	if len(weaves) != 1 || weaves[0].ID != "pw" {
+		t.Fatalf("restored weaves = %+v", weaves)
+	}
+	// A restored weave must be immediately usable.
+	if w := doJSON(t, h2, "POST", "/v1/hydra/weaves/pw/bench", tok, api.HydraBenchRequest{Packets: 20, PktBytes: 100}); w.Code != 200 {
+		t.Fatalf("bench after restore: %d %s", w.Code, w.Body.String())
+	}
+
+	// Deletion must also survive a restart.
+	doJSON(t, h, "DELETE", "/v1/hydra/weaves/pw", tok, nil)
+	srv3 := New(srv.cfg, srv.store, srv.id, fakeChecker{}, nil)
+	if _, ok := srv3.hydra.GetWeave("pw"); ok {
+		t.Fatal("deleted weave came back after restart")
+	}
+}
+
+func TestHydraThreadHealth(t *testing.T) {
+	srv, tok := newTestServer(t)
+	h := srv.Handler()
+	doJSON(t, h, "POST", "/v1/hydra/threads", tok, api.HydraThreadRequest{ID: "hh", Mbps: 300, Up: true})
+
+	w := doJSON(t, h, "POST", "/v1/hydra/threads/hh/health", tok,
+		api.HydraThreadHealth{Mbps: 0, RTTms: 12.5, LossPct: 1.2, Up: true})
+	if w.Code != 200 {
+		t.Fatalf("health: %d %s", w.Code, w.Body.String())
+	}
+	th, ok := srv.hydra.Thread("hh")
+	if !ok || th.RTTms != 12.5 || th.LossPct != 1.2 || th.Mbps != 300 {
+		t.Fatalf("thread = %+v (mbps must be preserved when 0)", th)
+	}
+
+	// Live health must persist across a restart.
+	srv2 := New(srv.cfg, srv.store, srv.id, fakeChecker{}, nil)
+	th2, _ := srv2.hydra.Thread("hh")
+	if th2.RTTms != 12.5 {
+		t.Fatalf("restored rtt = %v", th2.RTTms)
+	}
+
+	// Unknown thread is a 404, not a 500.
+	if w := doJSON(t, h, "POST", "/v1/hydra/threads/ghost/health", tok, api.HydraThreadHealth{Up: true}); w.Code != 404 {
+		t.Fatalf("ghost health: %d", w.Code)
+	}
+}
+
 func TestHydraRBAC(t *testing.T) {
 	srv, tok := newTestServer(t)
 	h := srv.Handler()

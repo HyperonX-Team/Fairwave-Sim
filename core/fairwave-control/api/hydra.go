@@ -52,3 +52,13 @@ type HydraBenchRequest struct {
 	Packets  int `json:"packets"`
 	PktBytes int `json:"pkt_bytes"`
 }
+
+// HydraThreadHealth is a running data-plane node's measured view of one
+// thread, reported back to the control plane so the operator sees live
+// link health rather than only the declared values.
+type HydraThreadHealth struct {
+	Mbps    float64 `json:"mbps"`
+	RTTms   float64 `json:"rtt_ms"`
+	LossPct float64 `json:"loss_pct"`
+	Up      bool    `json:"up"`
+}

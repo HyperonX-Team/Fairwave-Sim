@@ -173,6 +173,22 @@ paths:
       summary: Remove a bearer thread
       parameters:
         - { name: id, in: path, required: true, schema: { type: string } }
+  /v1/hydra/threads/{id}/health:
+    post:
+      summary: Report a running node's measured thread health (RTT, loss, up)
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                mbps: { type: number }
+                rtt_ms: { type: number }
+                loss_pct: { type: number }
+                up: { type: boolean }
   /v1/hydra/weaves:
     get:
       summary: List weaves
