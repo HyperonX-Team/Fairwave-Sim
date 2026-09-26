@@ -32,7 +32,10 @@ jobs:
       - name: Test (race)
         run: go test -race -count=1 ./...
       - name: Lint
-        uses: golangci/golangci-lint-action@v9
+        # golangci-lint-action >= v7 refuses golangci-lint v1, so pin the
+        # last action major that supports the v1.64.8 binary this repo's
+        # .golangci.yml (v1 schema) is written for.
+        uses: golangci/golangci-lint-action@v6
         with:
           version: v1.64.8
           args: --config=.golangci.yml ./...
