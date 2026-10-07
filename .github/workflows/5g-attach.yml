@@ -13,9 +13,15 @@ name: 5G attach
 #   - the ZMQ gNB needs CPU headroom; ubuntu-latest (4 vCPU) is the floor
 #     (the reference lab reports 5 cores for the gNB). If attach flakes
 #     here, move this job to a larger runner.
-#   - gtp5g must match the runner's kernel; v0.9.14 builds on the
-#     ubuntu-latest (24.04, kernel 6.8) headers. Override with
-#     GTP5G_REF=<tag> if the base image drifts.
+#   - gtp5g must match the runner's kernel AND kbuild generation:
+#     kbuild dropped EXTRA_*FLAGS in Linux 6.15 (torvalds/linux@e966ad0),
+#     so gtp5g <= v0.9.14 loses its include path and dies with
+#     `src/gtp5g.c:3: fatal error: genl.h: No such file or directory`.
+#     v0.9.14 additionally calls udp_tunnel_xmit_skb with the old arity
+#     and cannot build against 6.17 at all. gtp5g >= v0.10 uses
+#     ccflags-y and needs -Wno-error=missing-prototypes, which kbuild
+#     now treats as an error. Override with GTP5G_REF=<tag> if the base
+#     image drifts again.
 
 on:
   push:
@@ -45,7 +51,7 @@ on:
 
 env:
   FW_ADMIN_TOKEN: ci-admin
-  GTP5G_REF: v0.9.14 # builds on the ubuntu-24.04 runner kernel (6.8)
+  GTP5G_REF: v0.10.2 # ccflags-y include path, builds on kernels >= 6.15
 
 jobs:
   attach:
@@ -60,7 +66,9 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y linux-headers-$(uname -r) make gcc
           git clone --branch "${GTP5G_REF}" --depth 1 https://github.com/free5gc/gtp5g.git /tmp/gtp5g
-          cd /tmp/gtp5g && make && sudo make install
+          # kbuild on 6.15+ reports missing prototypes as errors; gtp5g has
+          # not added them yet (three helpers in src/gtpu/encap.c).
+          cd /tmp/gtp5g && make KCFLAGS="-Wno-error=missing-prototypes" && sudo make install
           sudo modprobe gtp5g || sudo insmod /tmp/gtp5g/gtp5g.ko
           lsmod | grep gtp5g
 
