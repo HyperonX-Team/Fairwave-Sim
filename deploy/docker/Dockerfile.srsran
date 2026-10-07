@@ -66,11 +66,18 @@ FROM debian:12-slim AS runtime
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
         procps ca-certificates \
+        iputils-ping iproute2 \
         libfftw3-single3 libmbedtls14 libboost-program-options1.74.0 \
         libconfig++9v5 libsctp1 libpcsclite1 \
         libzmq5 libyaml-cpp0.7 \
         libuhd4.3.0 libsoapysdr0.8 libbladerf2 \
     && rm -rf /var/lib/apt/lists/*
+# iputils-ping + iproute2: the e2e assertion and the lab-attach tutorial
+#   (`docker compose exec ue ping -I tun_srsue -c 3 8.8.8.8`) run ping/ip
+#   inside this container. Without them every data-path check fails with
+#   "command not found" and degrades to a warning, so a genuinely broken
+#   data path would be indistinguishable from the documented ZMQ timing
+#   limitation on Docker Desktop.
 
 COPY --from=build /usr/local/bin/srsenb /usr/local/bin/srsenb
 COPY --from=build /usr/local/bin/srsue /usr/local/bin/srsue
