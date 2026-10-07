@@ -85,6 +85,7 @@ Traffic exits via the PGW's NAT into your host network (local breakout), so exte
 | eNB shows `S1Setup` failing | Open5GS MME not ready | `docker compose restart enb` after open5gs is healthy |
 | ZMQ bind error on 2100/2200 | Port clash with another process | Change `ZMQ_PORT` env in compose or stop the competing process |
 | Control plane `state: degraded` | A container restarted | `docker compose ps`; check `fairwave doctor` output |
+| UE attaches, but external ping (`8.8.8.8`) fails | breakout prerequisites missing in the EPC container | `docker compose exec open5gs sh -c 'ip addr show dev ogstun; iptables -t nat -S POSTROUTING'` - `ogstun` must hold `10.45.0.1/16` and a `MASQUERADE` rule for `10.45.0.0/16` must exist (needs `iproute2` + `iptables`, see `deploy/docker/Dockerfile.open5gs`) |
 | No logs from `ue` | Container exited (bad config) | `docker compose logs ue --tail 50`; look for config parse errors |
 
 When in doubt, run `fairwave doctor` - it checks containers, ports, ZMQ sockets, control-plane connectivity, and prints a pass/fail table.

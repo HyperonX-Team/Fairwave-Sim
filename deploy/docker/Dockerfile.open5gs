@@ -37,11 +37,17 @@ FROM debian:12-slim AS runtime
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
         procps ca-certificates \
+        iproute2 iptables \
         libsctp1 libgnutls30 libgcrypt20 libssl3 \
         libmongoc-1.0-0 libbson-1.0-0 libyaml-0-2 \
         libmicrohttpd12 libcurl3-gnutls libnghttp2-14 \
         libtins-dev libtalloc2 libpcsclite1 libdw1 libidn12 \
     && rm -rf /var/lib/apt/lists/*
+# iproute2: the entrypoint configures ogstun (`ip addr add 10.45.0.1/16`,
+#           `ip link set up`); without it the tun device stays down and
+#           unaddressed, so no UE data path can ever come up.
+# iptables: local breakout (ADR-0005) SNATs the UE pool out of the WAN;
+#           without it UE traffic has no return path.
 # NOTE: libtins-dev is deliberately used at runtime - its name is ABI-stable
 # while the plain runtime package (libtinsX) varies with distro versioning.
 # Trim it to the exact package once your base is pinned.
@@ -83,10 +89,30 @@ cat > /usr/local/bin/open5gs-entry.sh <<'SH'
 set -u
 mkdir -p /var/log/open5gs /var/local/log/open5gs
 # Create the UPF data interface (ogstun) for UE traffic (10.45.0.1/16).
+# iproute2 ships in the runtime image; without it these calls fail silently
+# and ogstun stays down/unaddressed, so no UE data path can ever come up -
+# report it loudly instead of swallowing the error.
 if command -v ip >/dev/null 2>&1; then
     ip tuntap add dev ogstun mode tun 2>/dev/null || true
     ip addr add 10.45.0.1/16 dev ogstun 2>/dev/null || true
     ip link set ogstun up 2>/dev/null || true
+else
+    echo "[open5gs-entry] ERROR: iproute2 missing - ogstun not configured, UE data path down"
+fi
+# Local breakout (ADR-0005): SNAT the UE pool out of the box's WAN so
+# subscribers reach the Internet. Needs iptables + CAP_NET_ADMIN (the
+# compose file grants NET_ADMIN to this service).
+if command -v iptables >/dev/null 2>&1; then
+    # Best effort: Docker already sets ip_forward=1 in the container netns,
+    # and /proc/sys is read-only under some runtimes (guard, don't spam logs).
+    if [ -w /proc/sys/net/ipv4/ip_forward ]; then
+        echo 1 > /proc/sys/net/ipv4/ip_forward || true
+    fi
+    iptables -t nat -C POSTROUTING -s 10.45.0.0/16 ! -o ogstun -j MASQUERADE 2>/dev/null || \
+        iptables -t nat -A POSTROUTING -s 10.45.0.0/16 ! -o ogstun -j MASQUERADE 2>/dev/null || \
+        echo "[open5gs-entry] WARNING: breakout MASQUERADE rule not installed"
+else
+    echo "[open5gs-entry] ERROR: iptables missing - local breakout NAT unavailable"
 fi
 ALL_DAEMONS=(open5gs-nrfd open5gs-mmed open5gs-sgwcd open5gs-sgwud open5gs-smfd open5gs-upfd open5gs-hssd open5gs-pcrfd)
 if [[ -n "${FW_DAEMONS:-}" ]]; then

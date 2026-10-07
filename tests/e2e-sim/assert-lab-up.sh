@@ -8,9 +8,10 @@
 #   3. UE does RRC attach + random access on the lab PLMN
 #   4. UE completes NAS authentication + security mode (milenage against HSS)
 #   5. MME creates the PDN session and allocates a UE IP
-#   6. (if the host supports stable ZMQ timing) full data path via tun_srsue
+#   6. local breakout prerequisites (ogstun + WAN SNAT rule) - ADR-0005
+#   7. (if the host supports stable ZMQ timing) full data path via tun_srsue
 #
-# NOTE on step 6: the srsENB/srsUE ZMQ loopback needs low-latency,
+# NOTE on step 7: the srsENB/srsUE ZMQ loopback needs low-latency,
 # low-jitter scheduling. On native Linux it passes reliably. Under Docker
 # Desktop (Windows/macOS, WSL2) the PHY can lose subframe sync (SYNC TRACK
 # ret=-1) and the attach accept delivery fails even though the EPC side
@@ -56,7 +57,29 @@ wait_for fairwave-lab-ue1-1 "Security Mode" "UE security mode (NAS auth) started
 wait_for fairwave-lab-open5gs-1 "Bearer added (EBI=5" "MME created default bearer" || fail=1
 wait_for fairwave-lab-open5gs-1 "Attach accept" "MME sent Attach Accept (UE IP allocated)" || fail=1
 
-# 6. Data path (host-dependent - see note above)
+# 6. Local breakout (ADR-0005): the EPC must be able to SNAT UE traffic out
+#    of the WAN. Both halves live inside the EPC container's netns, so this
+#    is host-independent and must always hold - a missing iproute2/iptables
+#    in the runtime image used to break it silently.
+echo "== local breakout check =="
+if docker exec fairwave-lab-open5gs-1 sh -c \
+    'ip addr show dev ogstun 2>/dev/null | grep -q "inet 10.45.0.1/16"'; then
+  echo "[ok] ogstun configured with 10.45.0.1/16 (UE data interface up)"
+else
+  echo "[fail] ogstun missing or has no 10.45.0.1/16 address - UE data path dead"
+  echo "       (check iproute2 in the runtime image: deploy/docker/Dockerfile.open5gs)"
+  fail=1
+fi
+if docker exec fairwave-lab-open5gs-1 sh -c \
+    'iptables -t nat -C POSTROUTING -s 10.45.0.0/16 ! -o ogstun -j MASQUERADE'; then
+  echo "[ok] breakout SNAT rule present (10.45.0.0/16 -> WAN)"
+else
+  echo "[fail] no MASQUERADE rule for the UE pool - subscriber traffic blackholes"
+  echo "       (check iptables in the runtime image: deploy/docker/Dockerfile.open5gs)"
+  fail=1
+fi
+
+# 7. Data path (host-dependent - see note above)
 echo "== data path check (best effort) =="
 if docker exec fairwave-lab-ue1-1 ping -c 2 -W 2 10.45.0.1 >/dev/null 2>&1; then
   echo "[ok] ue1 -> 10.45.0.1 (tun_srsue) reachable"
